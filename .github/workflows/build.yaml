@@ -14,11 +14,11 @@ jobs:
           latexmk_use_xelatex: true
 
       - name: ©️ Copy to build folder ©️
-        run: bash -c 'mkdir build && cp cv.pdf build/cv.pdf'
+        run: bash -c 'cp cv.pdf gh-pages/cv.pdf'
 
       - name: 🚀 Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4.5.0
         with:
           branch: gh-pages
-          folder: build
+          folder: gh-pages
           single-commit: true
