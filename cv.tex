@@ -1,0 +1,214 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Deedy CV/Resume
+% XeLaTeX Template
+% Version 1.0 (5/5/2014)
+%
+% This template has been downloaded from:
+% http://www.LaTeXTemplates.com
+%
+% Original author:
+% Debarghya Das (http://www.debarghyadas.com)
+% With extensive modifications by:
+% Vel (vel@latextemplates.com)
+%
+% License:
+% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[]{deedy-resume} 
+
+\begin{document}
+%
+%----------------------------------------------------------------------------------------
+%	TITLE SECTION
+%----------------------------------------------------------------------------------------
+%
+\lastupdated % Print the Last Updated text at the top right
+ 
+\begin{minipage}[t]{0.60\textwidth}
+
+\blockspace
+\namesection{Anton}{Ugarov}{Highly qualified software engineer with 6+ years of experience in C++ development. Proactive and responsible team player focused on self-performance.}
+
+\end{minipage}
+\hfill
+\columnspace
+%
+%----------------------------------------------------------------------------------------
+%	CONTACTS & LINKS
+%----------------------------------------------------------------------------------------
+%
+\begin{minipage}[t]{0.35\textwidth}
+
+\blockspace
+\colorbox{shade}{
+\begin{supertabular}{@{\hspace{3pt}} p{0.05\linewidth} p{0.775\linewidth}} 
+    \raisebox{-1pt}{\faHome} & Cyprus, Nicosia \\
+    \raisebox{-1pt}{\small\faEnvelope} & \href{mailto:deligor6321@gmail.com}{\bf deligor6321@gmail.com} \\
+    \raisebox{-1pt}{\faLinkedin} & \href{https://www.linkedin.com/in/antonugarov}{\bf linkedin.com/in/antonugarov} \\
+    \raisebox{-1pt}{\faTelegramPlane} & \href{https://t.me/Deligor}{\bf t.me/Deligor} \\
+    \raisebox{-1pt}{\faGithub} & \href{https://github.com/Deligor6321}{\bf github.com/Deligor6321} \\
+\end{supertabular}
+}
+
+\end{minipage}
+
+\blockspace
+
+%----------------------------------------------------------------------------------------
+%	LEFT COLUMN
+%----------------------------------------------------------------------------------------
+
+\begin{minipage}[t]{0.25\textwidth}
+
+%------------------------------------------------
+% Skills
+%------------------------------------------------
+
+\section{Skills}
+
+\location{Expert:}
+\begin{tightitemize}
+    \item C++ 
+    \item STL
+    \item Multithreading
+    \item Performance
+\end{tightitemize}
+
+\location{Intermediate:}
+\begin{tightitemize}
+    \item Boost
+    \item Python
+    \item PostgreSQL
+    \item Protobuf
+    \item HTTP
+    \item Bash
+    \item Linux
+\end{tightitemize}
+
+\location{Basic:}
+\begin{tightitemize}
+    \item Qt
+    \item OpenCV
+    \item MetalKit
+\end{tightitemize}
+
+\sectionspace 
+
+%------------------------------------------------
+% Languages
+%------------------------------------------------
+
+\section{Languages}
+\textbf{English} / B2 \\
+\textbf{Russian} / native
+
+\sectionspace
+
+%------------------------------------------------
+% Education
+%------------------------------------------------
+
+\section{Education} 
+
+\runsubsection{State Electrotechnical University "LETI"} \\
+\descript{BS in Computer Science}
+\location{2015 - 2019 | St. Petersburg}
+Computer Systems Engineering and Informatics \\
+Specialization: Computer Aided Design Systems \\
+\textbf{Cum. GPA}: \textit{4.57 / 5.0} \\
+\textbf{Major GPA}: \textit{4.60 / 5.0}
+
+\sectionspace
+
+%----------------------------------------------------------------------------------------
+
+\end{minipage}
+\hfill
+\columnspace
+%
+%----------------------------------------------------------------------------------------
+%	RIGHT COLUMN
+%----------------------------------------------------------------------------------------
+%
+\begin{minipage}[t]{0.70\textwidth}
+
+%------------------------------------------------
+% Experience
+%------------------------------------------------
+
+\section{Experience}
+
+\runsubsection{WANNA}
+\descript{| Software Engineer}
+\location{Jun 2022 - PRESENT | Limassol, Cyprus}
+
+Developing a cross-platform C++ library which provides a virtual try-on experience. 
+\begin{tightitemize}
+    \tightitem The key responsibility is to design and implement \textbf{high-performance} solutions while keeping the \textbf{library size} as small as possible.
+    \tightitem Working with bare \textbf{C++20}, designing \textbf{universal C API} to interact with platform native frontends, and writing glue code on \textbf{Objective-C}.
+    \tightitem Successfully developed a \textbf{3D viewer} for handbags.
+    \tightitem Converted the old codebase to use the \textbf{new render engine}.
+\end{tightitemize}
+\textbf{Stack}: \textit{C++20 / Objective-C / OpenCV / Metal / CoreML / CMake / Conan / GoogleTest}
+
+\sectionspace
+
+%------------------------------------------------
+
+\runsubsection{Yandex}
+\descript{| Software Engineer}
+\location{Mar 2020 - May 2022 | St. Petersburg, Russia}
+
+Worked on a high-load \textbf{C++17} backend for Yandex.Messenger app. The challenge was to write an \textbf{efficient} and \textbf{secure} asynchronous code to ensure \textbf{system resilience}.
+\begin{tightitemize}
+    \tightitem Contributed to \textbf{Json/Protobuf APIs}, message processing conveyor, and data storage (\textbf{PostgreSQL/YDB}).
+    \tightitem Handled the features from scratch to production - design, develop, test, deploy, admin.
+    \tightitem Set up \textbf{sharding} and \textbf{load balancing} for the support service.
+    \tightitem \textbf{Optimized} in-memory cache storage which significantly decreased the RAM consumption of the service.
+    \tightitem Had experience with \textbf{Python3} projects (aiohttp, uwsgi, pytests).
+\end{tightitemize}
+\textbf{Stack}: \textit{C++17 / Python3 / Protobuf / PostgreSQL / YDB}
+
+\sectionspace
+
+%------------------------------------------------
+
+\runsubsection{Tensor}
+\descript{| Software Engineer}
+\location{Jun 2018 - Feb 2020 | St. Petersburg, Russia}
+
+Worked on a cross-platform \textbf{C++14 / Boost} library that implements the business logic of the \textbf{Android/iOS} mobile app for the courier service.
+\begin{tightitemize}
+    \tightitem Redesigned the overall library \textbf{architecture} which greatly reduced the time to market for new features.
+    \tightitem Implemented seamless interactions between the backend (via \textbf{JsonRPC}) and the system native frontend (via \textbf{Djinni}-generated native bridges), including caching to a local \textbf{SQLite} database to ensure a smooth user experience even in conditions of poor Internet connection.
+    \tightitem Designed the universal \textbf{CRUD API} for the library.
+\end{tightitemize}
+\textbf{Stack}: \textit{C++14 / Boost / JNI / Djinni / SQLite / Conan / CMake / Boost.Test}
+
+\sectionspace
+
+%------------------------------------------------
+
+\runsubsection{Confident}
+\descript{| Embedded System Developer, Part-time}
+\location{Mar 2018 - Jun 2018 | St. Petersburg, Russia}
+
+Engaged in the development of a security firewall device. Set up an OpenWRT build on the dedicated server. Provided mirroring of the project dependencies to local servers for steady access to the work environment.
+
+\sectionspace
+
+%------------------------------------------------
+
+\runsubsection{Clicknet}
+\descript{| Embedded System Developer, Part-time}
+\location{Jul 2017 - Mar 2018 | St. Petersburg, Russia}
+
+Had a short experience with automotive embedded systems like AGL/Yocto running on Raspberry Pi and Intel Minnowboard. Worked on boot time optimization, and Chromium integration.
+
+\sectionspace
+
+\end{minipage}
+
+\end{document}
