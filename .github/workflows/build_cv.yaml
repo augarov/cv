@@ -34,4 +34,4 @@ jobs:
 
   run_deploy_pages:
     name: Run deploy workflowss
-    uses: ./.github/workflows/deploy_pages.yml
+    uses: ./.github/workflows/deploy_pages.yaml
