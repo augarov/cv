@@ -1,8 +1,10 @@
 # Curriculum Vitae / Résumé
 
-### Links
-[Preview](https://deligor6321.github.io/cv/) [Download](https://deligor6321.github.io/cv/cv.pdf)
+[![Build CV](https://github.com/Deligor6321/cv/actions/workflows/build_cv.yaml/badge.svg)](https://github.com/Deligor6321/cv/actions/workflows/build_cv.yaml)
+[![Build & deploy GitHub Pages](https://github.com/Deligor6321/cv/actions/workflows/deploy_pages.yaml/badge.svg)](https://github.com/Deligor6321/cv/actions/workflows/deploy_pages.yaml)
 
-### CI 
-[![Build LaTeX document](https://github.com/Deligor6321/cv/actions/workflows/build.yaml/badge.svg)](https://github.com/Deligor6321/cv/actions/workflows/build.yaml)
-[![pages-build-deployment](https://github.com/Deligor6321/cv/actions/workflows/pages/pages-build-deployment/badge.svg)](https://github.com/Deligor6321/cv/actions/workflows/pages/pages-build-deployment)
+### Links
+
+[Online preview](https://deligor6321.github.io/cv/)
+
+[Download latest build](https://github.com/Deligor6321/cv/releases/download/main/cv.pdf)
