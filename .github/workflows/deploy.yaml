@@ -1,4 +1,5 @@
-name: Deploy GitHub Pages
+name: Build & deploy GitHub Pages
+
 on:
   push:
     branches:
@@ -6,8 +7,10 @@ on:
     paths:
       - '.github/workflows/deploy.yaml'
       - 'gh-pages/**'
+
 jobs:
-  deploy_pages:
+  build:
+    name: Build
     runs-on: ubuntu-latest
     steps:
       - name: 🛎️ Checkout 🛎️
@@ -16,15 +19,9 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
 
-      - name: Prepare build directory
-        shell: bash
-        run: |
-          mkdir build
-          cp gh-pages/* build/
-
       - name: Install npm dependencies
         shell: bash
-        working-directory: build
+        working-directory: gh-pages
         run: npm install
 
       - name: Download latest release
@@ -32,11 +29,34 @@ jobs:
         with:
           latest: true
           fileName: cv.pdf
-          out-file-path: build
+          out-file-path: gh-pages
 
-      - name: 🚀 Deploy 🚀
-        uses: JamesIves/github-pages-deploy-action@v4.5.0
+      - name: Archive the website
+        shell: bash
+        run: |
+          tar \
+            --dereference --hard-dereference \
+            --directory gh-pages \
+            -cvf "$RUNNER_TEMP/website.tar" \
+            --exclude=.gitignore \
+            .
+
+      - name: Upload the website
+        uses: actions/upload-artifact@v4
         with:
-          branch: gh-pages
-          folder: build
-          single-commit: true
+          name: github-pages
+          path: ${{ runner.temp }}/website.tar
+          retention-days: 1
+          if-no-files-found: error
+
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      pages: write  # Required to deploy to GitHub Pages.
+      id-token: write  # Required to verify that the deployment originates from this workflow.
+
+    steps:
+      - name: Deploy the website
+        uses: actions/deploy-pages@v4
