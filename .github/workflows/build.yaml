@@ -1,5 +1,13 @@
 name: Build LaTeX document
-on: [push]
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'cv.tex'
+      - 'deedy-resume.cls'
+
 jobs:
   build_latex:
     runs-on: ubuntu-latest
@@ -13,12 +21,10 @@ jobs:
           root_file: cv.tex
           latexmk_use_xelatex: true
 
-      - name: ©️ Copy to build folder ©️
-        run: bash -c 'cp cv.pdf gh-pages/cv.pdf'
-
-      - name: 🚀 Deploy 🚀
-        uses: JamesIves/github-pages-deploy-action@v4.5.0
+      - name: Upload files to release
+        uses: svenstaro/upload-release-action@v2
         with:
-          branch: gh-pages
-          folder: gh-pages
-          single-commit: true
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: cv.pdf
+          asset_name: cv
+          overwrite: true
