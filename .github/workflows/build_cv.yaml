@@ -34,4 +34,7 @@ jobs:
 
   run_deploy_pages:
     name: Run deploy workflowss
+    permissions:
+      pages: write  # Required to deploy to GitHub Pages.
+      id-token: write  # Required to verify that the deployment originates from this workflow.
     uses: ./.github/workflows/deploy_pages.yaml
