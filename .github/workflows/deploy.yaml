@@ -57,6 +57,10 @@ jobs:
       pages: write  # Required to deploy to GitHub Pages.
       id-token: write  # Required to verify that the deployment originates from this workflow.
 
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
     steps:
       - name: Deploy the website
         uses: actions/deploy-pages@v4
