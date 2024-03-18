@@ -1,0 +1,36 @@
+name: Deploy GitHub Pages
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/deploy.yaml'
+      - 'gh-pages/**'
+jobs:
+  deploy_pages:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🛎️ Checkout 🛎️
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+
+      - name: Install npm dependencies
+        shell: bash
+        working-directory: gh-pages
+        run: npm install
+
+      - name: Download latest release
+        uses: robinraju/release-downloader@v1.9
+        with:
+          latest: true
+          fileName: "cv.pdf"
+          out-file-path: "gh-pages"
+
+      - name: 🚀 Deploy 🚀
+        uses: JamesIves/github-pages-deploy-action@v4.5.0
+        with:
+          branch: gh-pages
+          folder: gh-pages
+          single-commit: true
