@@ -19,13 +19,13 @@
     <body>
         <canvas id="pdf-viewer-canvas"></canvas>
 
-        <script src="node_modules/pdfjs-dist/build/pdf.mjs" type="module"></script>
+        <script src="node_modules/pdfjs-dist/build/pdf.min.mjs" type="module"></script>
 
         <script id="script" type="module">
             const url = 'cv.pdf';
 
             pdfjsLib.GlobalWorkerOptions.workerSrc =
-                'node_modules/pdfjs-dist/build/pdf.worker.mjs';
+                'node_modules/pdfjs-dist/build/pdf.worker.min.mjs';
 
             //
             // Asynchronous download PDF
