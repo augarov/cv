@@ -14,17 +14,17 @@
                 margin: 0px;
                 padding: 0px;
             }
-            #pdf-viewer-box {
+            #pdf-viewer-canvas {
                 position: absolute;
                 left: 50%;
                 transform: translate(-50%, 0%);
+                width: 100%;
+                height: auto;
             }
         </style>
     </head>
     <body>
-        <div id="pdf-viewer-box">
-            <canvas id="pdf-viewer-canvas"></canvas>
-        </div>
+        <canvas id="pdf-viewer-canvas"></canvas>
 
         <script src="node_modules/pdfjs-dist/build/pdf.min.mjs" type="module"></script>
 
@@ -57,8 +57,8 @@
 
             canvas.width = Math.floor(viewport.width * outputScale);
             canvas.height = Math.floor(viewport.height * outputScale);
-            canvas.style.width = Math.floor(viewport.width) + "px";
-            canvas.style.height = Math.floor(viewport.height) + "px";
+
+            canvas.style.maxWidth = Math.floor(viewport.width) + "px";
 
             const transform = outputScale !== 1
                 ? [outputScale, 0, 0, outputScale, 0, 0]
