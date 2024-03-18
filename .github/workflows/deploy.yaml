@@ -39,7 +39,8 @@ jobs:
   
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
-        path: gh-pages/
+        with:
+          path: gh-pages/
 
   deploy:
     name: Deploy
