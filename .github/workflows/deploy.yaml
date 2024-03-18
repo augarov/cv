@@ -31,23 +31,15 @@ jobs:
           fileName: cv.pdf
           out-file-path: gh-pages
 
-      - name: Archive the website
-        shell: bash
+      - name: Fix permissions
         run: |
-          tar \
-            --dereference --hard-dereference \
-            --directory gh-pages \
-            -cvf "$RUNNER_TEMP/website.tar" \
-            --exclude=.gitignore \
-            .
-
-      - name: Upload the website
-        uses: actions/upload-artifact@v4
-        with:
-          name: github-pages
-          path: ${{ runner.temp }}/website.tar
-          retention-days: 1
-          if-no-files-found: error
+          chmod -v -R +rX "gh-pages" | while read line; do
+            echo "::warning title=Invalid file permissions automatically fixed::$line"
+          done
+  
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        path: gh-pages/
 
   deploy:
     name: Deploy
