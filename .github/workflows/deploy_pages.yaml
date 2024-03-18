@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - '.github/workflows/deploy.yaml'
+      - '.github/workflows/deploy_pages.yaml'
       - 'gh-pages/**'
 
 jobs:
