@@ -16,21 +16,27 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
 
+      - name: Prepare build directory
+        shell: bash
+        run: |
+          mkdir build
+          cp gh-pages/* build/
+
       - name: Install npm dependencies
         shell: bash
-        working-directory: gh-pages
+        working-directory: build
         run: npm install
 
       - name: Download latest release
         uses: robinraju/release-downloader@v1.9
         with:
           latest: true
-          fileName: "cv.pdf"
-          out-file-path: "gh-pages"
+          fileName: cv.pdf
+          out-file-path: build
 
       - name: 🚀 Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4.5.0
         with:
           branch: gh-pages
-          folder: gh-pages
+          folder: build
           single-commit: true
