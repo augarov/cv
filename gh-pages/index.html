@@ -14,10 +14,17 @@
                 margin: 0px;
                 padding: 0px;
             }
+            #pdf-viewer-box {
+                position: absolute;
+                left: 50%;
+                transform: translate(-50%, 0%);
+            }
         </style>
     </head>
     <body>
-        <canvas id="pdf-viewer-canvas"></canvas>
+        <div id="pdf-viewer-box">
+            <canvas id="pdf-viewer-canvas"></canvas>
+        </div>
 
         <script src="node_modules/pdfjs-dist/build/pdf.min.mjs" type="module"></script>
 
