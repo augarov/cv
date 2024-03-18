@@ -33,7 +33,8 @@ jobs:
           body: "Latest build"
 
   run_deploy_pages:
-    name: Run deploy workflowss
+    name: Deploy GH Pages
+    needs: build_latex
     permissions:
       pages: write  # Required to deploy to GitHub Pages.
       id-token: write  # Required to verify that the deployment originates from this workflow.
