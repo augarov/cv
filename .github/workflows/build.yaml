@@ -25,7 +25,8 @@ jobs:
       - name: Upload files to release
         uses: svenstaro/upload-release-action@v2
         with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: cv.pdf
-          asset_name: cv
+          asset_name: cv.pdf
           overwrite: true
+          release_name: cv-latest
+          body: "Latest build"
