@@ -17,12 +17,55 @@
         </style>
     </head>
     <body>
-    <iframe
-        src="https://drive.google.com/viewerng/viewer?embedded=true&url=https://deligor6321.github.io/cv/cv.pdf#toolbar=0&scrollbar=0"
-        frameBorder="0"
-        scrolling="auto"
-        height="100%"
-        width="100%"
-    ></iframe>
+        <canvas id="pdf-viewer-canvas"></canvas>
+
+        <script src="node_modules/pdfjs-dist/build/pdf.mjs" type="module"></script>
+
+        <script id="script" type="module">
+            const url = 'cv.pdf';
+
+            pdfjsLib.GlobalWorkerOptions.workerSrc =
+                'node_modules/pdfjs-dist/build/pdf.worker.mjs';
+
+            //
+            // Asynchronous download PDF
+            //
+            const loadingTask = pdfjsLib.getDocument(url);
+            const pdf = await loadingTask.promise;
+
+            //
+            // Fetch the first page
+            //
+            const page = await pdf.getPage(1);
+            const scale = 1.5;
+            const viewport = page.getViewport({ scale });
+            // Support HiDPI-screens.
+            const outputScale = window.devicePixelRatio || 1;
+
+            //
+            // Prepare canvas using PDF page dimensions
+            //
+            const canvas = document.getElementById("pdf-viewer-canvas");
+            const context = canvas.getContext("2d");
+
+            canvas.width = Math.floor(viewport.width * outputScale);
+            canvas.height = Math.floor(viewport.height * outputScale);
+            canvas.style.width = Math.floor(viewport.width) + "px";
+            canvas.style.height = Math.floor(viewport.height) + "px";
+
+            const transform = outputScale !== 1
+                ? [outputScale, 0, 0, outputScale, 0, 0]
+                : null;
+
+            //
+            // Render PDF page into canvas context
+            //
+            const renderContext = {
+                canvasContext: context,
+                transform,
+                viewport,
+            };
+            page.render(renderContext);
+        </script>
 </body>
 </html>
