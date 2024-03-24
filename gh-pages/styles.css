@@ -25,14 +25,16 @@ html, body, canvas {
     box-shadow: none;
     outline: none;
     border-radius: 5px;
+    user-select: none;
 }
 
-#pdf-viewer-canvas {
+#pdf-viewer-container {
+    overflow: auto;
     position: absolute;
     padding-bottom: 50px;
     left: 50%;
     transform: translate(-50%, 0%);
     width: 100%;
+    max-width: 1000px;
     height: auto;
-    z-index: -1;
 }
