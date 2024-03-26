@@ -5,29 +5,6 @@ html, body, canvas {
     padding: 0px;
 }
 
-#toolbar {
-    position: fixed;
-    width: 100%;
-    height: 50px;
-    bottom: 0px;
-    z-index: 1;
-    display: flex;
-    flex-direction: row-reverse;
-    background-color: black;
-}
-
-.toolbar-button {
-    margin: 10px;
-    width: 120px;
-    color: white;
-    background-color: black;
-    border: 1px solid white;
-    box-shadow: none;
-    outline: none;
-    border-radius: 5px;
-    user-select: none;
-}
-
 #pdf-viewer-container {
     overflow: auto;
     position: absolute;
@@ -37,4 +14,58 @@ html, body, canvas {
     width: 100%;
     max-width: 1000px;
     height: auto;
+}
+
+#toolbar {
+    position: fixed;
+    padding: 10px 12px;
+    width: 100%;
+    height: 50px;
+    bottom: 0px;
+    z-index: 1;
+    display: flex;
+    gap: 12px;
+    flex-direction: row-reverse;
+    background-color: black;
+    box-sizing: border-box;
+}
+
+.toolbar-button {
+    padding: 6px 12px;
+    width: auto;
+    max-width: 160px;
+    color: white;
+    background-color: black;
+    border: 1px solid white;
+    box-shadow: none;
+    outline: none;
+    border-radius: 5px;
+    user-select: none;
+    display: inline-flex;
+    flex-direction: row-reverse;
+    gap: 8px;
+    align-items: center;
+}
+
+.toolbar-button:hover {
+    background-color: #202020;
+}
+
+.toolbar-button:active {
+    background-color: gray;
+}
+
+.toolbar-button img {
+    height: 100%;
+    width: auto;
+}
+
+#source-button p {
+    visibility: hidden;
+    display: none;
+}
+
+#source-button:hover p {
+    visibility: visible;
+    display: block;
 }
