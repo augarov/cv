@@ -32,8 +32,9 @@ html, body, canvas {
 
 .toolbar-button {
     padding: 6px 12px;
+    white-space: nowrap;
     width: auto;
-    max-width: 160px;
+    max-width: max-content;
     color: white;
     background-color: black;
     border: 1px solid white;
@@ -41,14 +42,24 @@ html, body, canvas {
     outline: none;
     border-radius: 5px;
     user-select: none;
-    display: inline-flex;
-    flex-direction: row-reverse;
-    gap: 8px;
+    display: flex;
+    justify-content: flex-end;
     align-items: center;
+}
+
+.toolbar-button_margin {
+    margin-right: 8px;
+}
+
+@supports (-moz-appearance:none) {
+    .toolbar-button_margin {
+        margin: 0 8px 0 16px;
+    }
 }
 
 .toolbar-button:hover {
     background-color: #202020;
+    cursor: pointer;
 }
 
 .toolbar-button:active {
@@ -60,12 +71,23 @@ html, body, canvas {
     width: auto;
 }
 
-#source-button p {
-    visibility: hidden;
-    display: none;
+#source-button {
+    width: 42px;
+    transition: width  0.3s ease;
 }
 
-#source-button:hover p {
-    visibility: visible;
-    display: block;
+#source-button:hover {
+    width: 120px;
+}
+
+#source-button::before {
+    opacity: 0;
+    content: "View Source";
+    margin-right: 8px;
+    transition: all .3s linear 0s;
+}
+
+#source-button:hover::before {
+    transition: all .3s linear .3s;
+    opacity: 1;
 }

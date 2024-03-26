@@ -17,18 +17,21 @@
 
         <script src="node_modules/pdfjs-dist/build/pdf.min.mjs" type="module"></script>
         <script src="node_modules/pdfjs-dist/web/pdf_viewer.mjs" type="module"></script>
+        <script src="script.js" type="text/javascript"></script>
     </head>
     <body>
         <a id="download-link" href="cv.pdf" download="[CV] C++ Software Engineer - ANTON UGAROV.pdf" hidden></a>
 
         <div id="toolbar">
-            <button id="download-button" class="toolbar-button" onclick="document.getElementById('download-link').click()">
+            <button id="download-button" class="toolbar-button" onclick="downloadPdfClick()">
+                <span class="toolbar-button_margin">Download PDF</span>
                 <img src="img/download-solid.svg"></svg>
-                <p>Download PDF</p>
             </button>
-            <button id="source-button" class="toolbar-button" onclick="window.location.href='https://github.com/Deligor6321/cv/';">
+            <button id="source-button"
+                class="toolbar-button"
+                onclick="goToSource()"
+            >
                 <img src="img/github-mark-white.svg"></svg>
-                <p>View Source</p>
             </button>
         </div>
 
