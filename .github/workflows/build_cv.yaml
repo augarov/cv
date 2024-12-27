@@ -1,0 +1,41 @@
+name: Build CV
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/build_cv.yaml'
+      - 'cv.tex'
+      - 'deedy-resume.cls'
+
+jobs:
+  build_latex:
+    name: Build LaTeX document
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🛎️ Checkout 🛎️
+        uses: actions/checkout@v2
+
+      - name: 📕 Compile LaTeX document 📕
+        uses: xu-cheng/latex-action@v2
+        with:
+          root_file: cv.tex
+          latexmk_use_xelatex: true
+
+      - name: Upload files to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          file: cv.pdf
+          asset_name: cv.pdf
+          overwrite: true
+          release_name: cv-latest
+          body: "Latest build"
+
+  run_deploy_pages:
+    name: Deploy GH Pages
+    needs: build_latex
+    permissions:
+      pages: write  # Required to deploy to GitHub Pages.
+      id-token: write  # Required to verify that the deployment originates from this workflow.
+    uses: ./.github/workflows/deploy_pages.yaml

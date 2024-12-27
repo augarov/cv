@@ -1,0 +1,9 @@
+{
+    "latex-workshop.latex.external.build.command": "latexmk",
+    "latex-workshop.latex.external.build.args": [
+        "-xelatex",
+        "-interaction=nonstopmode",
+        "-synctex=1",
+        "-file-line-error"
+    ]
+}

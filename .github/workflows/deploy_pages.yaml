@@ -1,0 +1,61 @@
+name: Build & deploy GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/deploy_pages.yaml'
+      - 'gh-pages/**'
+
+  workflow_call:
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🛎️ Checkout 🛎️
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+
+      - name: Install npm dependencies
+        shell: bash
+        working-directory: gh-pages
+        run: npm install
+
+      - name: Download latest release
+        uses: robinraju/release-downloader@v1.9
+        with:
+          latest: true
+          fileName: cv.pdf
+          out-file-path: gh-pages
+
+      - name: Fix permissions
+        run: |
+          chmod -v -R +rX "gh-pages" | while read line; do
+            echo "::warning title=Invalid file permissions automatically fixed::$line"
+          done
+  
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: gh-pages/
+
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      pages: write  # Required to deploy to GitHub Pages.
+      id-token: write  # Required to verify that the deployment originates from this workflow.
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy the website
+        uses: actions/deploy-pages@v4

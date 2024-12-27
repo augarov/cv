@@ -1,0 +1,265 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% Deedy CV/Resume
+% The original template has been downloaded from:
+% http://www.LaTeXTemplates.com
+%
+% Original author:
+% Debarghya Das (http://www.debarghyadas.com)
+% With extensive modifications by:
+% Vel (vel@latextemplates.com)
+%
+% License:
+% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[]{deedy-resume}
+
+% Note: Don't forget to update the metadata in HTML.
+\hypersetup{
+    pdftitle={C++ Software Engineer - Anton Ugarov},
+    pdfauthor={Anton Ugarov},
+    pdfsubject={CV/Resume},
+    pdfkeywords={c++, software engineer, cv, resume},
+}
+
+\title{C++ Software Engineer - Anton Ugarov}
+\author{Anton Ugarov}
+\date{\today}
+
+\begin{document}
+%
+%----------------------------------------------------------------------------------------
+%	TITLE SECTION
+%----------------------------------------------------------------------------------------
+%
+\lastupdated % Print the Last Updated text at the top right
+
+\begin{minipage}[t]{0.68\textwidth}
+
+\blockspace
+% Note: Don't forget to update the metadata in HTML.
+\namesection{Anton}{Ugarov}{Highly qualified Software Engineer with 6+ years of expertise in C++ development. Specializing in high-performance backend systems and real-time data processing. }
+
+\end{minipage}
+\hfill
+\columnspace
+%
+%----------------------------------------------------------------------------------------
+%	CONTACTS & LINKS
+%----------------------------------------------------------------------------------------
+%
+\begin{minipage}[t]{0.27\textwidth}
+
+\blockspace
+\colorbox{shade}{
+\begin{supertabular}{@{\hspace{3pt}} p{0.05\linewidth} p{0.775\linewidth}}
+    \raisebox{-1pt}{\faHome} & Zürich, Switzerland \\
+    \raisebox{-1pt}{\small\faEnvelope} & \href{mailto:augarov.swe@gmail.com}{\bf augarov.swe@gmail.com} \\
+    \raisebox{-1pt}{\faLinkedin} & \href{https://www.linkedin.com/in/augarov}{\bf linkedin.com/in/augarov} \\
+    \raisebox{-1pt}{\faTelegramPlane} & \href{https://t.me/augarov_swe}{\bf t.me/augarov\_swe} \\
+    \raisebox{-1pt}{\faGithub} & \href{https://github.com/augarov}{\bf github.com/augarov} \\
+\end{supertabular}
+}
+
+\end{minipage}
+
+\blockspace
+
+%----------------------------------------------------------------------------------------
+%	LEFT COLUMN
+%----------------------------------------------------------------------------------------
+
+\begin{minipage}[t]{0.25\textwidth}
+
+%------------------------------------------------
+% Skills
+%------------------------------------------------
+
+\section{Skills}
+
+\textbf{Programming:}
+\begin{skillitemize}
+    \skillitem C++ 11-20
+    \skillitem STL
+    \skillitem Boost
+    \skillitem Python
+\end{skillitemize}
+\halfspace
+
+\textbf{Core Concepts:}
+\begin{skillitemize}
+    \skillitem Multithreading
+    \skillitem Performance Optimization
+    \skillitem Metaprogramming
+\end{skillitemize}
+\halfspace
+
+\textbf{Networking:}
+\begin{skillitemize}
+    \skillitem TCP/IP
+    \skillitem HTTP
+    \skillitem Protobuf
+\end{skillitemize}
+\halfspace
+
+\textbf{Databases:}
+\begin{skillitemize}
+    \skillitem PostgreSQL
+\end{skillitemize}
+\halfspace
+
+\textbf{Tools:}
+\begin{skillitemize}
+    \skillitem CMake
+    \skillitem Bash
+    \skillitem Git
+    \skillitem Linux
+    \skillitem Docker / Compose
+\end{skillitemize}
+\halfspace
+
+\textbf{Soft Skills:}
+\begin{skillitemize}
+    \skillitem Responsibility
+    \skillitem Attention to Detail
+    \skillitem Effective Communication
+    \skillitem Problem-Solving
+    \skillitem Initiative
+    \skillitem Team Collaboration
+\end{skillitemize}
+
+\sectionspace
+
+%------------------------------------------------
+% Languages
+%------------------------------------------------
+
+\section{Languages}
+\textbf{English} / C1 \\
+\textbf{Russian} / native \\
+\textbf{German} / A1 (learning)
+
+\sectionspace
+
+%------------------------------------------------
+% Education
+%------------------------------------------------
+
+\section{Education}
+
+\runsubsection{State Electrotechnical University "LETI"} \\
+\descript{BS in Computer Science}
+\location{2015 - 2019 | St. Petersburg}
+Computer Systems Engineering and Informatics \\
+Specialization: Computer Aided Design Systems \\
+\textbf{Cum. GPA}: \textit{4.57 / 5.0} \\
+\textbf{Major GPA}: \textit{4.60 / 5.0}
+
+\sectionspace
+
+%----------------------------------------------------------------------------------------
+
+\end{minipage}
+\hfill
+\columnspace
+%
+%----------------------------------------------------------------------------------------
+%	RIGHT COLUMN
+%----------------------------------------------------------------------------------------
+%
+\begin{minipage}[t]{0.70\textwidth}
+
+%------------------------------------------------
+% Experience
+%------------------------------------------------
+
+\section{Experience}
+
+\runsubsection{Self Employed}
+\descript{| Senior Software Engineer}
+\location{Apr 2024 - PRESENT | Zürich, Switzerland}
+
+Collaborating with a dynamic startup in a fast-paced environment.
+Developing a \textbf{high-load C++20 backend} for real-time telemetry and event aggregation, efficiently processing and manipulating \textbf{large-scale data streams} at 200Mbps per core.
+\begin{descritemize}
+    \descritem Leveraged C++ \textbf{coroutines} with the Seastar framework for efficient concurrency.
+    \descritem Utilized the Ragel state machine compiler \textbf{reducing the parsing time} of standard event formats (SyslogBSD, CEF) by 70\%.
+    \descritem Led availability enhancements, \textbf{eliminating downtime} during service upgrades
+    \descritem \textbf{Built a sandbox service} for debugging data aggregation with step-by-step insights.
+    \descritem \textbf{Reverse-engineered} and implemented a proprietary 3rd-party binary protocol.
+\end{descritemize}
+\textbf{Stack}: \textit{C++20 / Seastar / Boost / Ragel / Docker / AWS / Python / Jinja / MongoDB / Go}
+
+\sectionspace
+
+%------------------------------------------------
+
+\runsubsection{WANNA}
+\descript{| Senior Software Engineer}
+\location{Jun 2022 - Apr 2024 | Limassol, Cyprus}
+
+Developed a \textbf{lightweight cross-platform C++20 library} enabling virtual try-on experiences on \textbf{mobile devices}.
+\begin{descritemize}
+    \descritem \textbf{Designed a universal C API} for seamless interaction with native platform frontends, encapsulated by Objective-C glue code.
+    \descritem Built a \textbf{generic 3D viewer} with smooth animations and high performance at 60FPS, establishing it as a core offering for the company.
+    \descritem Upgraded the codebase to a \textbf{new render engine} unlocking realistic reflections.
+\end{descritemize}
+\textbf{Stack}: \textit{C++20 / Objective-C / OpenCV / Metal / CoreML / CMake / Conan / GoogleTest}
+
+\sectionspace
+
+%------------------------------------------------
+
+\runsubsection{Yandex}
+\descript{| Software Engineer}
+\location{Mar 2020 - May 2022 | St. Petersburg, Russia}
+
+Developed a \textbf{high-load C++17 backend} for Yandex.Messenger, serving 20kRPS, with a focus on efficient and secure asynchronous code to ensure \textbf{system resilience}.
+\begin{descritemize}
+    \descritem Contributed to \textbf{core service components}: Json/Protobuf APIs, message processing pipeline, and data storage (PostgreSQL/YDB).
+    \descritem Boosted system scalability by implementing  \textbf{sharding and load balancing}, resolving bottlenecks in the support-automation service.
+    \descritem Optimized in-memory cache storage, \textbf{reducing RAM consumption} by 10\%.
+    \descritem Integrated probabilistic data structures to count unique message views in large channels, \textbf{reducing the space complexity} significantly.
+    \descritem Gained Python experience while \textbf{developing the auxiliary services}.
+\end{descritemize}
+\textbf{Stack}: \textit{C++17 / Python / Protobuf / PostgreSQL / YDB}
+
+\sectionspace
+
+%------------------------------------------------
+
+\runsubsection{Tensor}
+\descript{| Software Engineer}
+\location{Jun 2018 - Feb 2020 | St. Petersburg, Russia}
+
+Developed a \textbf{cross-platform C++14 / Boost library} for the business logic of an \textbf{Android/iOS} courier app.
+\begin{descritemize}
+    \descritem \textbf{Redesigned architecture}, cutting time-to-market for new features by 30\%.
+    \descritem Developed a middle-end layer to \textbf{integrate the backend with platform-native frontends} using JsonRPC and Djinni-generated bridges.
+    \descritem \textbf{Mentored a junior developer} to independently deliver key features in 6 months.
+    \descritem Built a generic \textbf{component for automatic data caching} to a local SQLite DB.
+\end{descritemize}
+\textbf{Stack}: \textit{C++14 / Boost / JNI / Djinni / SQLite / Conan / CMake / Boost.Test}
+
+\sectionspace
+
+%------------------------------------------------
+
+\runsubsection{Confident}
+\descript{| Embedded System Developer, Part-time}
+\location{Mar 2018 - Jun 2018 | St. Petersburg, Russia}
+\textbf{Stack}: \textit{Linux / OpenWRT / Bash / make /  GitLab CI}
+\sectionspace
+
+%------------------------------------------------
+
+\runsubsection{Clicknet}
+\descript{| Embedded System Developer, Part-time}
+\location{Jul 2017 - Mar 2018 | St. Petersburg, Russia}
+\textbf{Stack}: \textit{Linux / AGL / Chromium / Bash / CMake / ninja}
+
+\end{minipage}
+
+\end{document}
