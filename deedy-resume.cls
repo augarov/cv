@@ -8,9 +8,10 @@
 \ProcessOptions\relax
 \LoadClass{article}
 
-\usepackage[hidelinks=true]{hyperref} % Hidden links
+\usepackage[hidelinks]{hyperref} % Hidden links
 \usepackage{supertabular} % Required for the supertabular environment which allows tables to span multiple pages so sections with tables correctly wrap across pages
 \usepackage{enumitem} % For compact itemize
+\usepackage{accsupp} % Allows copying text from PDF
 
 %----------------------------------------------------------------------------------------
 %	MARGINS
@@ -32,7 +33,7 @@
 %	COLORS
 %----------------------------------------------------------------------------------------
 
-\usepackage[usenames,dvipsnames]{xcolor} % Required for custom colors
+\usepackage[dvipsnames]{xcolor} % Required for custom colors
 
 \definecolor{primary}{HTML}{2b2b2b} % The primary document color for content text
 \definecolor{headings}{HTML}{6A6A6A} % The color of the large sections
@@ -48,9 +49,23 @@
 \usepackage{fontawesome5} % Font with icons
 \usepackage{pifont} % More styles for bullets
 
-\setmainfont[Color=primary, Path = fonts/lato/,BoldItalicFont=Lato-RegIta,BoldFont=Lato-Reg,ItalicFont=Lato-LigIta]{Lato-Lig} % The primary font for content text; defines bold, italic and bold-italic as well
+% The primary font for content text; defines bold, italic and bold-italic as well
+\setmainfont[
+	Color=primary,
+	Path = fonts/lato/,
+	Extension=.ttf,
+	UprightFont=Lato-Lig,
+	ItalicFont=Lato-LigIta,
+	BoldFont=Lato-Reg,
+	BoldItalicFont=Lato-RegIta,
+]{Lato-Lig}
 
-\setsansfont[Scale=MatchLowercase,Mapping=tex-text, Path = fonts/raleway/]{Raleway-ExtraLight} % The font used where \sfffamily is called
+% The font used where \sfffamily is called
+\setsansfont[
+	Scale=MatchLowercase,
+	Mapping=tex-text,
+	Path = fonts/raleway/
+]{Raleway-ExtraLight}
 
 %----------------------------------------------------------------------------------------
 %	LAST UPDATED COMMAND
@@ -76,8 +91,8 @@
     \fontspec[Path = fonts/lato/]{Lato-Hai}\selectfont #1 % First name font
     \fontspec[Path = fonts/lato/]{Lato-Lig}\selectfont #2 % Last name font
     \sectionspace\\
-    \color{headings}\raggedright\fontspec[Path = fonts/raleway/]{Raleway-Medium}\fontsize{11pt}{14pt}\selectfont #3
-} % Contact information font
+    \color{headings}\raggedright\fontspec[Path = fonts/lato/]{Lato-Reg}\fontsize{11pt}{14pt}\selectfont #3
+}
 
 %----------------------------------------------------------------------------------------
 %	SECTION TITLE STYLING AND SPACING
@@ -93,16 +108,13 @@
 \newcommand{\columnspace}{\hspace{14pt}} % Add a set amount of space between vertical columns
 
 \titleformat{\section}{ % Customize the large section titles
-\color{headings}\scshape\fontspec[Path = fonts/lato/]{Lato-Lig}\fontsize{16pt}{24pt}\selectfont \raggedright\uppercase}{}{0em}{}
-
-\titleformat{\subsection}{ % Customize the subsections and places worked/studied titles
-\color{subheadings}\fontspec[Path = fonts/lato/]{Lato-Bol}\fontsize{12pt}{12pt}\selectfont\bfseries\uppercase}{}{0em}{}
+\color{headings}\fontspec[Path = fonts/lato/]{Lato-Lig}\fontsize{16pt}{24pt}\selectfont \raggedright\uppercase}{}{0em}{}
 
 \newcommand{\runsubsection}[1]{ % Used for creating subsections where a description is required on the same line
-\color{subheadings}\fontspec[Path = fonts/lato/]{Lato-Bol}\fontsize{12pt}{12pt}\selectfont\bfseries\uppercase {#1} \normalfont}
+\color{subheadings}\fontspec[Path = fonts/lato/]{Lato-Bol}\fontsize{12pt}{12pt}\selectfont\uppercase {#1} \normalfont}
 
 \newcommand{\descript}[1]{ % Used for describing the subsection either on the same line or underneath
-\color{subheadings}\raggedright\scshape\fontspec[Path = fonts/raleway/]{Raleway-Medium}\fontsize{11pt}{13pt}\selectfont {#1 \\} \normalfont}
+\color{subheadings}\raggedright\fontspec[Path = fonts/raleway/]{Raleway-Medium}\fontsize{11pt}{13pt}\selectfont\scshape {#1 \\} \normalfont}
 
 \newcommand{\location}[1]{ % Used for specifying a duration and/or location under a subsection
 \color{headings}\raggedright\fontspec[Path = fonts/raleway/]{Raleway-Medium}\fontsize{10pt}{12pt}\selectfont {#1\\} \normalfont}
@@ -116,10 +128,10 @@
 {\begin{itemize}[noitemsep,topsep=0pt,parsep=0pt,partopsep=0pt,rightmargin=0pt,leftmargin=24pt]}
 {\end{itemize}}
 
-\newcommand{\descritem}{\item[\ding{226}]} % Arrow-style bullets for the Experience Description section
+\newcommand{\descritem}{\item[\BeginAccSupp{ActualText=*}\ding{226}\EndAccSupp{}]} % Arrow-style bullets for the Experience Description section
 
 \newenvironment{skillitemize} % Defines the skillitemize environment for the Skills section
 {\begin{itemize}[noitemsep,topsep=0pt,parsep=0pt,partopsep=0pt,rightmargin=0pt,leftmargin=16pt]}
 {\end{itemize}}
 
-\newcommand{\skillitem}{\item} % Bullets for the Skills section
+\newcommand{\skillitem}{\item[\BeginAccSupp{ActualText=*}\labelitemi\EndAccSupp{}]} % Bullets for the Skills section
