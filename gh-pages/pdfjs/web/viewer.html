@@ -322,62 +322,6 @@ See https://github.com/adobe-type-tools/cmap-resources
 
                       <div class="horizontalToolbarSeparator"></div>
 
-                      <button id="pageRotateCw" class="toolbarButton labeled" type="button" tabindex="0" data-l10n-id="pdfjs-page-rotate-cw-button">
-                        <span data-l10n-id="pdfjs-page-rotate-cw-button-label"></span>
-                      </button>
-                      <button id="pageRotateCcw" class="toolbarButton labeled" type="button" tabindex="0" data-l10n-id="pdfjs-page-rotate-ccw-button">
-                        <span data-l10n-id="pdfjs-page-rotate-ccw-button-label"></span>
-                      </button>
-
-                      <div class="horizontalToolbarSeparator"></div>
-
-                      <div id="cursorToolButtons" role="radiogroup">
-                        <button id="cursorSelectTool" class="toolbarButton labeled toggled" type="button" tabindex="0" data-l10n-id="pdfjs-cursor-text-select-tool-button" role="radio" aria-checked="true">
-                          <span data-l10n-id="pdfjs-cursor-text-select-tool-button-label"></span>
-                        </button>
-                        <button id="cursorHandTool" class="toolbarButton labeled" type="button" tabindex="0" data-l10n-id="pdfjs-cursor-hand-tool-button" role="radio" aria-checked="false">
-                          <span data-l10n-id="pdfjs-cursor-hand-tool-button-label"></span>
-                        </button>
-                      </div>
-
-                      <div class="horizontalToolbarSeparator"></div>
-
-                      <div id="scrollModeButtons" role="radiogroup">
-                        <button id="scrollPage" class="toolbarButton labeled" type="button" tabindex="0" data-l10n-id="pdfjs-scroll-page-button" role="radio" aria-checked="false">
-                          <span data-l10n-id="pdfjs-scroll-page-button-label"></span>
-                        </button>
-                        <button id="scrollVertical" class="toolbarButton labeled toggled" type="button" tabindex="0" data-l10n-id="pdfjs-scroll-vertical-button" role="radio" aria-checked="true">
-                          <span data-l10n-id="pdfjs-scroll-vertical-button-label"></span>
-                        </button>
-                        <button id="scrollHorizontal" class="toolbarButton labeled" type="button" tabindex="0" data-l10n-id="pdfjs-scroll-horizontal-button" role="radio" aria-checked="false">
-                          <span data-l10n-id="pdfjs-scroll-horizontal-button-label"></span>
-                        </button>
-                        <button id="scrollWrapped" class="toolbarButton labeled" type="button" tabindex="0" data-l10n-id="pdfjs-scroll-wrapped-button" role="radio" aria-checked="false">
-                          <span data-l10n-id="pdfjs-scroll-wrapped-button-label"></span>
-                        </button>
-                      </div>
-
-                      <div class="horizontalToolbarSeparator"></div>
-
-                      <div id="spreadModeButtons" role="radiogroup">
-                        <button id="spreadNone" class="toolbarButton labeled toggled" type="button" tabindex="0" data-l10n-id="pdfjs-spread-none-button" role="radio" aria-checked="true">
-                          <span data-l10n-id="pdfjs-spread-none-button-label"></span>
-                        </button>
-                        <button id="spreadOdd" class="toolbarButton labeled" type="button" tabindex="0" data-l10n-id="pdfjs-spread-odd-button" role="radio" aria-checked="false">
-                          <span data-l10n-id="pdfjs-spread-odd-button-label"></span>
-                        </button>
-                        <button id="spreadEven" class="toolbarButton labeled" type="button" tabindex="0" data-l10n-id="pdfjs-spread-even-button" role="radio" aria-checked="false">
-                          <span data-l10n-id="pdfjs-spread-even-button-label"></span>
-                        </button>
-                      </div>
-
-                      <div id="imageAltTextSettingsSeparator" class="horizontalToolbarSeparator hidden"></div>
-                      <button id="imageAltTextSettings" type="button" class="toolbarButton labeled hidden" tabindex="0" data-l10n-id="pdfjs-image-alt-text-settings-button" aria-controls="altTextSettingsDialog">
-                        <span data-l10n-id="pdfjs-image-alt-text-settings-button-label"></span>
-                      </button>
-
-                      <div class="horizontalToolbarSeparator"></div>
-
                       <button id="documentProperties" class="toolbarButton labeled" type="button" tabindex="0" data-l10n-id="pdfjs-document-properties-button" aria-controls="documentPropertiesDialog">
                         <span data-l10n-id="pdfjs-document-properties-button-label"></span>
                       </button>
@@ -767,6 +711,62 @@ See https://github.com/adobe-type-tools/cmap-resources
     <button id="sidebarToggleButton" class="toolbarButton" type="button" tabindex="0" data-l10n-id="pdfjs-toggle-sidebar-button" aria-expanded="false" aria-haspopup="true" aria-controls="sidebarContainer" style="display: none;">
       <span data-l10n-id="pdfjs-toggle-sidebar-button-label"></span>
     </button>
+
+    <!-- Hidden removed toolbar elements to prevent JS errors -->
+    <div style="display: none;">
+      <!-- Hidden page rotation buttons -->
+      <button id="pageRotateCw" class="toolbarButton labeled" type="button" tabindex="0" data-l10n-id="pdfjs-page-rotate-cw-button">
+        <span data-l10n-id="pdfjs-page-rotate-cw-button-label"></span>
+      </button>
+      <button id="pageRotateCcw" class="toolbarButton labeled" type="button" tabindex="0" data-l10n-id="pdfjs-page-rotate-ccw-button">
+        <span data-l10n-id="pdfjs-page-rotate-ccw-button-label"></span>
+      </button>
+
+      <!-- Hidden cursor tool buttons -->
+      <div id="cursorToolButtons" role="radiogroup">
+        <button id="cursorSelectTool" class="toolbarButton labeled toggled" type="button" tabindex="0" data-l10n-id="pdfjs-cursor-text-select-tool-button" role="radio" aria-checked="true">
+          <span data-l10n-id="pdfjs-cursor-text-select-tool-button-label"></span>
+        </button>
+        <button id="cursorHandTool" class="toolbarButton labeled" type="button" tabindex="0" data-l10n-id="pdfjs-cursor-hand-tool-button" role="radio" aria-checked="false">
+          <span data-l10n-id="pdfjs-cursor-hand-tool-button-label"></span>
+        </button>
+      </div>
+
+      <!-- Hidden scroll mode buttons -->
+      <div id="scrollModeButtons" role="radiogroup">
+        <button id="scrollPage" class="toolbarButton labeled" type="button" tabindex="0" data-l10n-id="pdfjs-scroll-page-button" role="radio" aria-checked="false">
+          <span data-l10n-id="pdfjs-scroll-page-button-label"></span>
+        </button>
+        <button id="scrollVertical" class="toolbarButton labeled toggled" type="button" tabindex="0" data-l10n-id="pdfjs-scroll-vertical-button" role="radio" aria-checked="true">
+          <span data-l10n-id="pdfjs-scroll-vertical-button-label"></span>
+        </button>
+        <button id="scrollHorizontal" class="toolbarButton labeled" type="button" tabindex="0" data-l10n-id="pdfjs-scroll-horizontal-button" role="radio" aria-checked="false">
+          <span data-l10n-id="pdfjs-scroll-horizontal-button-label"></span>
+        </button>
+        <button id="scrollWrapped" class="toolbarButton labeled" type="button" tabindex="0" data-l10n-id="pdfjs-scroll-wrapped-button" role="radio" aria-checked="false">
+          <span data-l10n-id="pdfjs-scroll-wrapped-button-label"></span>
+        </button>
+      </div>
+
+      <!-- Hidden spread mode buttons -->
+      <div id="spreadModeButtons" role="radiogroup">
+        <button id="spreadNone" class="toolbarButton labeled toggled" type="button" tabindex="0" data-l10n-id="pdfjs-spread-none-button" role="radio" aria-checked="true">
+          <span data-l10n-id="pdfjs-spread-none-button-label"></span>
+        </button>
+        <button id="spreadOdd" class="toolbarButton labeled" type="button" tabindex="0" data-l10n-id="pdfjs-spread-odd-button" role="radio" aria-checked="false">
+          <span data-l10n-id="pdfjs-spread-odd-button-label"></span>
+        </button>
+        <button id="spreadEven" class="toolbarButton labeled" type="button" tabindex="0" data-l10n-id="pdfjs-spread-even-button" role="radio" aria-checked="false">
+          <span data-l10n-id="pdfjs-spread-even-button-label"></span>
+        </button>
+      </div>
+
+      <!-- Hidden image alt text settings -->
+      <div id="imageAltTextSettingsSeparator" class="horizontalToolbarSeparator hidden"></div>
+      <button id="imageAltTextSettings" type="button" class="toolbarButton labeled hidden" tabindex="0" data-l10n-id="pdfjs-image-alt-text-settings-button" aria-controls="altTextSettingsDialog">
+        <span data-l10n-id="pdfjs-image-alt-text-settings-button-label"></span>
+      </button>
+    </div>
 
     <div id="printContainer"></div>
   </body>
