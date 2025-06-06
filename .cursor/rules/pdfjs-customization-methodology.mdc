@@ -1,0 +1,111 @@
+---
+description:
+globs: **/pdfjs/**
+alwaysApply: false
+---
+# PDF.js Customization Methodology
+
+Systematic approach for customizing PDF.js viewer functionality while maintaining consistency and avoiding breaking changes.
+
+<rule>
+name: pdfjs_customization_methodology
+description: Methodology for safely customizing PDF.js viewer components
+filters:
+  # Match PDF.js directory and files
+  - type: glob
+    pattern: "**/pdfjs/**"
+  # Match PDF.js viewer files specifically
+  - type: glob
+    pattern: "**/pdfjs/web/viewer.{html,css,js,mjs}"
+  # Match PDF.js build files
+  - type: glob
+    pattern: "**/pdfjs/build/**"
+  # Match any file with pdfjs in the path
+  - type: file_path
+    pattern: "pdfjs"
+  # Match viewer customization work
+  - type: content
+    pattern: "(?i)(pdf\\.?js|viewer|toolbar|button|icon)"
+  # Match modification events
+  - type: event
+    pattern: "file_modify"
+
+actions:
+  - type: suggest
+    message: |
+      When customizing PDF.js viewer functionality, follow this systematic approach:
+
+      ## 1. Pattern Discovery Phase
+      **ALWAYS investigate first before implementing:**
+      - Examine how existing features are implemented in the original viewer
+      - Use grep/search tools to find similar implementations in the codebase
+      - Understand the architecture, patterns, and naming conventions used
+
+      ## 2. Implementation Consistency
+      **Match existing patterns:**
+      - Use the same patterns, conventions, and approaches as original code
+      - Follow consistent naming (CSS variables, class names, IDs)
+      - Place customizations in appropriate locations that align with existing architecture
+
+      ## 3. PDF.js-Specific Patterns
+
+      ### CSS Icons
+      ```css
+      /* Define CSS variables in :root */
+      :root {
+        --custom-icon: url("path/to/icon.svg");
+      }
+
+      /* Apply using mask-image (NOT background-image) */
+      .button::before {
+        -webkit-mask-image: var(--custom-icon);
+        mask-image: var(--custom-icon);
+      }
+      ```
+
+      ### HTML Structure
+      - Keep removed elements hidden with `style="display: none;"` to prevent JS errors
+      - Follow existing button structure and class patterns
+      - Maintain ARIA attributes and accessibility patterns
+
+      ### JavaScript Integration
+      - Understand existing event handlers and initialization patterns
+      - Maintain expected DOM structure to avoid breaking functionality
+      - Test for JavaScript errors after modifications
+
+      ## 4. Verification Process
+      - Test thoroughly across different devices and browsers
+      - Check browser console for JavaScript errors
+      - Verify accessibility features remain intact
+      - Ensure no existing functionality is broken
+
+examples:
+  - input: |
+      # Bad: Using background-image for toolbar icons
+      .toolbarButton::before {
+        background-image: url("icon.svg");
+      }
+
+      # Good: Using PDF.js mask-image pattern
+      :root {
+        --custom-icon: url("icon.svg");
+      }
+      .toolbarButton::before {
+        -webkit-mask-image: var(--custom-icon);
+        mask-image: var(--custom-icon);
+      }
+    output: "Correctly implemented PDF.js icon pattern"
+
+  - input: |
+      # Bad: Deleting unused elements
+      <!-- <button id="unusedButton">...</button> -->
+
+      # Good: Hiding unused elements
+      <button id="unusedButton" style="display: none;">...</button>
+    output: "Properly hidden unused elements to prevent JS errors"
+
+metadata:
+  priority: high
+  version: 1.0
+  principle: "Understand before you customize"
+</rule>

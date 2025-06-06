@@ -1,0 +1,82 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+# Investigation-First Methodology
+
+General principle for customizing existing codebases: always understand before you modify.
+
+<rule>
+name: investigation_first_methodology
+description: Systematic approach for safely customizing any existing codebase
+filters:
+  # Match any code modification work
+  - type: event
+    pattern: "file_modify"
+  # Match customization-related content
+  - type: content
+    pattern: "(?i)(custom|modify|change|add|implement|integrate)"
+
+actions:
+  - type: suggest
+    message: |
+      Before implementing any customization in an existing codebase, follow this methodology:
+
+      ## Core Principle: "Understand Before You Customize"
+
+      ### 1. Investigation Phase
+      **ALWAYS start with discovery:**
+      - Examine how similar features are implemented in the existing codebase
+      - Search for patterns, conventions, and architectural approaches
+      - Understand the reasoning behind existing implementations
+      - Identify dependencies and integration points
+
+      ### 2. Pattern Matching
+      **Consistency is key:**
+      - Use the same patterns and conventions as the existing code
+      - Follow established naming conventions
+      - Respect the existing architecture and code organization
+      - Maintain the same level of code quality and documentation
+
+      ### 3. Safe Integration
+      **Minimize breaking changes:**
+      - Preserve existing functionality while adding new features
+      - Test thoroughly to ensure no regressions
+      - Maintain backward compatibility where possible
+      - Document any changes that might affect other parts of the system
+
+      ### 4. Verification
+      **Validate your changes:**
+      - Test across different scenarios and edge cases
+      - Verify no errors are introduced
+      - Check that existing tests still pass
+      - Ensure accessibility and performance are maintained
+
+      ### 5. Documentation
+      **Record your decisions:**
+      - Document why you chose specific patterns
+      - Explain how your changes integrate with existing code
+      - Note any assumptions or dependencies
+      - Provide examples for future maintainers
+
+examples:
+  - input: |
+      # Bad: Implementing without investigation
+      // Adding new feature without checking existing patterns
+      function myNewFeature() {
+        // Custom implementation that doesn't match codebase style
+      }
+
+      # Good: Following existing patterns
+      // After investigating, found existing pattern for similar features
+      function createNewFeature() {
+        // Implementation that matches existing codebase patterns
+      }
+    output: "Properly investigated and matched existing patterns"
+
+metadata:
+  priority: high
+  version: 1.0
+  principle: "Investigation leads to better integration"
+</rule>
