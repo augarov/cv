@@ -70,6 +70,16 @@ See https://github.com/adobe-type-tools/cmap-resources
       .page {
         background-color: white !important;
       }
+
+      /* Custom View Source button icon using PDF.js pattern */
+      :root {
+        --viewSource-icon: url("images/github-mark-white.svg");
+      }
+
+      :is(#secondaryToolbar #secondaryToolbarButtonContainer) #viewSource::before {
+        -webkit-mask-image: var(--viewSource-icon) !important;
+        mask-image: var(--viewSource-icon) !important;
+      }
     </style>
 
   <script src="viewer.mjs" type="module"></script>
@@ -321,6 +331,10 @@ See https://github.com/adobe-type-tools/cmap-resources
                       </button>
 
                       <div class="horizontalToolbarSeparator"></div>
+
+                      <a href="https://github.com/augarov/cv/" id="viewSource" class="toolbarButton labeled" tabindex="0" target="_blank" rel="noopener noreferrer" title="View Source">
+                        <span>View Source</span>
+                      </a>
 
                       <button id="documentProperties" class="toolbarButton labeled" type="button" tabindex="0" data-l10n-id="pdfjs-document-properties-button" aria-controls="documentPropertiesDialog">
                         <span data-l10n-id="pdfjs-document-properties-button-label"></span>
