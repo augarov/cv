@@ -5,5 +5,8 @@
         "-interaction=nonstopmode",
         "-synctex=1",
         "-file-line-error"
-    ]
+    ],
+    "workbench.editorAssociations": {
+        "*.pdf": "pdf.preview"
+    }
 }
