@@ -42,11 +42,24 @@
 </head>
 
 <body>
-    <div id="pdf-viewer-container">
+    <!-- PDF Viewer (hidden by default) -->
+    <div id="pdf-viewer-container" style="display: none;">
         <iframe id="pdf-viewer-iframe" src="pdfjs/web/viewer.html?file=../../cv.pdf" width="100%" height="100%"
             frameborder="0">
         </iframe>
     </div>
+
+    <!-- Fallback interface (visible by default) -->
+    <div id="fallback-container">
+        <h1>CV - ANTON UGAROV</h1>
+        <p>C++ Software Engineer</p>
+        <p>Please download or view the CV</p>
+        <a href="cv.pdf" download="Anton_Ugarov_CV.pdf">Download CV (PDF)</a>
+        <a href="cv.pdf" target="_blank">Open in New Tab</a>
+    </div>
+
+    <!-- PDF.js Capability Detection -->
+    <script src="fallback-detection.js"></script>
 </body>
 
 </html>
