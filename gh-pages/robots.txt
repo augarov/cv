@@ -1,0 +1,22 @@
+User-agent: *
+Allow: /
+
+# Allow access to PDF file
+Allow: /cv.pdf
+
+# Allow access to structured data
+Allow: /cv-data.json
+
+# Allow access to images
+Allow: /img/
+
+# Disallow node_modules and build files
+Disallow: /node_modules/
+Disallow: /pdfjs/build/
+Disallow: /.git/
+
+# Sitemap location
+Sitemap: https://augarov.github.io/cv/sitemap.xml
+
+# Crawl delay (optional, be respectful)
+Crawl-delay: 1
