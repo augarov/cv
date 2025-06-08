@@ -42,7 +42,7 @@ jobs:
         run: |
           source venv/bin/activate
           cd cv_renderer
-          poetry install --no-dev
+          poetry install
 
       - name: 🔄 Generate CV using cv_renderer 🔄
         run: |
