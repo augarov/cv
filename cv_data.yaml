@@ -63,12 +63,11 @@ education:
       major: 4.60 / 5.0
 
 experience:
-  - company: Self Employed
-    position: Senior Software Engineer, Team Lead
+  - company: CeTu
+    position: Software Engineering Team Lead
     period: Apr 2024 - PRESENT
     location: Zürich, Switzerland
     description: >
-      Collaborating with a dynamic startup in a fast-paced environment.
       Developing a **high-load C++20 backend** for real-time telemetry and event aggregation,
       efficiently processing and manipulating **large-scale data streams** at 200Mbps per core.
     achievements:
@@ -82,7 +81,7 @@ experience:
       - "Led availability enhancements, **eliminating downtime** during service upgrades"
       - "**Built a sandbox service** for debugging data aggregation with step-by-step insights."
       - "**Reverse-engineered** and implemented a proprietary 3rd-party binary protocol."
-      - "**Managed a two-person engineering team**, coordinating development efforts."
+      - "**Managed a four-person engineering team**, coordinating development efforts."
     stack: C++20 / Seastar / Boost / Ragel / Docker / AWS / Python / Jinja / MongoDB / Go
 
   - company: WANNA
