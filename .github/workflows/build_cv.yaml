@@ -22,8 +22,9 @@ jobs:
       - name: 📕 Compile LaTeX document 📕
         uses: xu-cheng/latex-action@v2
         with:
-          root_file: tex/cv.tex
+          root_file: cv.tex
           latexmk_use_xelatex: true
+          working_directory: tex
 
       - name: Upload files to release
         uses: svenstaro/upload-release-action@v2
