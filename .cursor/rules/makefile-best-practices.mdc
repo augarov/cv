@@ -74,9 +74,10 @@ actions:
       - **Consistent naming**: All directory variables end with `_DIR`
 
       ### 4. Marker Files for Single-Shot Targets
-      - **Use .stamp extension**: `target-name.stamp`
-      - **Place in appropriate directory**: `$(VENV_DIR)/setup-env-python.stamp`
-      - **Reference in variables**: `VENV_MARKER = $(VENV_DIR)/setup-env-python.stamp`
+      - **Use .stamp extension**: `.target-name.stamp`
+      - **Make them hidden**: Start with "." to keep directories clean
+      - **Place in appropriate directory**: `$(VENV_DIR)/.setup-env-python.stamp`
+      - **Reference in variables**: `VENV_MARKER = $(VENV_DIR)/.setup-env-python.stamp`
 
       ## Target Implementation
 
