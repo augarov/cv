@@ -1,0 +1,139 @@
+---
+description:
+globs: **/Makefile,**/*.make
+alwaysApply: false
+---
+# Makefile Best Practices
+
+Guidelines for creating, maintaining, and working with Makefiles in this project.
+
+<rule>
+name: makefile_best_practices
+description: Standards and patterns for writing maintainable Makefiles
+filters:
+  # Match Makefile files
+  - type: file_name
+    pattern: "^Makefile$"
+  # Match make-related content
+  - type: content
+    pattern: "(?i)(makefile|make target|\\.PHONY)"
+  # Match file modification events
+  - type: event
+    pattern: "file_modify"
+
+actions:
+  - type: suggest
+    message: |
+      When working with Makefiles, follow these best practices:
+
+      ## Structure and Organization
+
+      ### 1. File Organization
+      ```makefile
+      .PHONY: target1 target2 target3
+
+      ######################################################################
+      #                            VARIABLES                               #
+      ######################################################################
+
+      # Base directory
+      BASE_DIR = $(shell pwd)
+
+      # Directory names
+      DIR_NAME = $(BASE_DIR)/relative/path
+
+      ######################################################################
+      #                             TARGETS                                #
+      ######################################################################
+
+      all : primary-target secondary-target
+
+      help :
+          @echo "Available targets:"
+          @echo " - target-name    : description"
+
+      ######################################################################
+      #                           BUILD RULES                              #
+      ######################################################################
+
+      $(OUTPUT_FILE) : $(INPUT_FILE)
+          command to build
+      ```
+
+      ### 2. Target Naming Convention
+      - **Use kebab-case**: `build-cv`, `install-deps-node`
+      - **Follow action-component pattern**: `action-component`
+        - `build-cv` (build the CV)
+        - `install-deps-python` (install Python dependencies)
+        - `clean-env-python` (clean Python environment)
+        - `setup-env-python` (setup Python environment)
+
+      ### 3. Directory Variables
+      - **Use absolute paths**: `BASE_DIR = $(shell pwd)`
+      - **Build from base**: `TEX_DIR = $(BASE_DIR)/tex`
+      - **Consistent naming**: All directory variables end with `_DIR`
+
+      ### 4. Marker Files for Single-Shot Targets
+      - **Use .stamp extension**: `target-name.stamp`
+      - **Place in appropriate directory**: `$(VENV_DIR)/setup-env-python.stamp`
+      - **Reference in variables**: `VENV_MARKER = $(VENV_DIR)/setup-env-python.stamp`
+
+      ## Target Implementation
+
+      ### 5. .PHONY Declaration
+      - **List all non-file targets**: `.PHONY: all help clean-cv install-deps-python`
+      - **Place at top of file**: First line after comments
+
+      ### 6. Help Target
+      - **Always include**: Provide `help` target with clear descriptions
+      - **Align descriptions**: Use consistent spacing for readability
+      - **Group logically**: Group related targets together
+
+      ### 7. Dependency Management
+      - **Clear dependencies**: `install-deps-python : setup-env-python`
+      - **Marker file patterns**: Use consistent marker file approach
+      - **Conditional checks**: Check for required files before proceeding
+
+      ### 8. Error Handling
+      ```makefile
+      install-deps-python : setup-env-python
+          @if [ ! -f $(PYPROJECT_TOML) ]; then \
+              echo "No pyproject.toml found. Run 'poetry init' first."; \
+              exit 1; \
+          fi
+          . $(VENV_DIR)/bin/activate && poetry install
+      ```
+
+      ## Variable Naming
+
+      ### 9. Consistent Variable Names
+      - **Directories**: `*_DIR` (e.g., `TEX_DIR`, `VENV_DIR`)
+      - **Files**: `*_FILE` or descriptive name (e.g., `CV_PDF`, `POETRY_LOCK`)
+      - **Markers**: `*_MARKER` (e.g., `VENV_MARKER`, `MODULES_MARKER`)
+
+      ### 10. Path Construction
+      - **Build from base**: Always use `$(BASE_DIR)` as foundation
+      - **Consistent separators**: Use `/` for path separation
+      - **Avoid hardcoded paths**: Make paths configurable through variables
+
+examples:
+  - input: |
+      # Bad: Inconsistent naming and structure
+      .PHONY: build deploy
+      build: cv.pdf
+      deploy: build
+          cp cv.pdf site/
+
+      # Good: Consistent naming and structure
+      .PHONY: build-cv deploy-cv
+      build-cv: $(CV_PDF)
+      deploy-cv: $(DEPLOY_PDF)
+      $(DEPLOY_PDF): $(CV_PDF)
+          cp $(CV_PDF) $(DEPLOY_DIR)/
+    output: "Properly structured Makefile with consistent naming"
+
+metadata:
+  priority: high
+  version: 1.0
+  principle: "Consistency and clarity in build automation"
+</rule>
