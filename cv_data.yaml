@@ -69,20 +69,20 @@ experience:
     location: Zürich, Switzerland
     description: >
       Collaborating with a dynamic startup in a fast-paced environment.
-      Developing a high-load C++20 backend for real-time telemetry and event aggregation,
-      efficiently processing and manipulating large-scale data streams at 200Mbps per core.
+      Developing a **high-load C++20 backend** for real-time telemetry and event aggregation,
+      efficiently processing and manipulating **large-scale data streams** at 200Mbps per core.
     achievements:
-      - Leveraged C++ coroutines with the Seastar framework for efficient concurrency.
+      - "Leveraged C++ **coroutines** with the Seastar framework for efficient concurrency."
       - >
-        Improved overall data throughput by 50% and reduced service memory consumption by 30%
+        **Improved overall data throughput by 50%** and reduced service memory consumption by 30%
         by optimizing a single component in the system.
       - >
-        Utilized the Ragel state machine compiler reducing the parsing time
+        Utilized the Ragel state machine compiler **reducing the parsing time**
         of standard event formats (SyslogBSD, CEF) by 70%.
-      - Led availability enhancements, eliminating downtime during service upgrades
-      - Built a sandbox service for debugging data aggregation with step-by-step insights.
-      - Reverse-engineered and implemented a proprietary 3rd-party binary protocol.
-      - Managed a two-person engineering team, coordinating development efforts.
+      - "Led availability enhancements, **eliminating downtime** during service upgrades"
+      - "**Built a sandbox service** for debugging data aggregation with step-by-step insights."
+      - "**Reverse-engineered** and implemented a proprietary 3rd-party binary protocol."
+      - "**Managed a two-person engineering team**, coordinating development efforts."
     stack: C++20 / Seastar / Boost / Ragel / Docker / AWS / Python / Jinja / MongoDB / Go
 
   - company: WANNA
@@ -90,15 +90,15 @@ experience:
     period: Jun 2022 - Apr 2024
     location: Limassol, Cyprus
     description: >
-      Developed a lightweight cross-platform C++20 library enabling immersive AR try-on experiences
-      on mobile devices.
+      Developed a **lightweight cross-platform C++20 library** enabling immersive AR try-on experiences
+      on **mobile devices**.
     achievements:
-      - Designed a universal C API for seamless interaction with native frontends.
+      - "**Designed a universal C API** for seamless interaction with native frontends."
       - >
-        Built a generic 3D viewer with smooth animations and high performance at 60FPS,
+        Built a **generic 3D viewer** with smooth animations and high performance at 60FPS,
         establishing it as a core offering for the company.
-      - Optimized 3D rendering pipelines for enhanced real-time performance.
-      - Integrated a new render engine unlocking realistic reflections and materials.
+      - "**Optimized 3D rendering pipelines** for enhanced real-time performance."
+      - "**Integrated a new render engine** unlocking realistic reflections and materials."
     stack: C++20 / Objective-C / OpenCV / Metal / CoreML / CMake / Conan / GoogleTest
 
   - company: Yandex
@@ -106,20 +106,20 @@ experience:
     period: Mar 2020 - May 2022
     location: St. Petersburg, Russia
     description: >
-      Developed a high-load C++17 backend for Yandex.Messenger, serving 20kRPS,
-      with a focus on efficient and secure asynchronous code to ensure system resilience.
+      Developed a **high-load C++17 backend** for Yandex.Messenger, serving 20kRPS,
+      with a focus on efficient and secure asynchronous code to ensure **system resilience**.
     achievements:
       - >
-        Contributed to core service components: Json/Protobuf APIs, message processing pipeline,
+        Contributed to **core service components**: Json/Protobuf APIs, message processing pipeline,
         and data storage (PostgreSQL/YDB).
       - >
-        Boosted system scalability by implementing sharding and load balancing,
+        Boosted system scalability by implementing **sharding and load balancing**,
         resolving bottlenecks in the support-automation service.
-      - Optimized in-memory cache storage, reducing RAM consumption by 10%.
+      - "Optimized in-memory cache storage, **reducing RAM consumption** by 10%."
       - >
         Integrated probabilistic data structures to count unique message views in large channels,
-        reducing the space complexity significantly.
-      - Gained Python experience while developing the auxiliary services.
+        **reducing the space complexity** significantly.
+      - "Gained Python experience while **developing the auxiliary services**."
     stack: C++17 / Python / Protobuf / PostgreSQL / YDB
 
   - company: Tensor
@@ -127,15 +127,15 @@ experience:
     period: Jun 2018 - Feb 2020
     location: St. Petersburg, Russia
     description: >
-      Developed a cross-platform C++14 / Boost library for the business logic
-      of an Android/iOS courier app.
+      Developed a **cross-platform C++14 / Boost library** for the business logic
+      of an **Android/iOS** courier app.
     achievements:
-      - Redesigned architecture, cutting time-to-market for new features by 30%.
+      - "**Redesigned architecture**, cutting time-to-market for new features by 30%."
       - >
-        Developed a middle-end layer to integrate the backend with platform-native frontends
+        Developed a middle-end layer to **integrate the backend with platform-native frontends**
         using JsonRPC and Djinni-generated bridges.
-      - Mentored a junior developer to independently deliver key features in 6 months.
-      - Built a generic component for automatic data caching to a local SQLite DB.
+      - "**Mentored a junior developer** to independently deliver key features in 6 months."
+      - "Built a generic **component for automatic data caching** to a local SQLite DB."
     stack: C++14 / Boost / JNI / Djinni / SQLite / Conan / CMake / Boost.Test
 
 metadata:

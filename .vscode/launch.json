@@ -24,7 +24,7 @@
                 "--format",
                 "html",
                 "--output",
-                "gh-pages/index.html",
+                "gh-pages/cv.html",
                 "--data",
                 "cv_data.yaml",
             ]

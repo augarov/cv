@@ -112,7 +112,7 @@
 
 \runsubsection{ {{- edu.institution | escape_latex -}} } \\
 \descript{ {{- edu.degree | escape_latex -}} }
-\location{ {{- edu.period | escape_latex -}} | {{ edu.location | escape_latex }}}
+\location{ {{- edu.period | escape_latex }} | {{ edu.location | escape_latex }}}
 {{ edu.specialization | escape_latex }} \\
 Specialization: {{ edu.focus | escape_latex }} \\
 \textbf{Cum. GPA}: \textit{ {{- edu.gpa.cumulative | escape_latex -}} } \\
@@ -142,12 +142,12 @@ Specialization: {{ edu.focus | escape_latex }} \\
 
 \runsubsection{ {{- job.company | escape_latex -}} }
 \descript{| {{ job.position | escape_latex }}}
-\location{ {{- job.period | escape_latex -}} | {{ job.location | escape_latex }}}
+\location{ {{- job.period | escape_latex }} | {{ job.location | escape_latex }}}
 
-{{ job.description | escape_latex }}
+{{ job.description | markdown_latex }}
 \begin{descritemize}
 {%- for achievement in job.achievements %}
-    \descritem {{ achievement | escape_latex }}
+    \descritem {{ achievement | markdown_latex }}
 {%- endfor %}
 \end{descritemize}
 \textbf{Stack}: \textit{ {{- job.stack | escape_latex -}} }
