@@ -11,6 +11,7 @@ BASE_DIR = $(shell pwd)
 TEX_DIR = $(BASE_DIR)/tex
 WEBSITE_DIR = $(BASE_DIR)/gh-pages
 RENDERER_DIR = $(BASE_DIR)/cv_renderer
+TEMPLATES_DIR = $(BASE_DIR)/templates
 
 # Python setup
 VENV_DIR = $(BASE_DIR)/.venv
@@ -18,8 +19,8 @@ PYPROJECT_TOML = $(RENDERER_DIR)/pyproject.toml
 
 # Source files
 CV_DATA = $(BASE_DIR)/cv_data.yaml
-CV_TEX_TEMPLATE = $(BASE_DIR)/templates/cv.tex.j2
-CV_HTML_TEMPLATE = $(BASE_DIR)/templates/cv.html.j2
+CV_TEX_TEMPLATE = $(TEMPLATES_DIR)/cv.tex.j2
+CV_HTML_TEMPLATE = $(TEMPLATES_DIR)/cv.html.j2
 CV_TEX = $(TEX_DIR)/cv.tex
 CV_CLS = $(TEX_DIR)/deedy-resume.cls
 
@@ -40,10 +41,10 @@ all : build-cv deploy-cv
 help :
 	@echo "Available targets:"
 	@echo " - all                    : build and deploy CV locally"
-	@echo " - build-cv               : build $(CV_PDF)"
-	@echo " - deploy-cv              : deploy $(CV_PDF) to $(WEBSITE_DIR)"
-	@echo " - render-tex             : generate $(CV_TEX) from YAML data"
-	@echo " - render-html            : generate $(CV_HTML) from YAML data"
+	@echo " - build-cv               : build CV PDF from LaTeX"
+	@echo " - deploy-cv              : copy CV PDF to website directory"
+	@echo " - render-tex             : generate LaTeX file from YAML data"
+	@echo " - render-html            : generate HTML file from YAML data"
 	@echo " - install-deps-node      : install Node.js dependencies"
 	@echo " - install-deps-python    : install Python dependencies with Poetry"
 	@echo " - clear-cv               : remove built CV files"
