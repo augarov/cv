@@ -1,0 +1,98 @@
+---
+description:
+globs: **/README.md
+alwaysApply: false
+---
+# Brief README Rule
+
+Keep READMEs concise, focused, and immediately useful.
+
+<rule>
+name: brief_readme
+description: Enforce brief and informative README files
+filters:
+  # Match README files
+  - type: file_name
+    pattern: "(?i)readme\\.(md|txt|rst)$"
+  # Match documentation-related content
+  - type: content
+    pattern: "(?i)(readme|documentation)"
+
+actions:
+  - type: suggest
+    message: |
+      Keep READMEs brief and informative by following these principles:
+
+      ## ✅ Essential Sections Only
+      - **Purpose**: What the project does (1-2 sentences)
+      - **Quick Start**: Minimal setup and usage
+      - **Core Usage**: Main commands/examples
+      - **Data/Config**: Critical structure information
+
+      ## ❌ Remove Unnecessary Sections
+      - Verbose project benefits or marketing language
+      - Detailed file structure trees
+      - Advanced usage examples for basic tools
+      - Troubleshooting sections for common issues
+      - Long integration examples (CI/CD, Docker, etc.)
+      - Programmatic usage for CLI tools
+      - Development setup instructions
+      - Contribution guidelines (unless essential)
+
+      ## 📝 Writing Guidelines
+      - **No Command Duplication**: Show one way to do things, not multiple alternatives
+      - **Concise Examples**: Use realistic, minimal examples
+      - **Essential Only**: If a user can figure it out easily, don't document it
+      - **Scannable**: Use clear headings and bullet points
+      - **Immediate Value**: Every section should help users get started quickly
+
+      ## 🎯 Length Target
+      - Basic tools: ~50-100 lines
+      - Complex libraries: ~100-200 lines
+      - If it's longer, question every section
+
+examples:
+  - input: |
+      # Bad: Verbose README
+      ## Benefits
+      - Single source of truth
+      - Easy maintenance
+      - Version control friendly
+      - Perfect for CI/CD
+
+      ## Project Structure
+      ├── src/
+      ├── docs/
+      └── tests/
+
+      ## Basic Usage
+      npm run build
+      # Or with yarn
+      yarn build
+
+      ## Advanced Usage
+      npm run build --production
+
+      ## Troubleshooting
+      Q: Build fails?
+      A: Check dependencies
+
+      ## Contributing
+      1. Fork repo
+      2. Create branch
+      3. Submit PR
+
+      # Good: Concise README
+      ## Quick Start
+      npm install
+      npm run build
+
+      ## Usage
+      npm run build --production
+    output: "Concise, focused README that gets users started quickly"
+
+metadata:
+  priority: medium
+  version: 1.0
+  principle: "Brevity serves users better than completeness"
+</rule>

@@ -1,0 +1,140 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# CV Project Structure Rule
+
+Define and maintain the organized structure of the CV project with its multiple components.
+
+<rule>
+name: cv_project_structure
+description: Standards for organizing the CV project structure with its multiple output formats and deployment targets
+filters:
+  # Match project structure changes
+  - type: event
+    pattern: "(directory_create|file_create|file_move)"
+  # Match files that affect project organization
+  - type: content
+    pattern: "(?i)(structure|organization|directory|folder)"
+
+actions:
+  - type: suggest
+    message: |
+      Maintain the CV project structure with these organized components:
+
+      ## 📁 Core Project Structure
+
+      ```
+      cv/                           # Main project root
+      ├── cv_data.json             # ✨ Single source of truth (JSON)
+      ├── Makefile                 # Build automation
+      ├── README.md                # Main project documentation
+      │
+      ├── cv_renderer/             # 🐍 Python Package
+      │   ├── __init__.py         # Package initialization
+      │   ├── __main__.py         # CLI interface
+      │   ├── renderer.py         # Core rendering logic
+      │   ├── pyproject.toml      # Poetry configuration
+      │   └── README.md           # Package documentation
+      │
+      ├── templates/               # 📄 Jinja2 Templates
+      │   ├── cv.tex.j2           # LaTeX template (PDF output)
+      │   └── cv.html.j2          # HTML template (web output)
+      │
+      ├── tex/                     # 📝 LaTeX & PDF Components
+      │   ├── cv.tex              # Generated LaTeX file
+      │   ├── cv.pdf              # Generated PDF output
+      │   ├── deedy-resume.cls    # LaTeX class file
+      │   ├── fonts/              # Custom fonts for PDF styling
+      │   └── *.aux, *.log, etc.  # LaTeX compilation artifacts
+      │
+      ├── gh-pages/                # 🌐 Web Deployment
+      │   ├── index.html          # Main web CV page
+      │   ├── styles.css          # Web styling
+      │   ├── fallback-detection.js # PDF.js capability detection
+      │   ├── cv.pdf              # PDF copy for web display
+      │   ├── pdfjs/              # PDF.js viewer files
+      │   ├── img/                # Web assets/images
+      │   ├── sitemap.xml         # SEO sitemap
+      │   └── robots.txt          # Search engine directives
+      │
+      ├── .github/                 # 🔄 CI/CD Workflows
+      └── .cursor/rules/           # 📋 Project Rules
+      ```
+
+      ## 🎯 Component Purposes
+
+      ### **📊 Data Layer**
+      - `cv_data.json`: **Single source of truth** - All CV content in structured JSON
+      - `templates/*.j2`: **Jinja2 templates** for rendering to different formats
+
+      ### **🐍 Python Package (`cv_renderer/`)**
+      - **Purpose**: Template-based CV generation system
+      - **Functionality**: Renders JSON data to LaTeX/HTML using Jinja2
+      - **CLI**: `python -m cv_renderer` for command-line usage
+      - **Dependencies**: Managed with Poetry (`pyproject.toml`)
+
+      ### **📝 LaTeX & PDF Components (`tex/`)**
+      - `tex/cv.tex`: **Generated LaTeX** from JSON data via template
+      - `tex/cv.pdf`: **Final PDF output** compiled from LaTeX
+      - `tex/deedy-resume.cls`: **LaTeX class** defining document style
+      - `tex/fonts/`: **Custom fonts** for PDF styling
+      - `tex/*.aux, *.log, etc.`: **LaTeX compilation artifacts** (auto-generated)
+
+      ### **🌐 Web Deployment (`gh-pages/`)**
+      - **Purpose**: GitHub Pages web version of CV
+      - `index.html`: **Main web page** with PDF viewer
+      - `fallback-detection.js`: **Browser capability detection** for PDF.js
+      - `pdfjs/`: **PDF.js viewer** for in-browser PDF display
+      - `cv.pdf`: **Web-optimized PDF** copy for online viewing
+      - `styles.css`: **Web styling** for responsive design
+
+      ### **🔧 Build & Automation**
+      - `Makefile`: **Build commands** for generating different formats
+      - `.github/`: **CI/CD workflows** for automated building/deployment
+
+      ## 📐 Design Principles
+
+      1. **Single Source of Truth**: All content originates from `cv_data.json`
+      2. **Template-Based**: Use Jinja2 templates for consistent rendering
+      3. **Multi-Format Output**: LaTeX/PDF, HTML, and web deployment
+      4. **Separation of Concerns**: Data, templates, rendering logic, and deployment are separate
+      5. **Automated Pipeline**: From JSON → Templates → Multiple Outputs → Deployment
+      6. **Organized Structure**: LaTeX files contained in `tex/` directory
+
+      ## 🚫 What NOT to Do
+
+      - Don't duplicate content across formats - use templates
+      - Don't place generated files in version control (except web deployment)
+      - Don't mix data with presentation logic
+      - Don't create files outside the established structure
+      - Don't bypass the template system for content changes
+      - Don't put LaTeX files in the root directory - use `tex/`
+
+examples:
+  - input: |
+      # Bad: Mixed structure with LaTeX files in root
+      ├── cv.tex
+      ├── cv.pdf
+      ├── cv_latex.tex
+      ├── cv_html.html
+      ├── python_scripts/
+      └── web_files/
+
+      # Good: Organized structure with tex/ directory
+      ├── cv_data.json
+      ├── cv_renderer/
+      ├── templates/
+      ├── tex/
+      │   ├── cv.tex
+      │   ├── cv.pdf
+      │   └── deedy-resume.cls
+      └── gh-pages/
+    output: "Proper CV project organization with LaTeX files contained in tex/ directory"
+
+metadata:
+  priority: high
+  version: 1.1
+  principle: "Structure enables maintainability and automation"
+</rule>
