@@ -1,0 +1,162 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% Deedy CV/Resume
+% The original template has been downloaded from:
+% http://www.LaTeXTemplates.com
+%
+% Original author:
+% Debarghya Das (http://www.debarghyadas.com)
+% With extensive modifications by:
+% Vel (vel@latextemplates.com)
+%
+% License:
+% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[]{deedy-resume}
+
+% Note: Don't forget to update the metadata in HTML.
+\hypersetup{
+    pdftitle={ {{- metadata.pdf_title | escape_latex -}} },
+    pdfauthor={ {{- metadata.pdf_author | escape_latex -}} },
+    pdfsubject={ {{- metadata.pdf_subject | escape_latex -}} },
+    pdfkeywords={ {{- metadata.pdf_keywords | escape_latex -}} },
+}
+
+\title{ {{- metadata.pdf_title | escape_latex -}} }
+\author{ {{- metadata.pdf_author | escape_latex -}} }
+\date{\today}
+
+\begin{document}
+%
+%----------------------------------------------------------------------------------------
+%	TITLE SECTION
+%----------------------------------------------------------------------------------------
+%
+\lastupdated % Print the Last Updated text at the top right
+
+\begin{minipage}[t]{0.68\textwidth}
+
+\blockspace
+% Note: Don't forget to update the metadata in HTML.
+\namesection{ {{- personal.name.first | escape_latex -}} }{ {{- personal.name.last | escape_latex -}} }
+{ {{- personal.summary | escape_latex -}} }
+
+\end{minipage}
+\hfill
+\columnspace
+%
+%----------------------------------------------------------------------------------------
+%	CONTACTS & LINKS
+%----------------------------------------------------------------------------------------
+%
+\begin{minipage}[t]{0.27\textwidth}
+
+\blockspace
+\colorbox{shade}{
+\begin{supertabular}{@{\hspace{3pt}} p{0.05\linewidth} p{0.775\linewidth}}
+    \raisebox{-1pt}{\faHome} & {{ personal.location | escape_latex }} \\
+    \raisebox{-1pt}{\small\faEnvelope} & \href{mailto:{{ personal.contact.email }}}{\bf {{ personal.contact.email | escape_latex }}} \\
+    \raisebox{-1pt}{\faLinkedin} & \href{https://{{ personal.contact.linkedin }}}{\bf {{ personal.contact.linkedin | escape_latex }}} \\
+    \raisebox{-1pt}{\faTelegramPlane} & \href{https://{{ personal.contact.telegram }}}{\bf {{ personal.contact.telegram | escape_latex }}} \\
+    \raisebox{-1pt}{\faGithub} & \href{https://{{ personal.contact.github }}}{\bf {{ personal.contact.github | escape_latex }}} \\
+\end{supertabular}
+}
+
+\end{minipage}
+
+\blockspace
+
+%----------------------------------------------------------------------------------------
+%	LEFT COLUMN
+%----------------------------------------------------------------------------------------
+
+\begin{minipage}[t]{0.25\textwidth}
+
+%------------------------------------------------
+% Skills
+%------------------------------------------------
+
+\section{Skills}
+{% for category, skill_list in skills.items() %}
+
+\textbf{ {{- category | escape_latex -}} :}
+\begin{skillitemize}
+{%- for skill in skill_list %}
+    \skillitem {{ skill | escape_latex }}
+{%- endfor %}
+\end{skillitemize}
+\halfspace
+{% endfor %}
+
+\sectionspace
+
+%------------------------------------------------
+% Languages
+%------------------------------------------------
+
+\section{Languages}
+{% for lang in languages -%}
+\textbf{ {{- lang.language | escape_latex -}} } / {{ lang.level | escape_latex }}{% if not loop.last %} \\{% endif %}
+{% endfor %}
+
+\sectionspace
+
+%------------------------------------------------
+% Education
+%------------------------------------------------
+
+\section{Education}
+{% for edu in education %}
+
+\runsubsection{ {{- edu.institution | escape_latex -}} } \\
+\descript{ {{- edu.degree | escape_latex -}} }
+\location{ {{- edu.period | escape_latex -}} | {{ edu.location | escape_latex }}}
+{{ edu.specialization | escape_latex }} \\
+Specialization: {{ edu.focus | escape_latex }} \\
+\textbf{Cum. GPA}: \textit{ {{- edu.gpa.cumulative | escape_latex -}} } \\
+\textbf{Major GPA}: \textit{ {{- edu.gpa.major | escape_latex -}} }
+{% endfor %}
+
+\sectionspace
+
+%----------------------------------------------------------------------------------------
+
+\end{minipage}
+\hfill
+\columnspace
+%
+%----------------------------------------------------------------------------------------
+%	RIGHT COLUMN
+%----------------------------------------------------------------------------------------
+%
+\begin{minipage}[t]{0.70\textwidth}
+
+%------------------------------------------------
+% Experience
+%------------------------------------------------
+
+\section{Experience}
+{% for job in experience %}
+
+\runsubsection{ {{- job.company | escape_latex -}} }
+\descript{| {{ job.position | escape_latex }}}
+\location{ {{- job.period | escape_latex -}} | {{ job.location | escape_latex }}}
+
+{{ job.description | escape_latex }}
+\begin{descritemize}
+{%- for achievement in job.achievements %}
+    \descritem {{ achievement | escape_latex }}
+{%- endfor %}
+\end{descritemize}
+\textbf{Stack}: \textit{ {{- job.stack | escape_latex -}} }
+
+\sectionspace
+{% endfor %}
+
+%------------------------------------------------
+
+\end{minipage}
+
+\end{document}
