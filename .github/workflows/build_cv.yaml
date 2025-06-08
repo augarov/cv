@@ -6,8 +6,8 @@ on:
       - main
     paths:
       - '.github/workflows/build_cv.yaml'
-      - 'cv.tex'
-      - 'deedy-resume.cls'
+      - 'tex/cv.tex'
+      - 'tex/deedy-resume.cls'
 
 jobs:
   build_latex:
@@ -22,13 +22,13 @@ jobs:
       - name: 📕 Compile LaTeX document 📕
         uses: xu-cheng/latex-action@v2
         with:
-          root_file: cv.tex
+          root_file: tex/cv.tex
           latexmk_use_xelatex: true
 
       - name: Upload files to release
         uses: svenstaro/upload-release-action@v2
         with:
-          file: cv.pdf
+          file: tex/cv.pdf
           asset_name: cv.pdf
           overwrite: true
           release_name: cv-latest
