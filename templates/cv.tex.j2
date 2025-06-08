@@ -1,22 +1,5 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-% Deedy CV/Resume
-% The original template has been downloaded from:
-% http://www.LaTeXTemplates.com
-%
-% Original author:
-% Debarghya Das (http://www.debarghyadas.com)
-% With extensive modifications by:
-% Vel (vel@latextemplates.com)
-%
-% License:
-% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 \documentclass[]{deedy-resume}
 
-% Note: Don't forget to update the metadata in HTML.
 \hypersetup{
     pdftitle={ {{- metadata.pdf_title | escape_latex -}} },
     pdfauthor={ {{- metadata.pdf_author | escape_latex -}} },
@@ -39,7 +22,6 @@
 \begin{minipage}[t]{0.68\textwidth}
 
 \blockspace
-% Note: Don't forget to update the metadata in HTML.
 \namesection{ {{- personal.name.first | escape_latex -}} }{ {{- personal.name.last | escape_latex -}} }
 { {{- personal.summary | escape_latex -}} }
 
