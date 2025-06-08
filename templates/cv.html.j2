@@ -143,16 +143,16 @@
 </head>
 <body>
     <div class="header">
-        <div class="name">{{ personal.name.first }} {{ personal.name.last }}</div>
-        <div class="title">{{ personal.title }}</div>
+        <div class="name">{{ personal.name.first | escape_html }} {{ personal.name.last | escape_html }}</div>
+        <div class="title">{{ personal.title | escape_html }}</div>
         <div class="summary">{{ personal.summary | markdown_html }}</div>
 
         <div class="contact">
-            <div class="contact-item">📍 {{ personal.location }}</div>
-            <div class="contact-item">✉️ <a href="mailto:{{ personal.contact.email }}">{{ personal.contact.email }}</a></div>
-            <div class="contact-item">💼 <a href="https://{{ personal.contact.linkedin }}">{{ personal.contact.linkedin }}</a></div>
-            <div class="contact-item">💬 <a href="https://{{ personal.contact.telegram }}">{{ personal.contact.telegram }}</a></div>
-            <div class="contact-item">💻 <a href="https://{{ personal.contact.github }}">{{ personal.contact.github }}</a></div>
+            <div class="contact-item">📍 {{ personal.location | escape_html }}</div>
+            <div class="contact-item">✉️ <a href="mailto:{{ personal.contact.email }}">{{ personal.contact.email | escape_html }}</a></div>
+            <div class="contact-item">💼 <a href="https://{{ personal.contact.linkedin }}">{{ personal.contact.linkedin | escape_html }}</a></div>
+            <div class="contact-item">💬 <a href="https://{{ personal.contact.telegram }}">{{ personal.contact.telegram | escape_html }}</a></div>
+            <div class="contact-item">💻 <a href="https://{{ personal.contact.github }}">{{ personal.contact.github | escape_html }}</a></div>
         </div>
     </div>
 
@@ -160,16 +160,16 @@
         <h2>Experience</h2>
         {% for job in experience %}
         <div class="experience-item">
-            <div class="company">{{ job.company }}</div>
-            <div class="position">{{ job.position }}</div>
-            <div class="period-location">{{ job.period }} | {{ job.location }}</div>
+            <div class="company">{{ job.company | escape_html }}</div>
+            <div class="position">{{ job.position | escape_html }}</div>
+            <div class="period-location">{{ job.period | escape_html }} | {{ job.location | escape_html }}</div>
             <div class="description">{{ job.description | markdown_html }}</div>
             <ul class="achievements">
                 {% for achievement in job.achievements %}
                 <li>{{ achievement | markdown_html }}</li>
                 {% endfor %}
             </ul>
-            <div class="stack"><strong>Stack:</strong> {{ job.stack }}</div>
+            <div class="stack"><strong>Stack:</strong> {{ job.stack | escape_html }}</div>
         </div>
         {% endfor %}
     </div>
@@ -179,10 +179,10 @@
         <div class="skills-grid">
             {% for category, skill_list in skills.items() %}
             <div class="skill-category">
-                <h3>{{ category }}</h3>
+                <h3>{{ category | escape_html }}</h3>
                 <ul class="skill-list">
                     {% for skill in skill_list %}
-                    <li>{{ skill }}</li>
+                    <li>{{ skill | escape_html }}</li>
                     {% endfor %}
                 </ul>
             </div>
@@ -195,7 +195,7 @@
         <div class="languages">
             {% for lang in languages %}
             <div class="language-item">
-                <strong>{{ lang.language }}</strong> / {{ lang.level }}
+                <strong>{{ lang.language | escape_html }}</strong> / {{ lang.level | escape_html }}
             </div>
             {% endfor %}
         </div>
@@ -205,13 +205,13 @@
         <h2>Education</h2>
         {% for edu in education %}
         <div class="education-item">
-            <div class="company">{{ edu.institution }}</div>
-            <div class="position">{{ edu.degree }}</div>
-            <div class="period-location">{{ edu.period }} | {{ edu.location }}</div>
-            <div>{{ edu.specialization }}</div>
-            <div>Specialization: {{ edu.focus }}</div>
-            <div>{{ edu.gpa.cumulative.label | markdown_html }}: {{ edu.gpa.cumulative.value }}</div>
-            <div>{{ edu.gpa.major.label | markdown_html }}: {{ edu.gpa.major.value }}</div>
+            <div class="company">{{ edu.institution | escape_html }}</div>
+            <div class="position">{{ edu.degree | escape_html }}</div>
+            <div class="period-location">{{ edu.period | escape_html }} | {{ edu.location | escape_html }}</div>
+            <div>{{ edu.specialization | escape_html }}</div>
+            <div>Specialization: {{ edu.focus | escape_html }}</div>
+            <div><strong>Cum. GPA:</strong> {{ edu.gpa.cumulative | escape_html }}</div>
+            <div><strong>Major GPA:</strong> {{ edu.gpa.major | escape_html }}</div>
         </div>
         {% endfor %}
     </div>

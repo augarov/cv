@@ -11,7 +11,7 @@ from datetime import datetime
 
 
 def escape_latex_text(text: str) -> str:
-    """Escape special LaTeX characters in plain text."""
+    """Escape special LaTeX characters and handle newlines in plain text."""
     if not isinstance(text, str):
         return text
 
@@ -34,6 +34,42 @@ def escape_latex_text(text: str) -> str:
     for char, replacement in latex_special_chars.items():
         text = text.replace(char, replacement)
 
+    # Handle newlines for LaTeX
+    # Handle double newlines as paragraph breaks
+    text = text.replace('\n\n', '\n\n\\par\n')
+    # Handle single newlines as line breaks
+    text = text.replace('\n', ' \\\\\n')
+
+    return text
+
+
+def escape_html_text(text: str) -> str:
+    """Escape special HTML characters and handle newlines in plain text."""
+    if not isinstance(text, str):
+        return text
+
+    # Escape special HTML characters
+    html_special_chars = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#x27;',
+    }
+
+    for char, replacement in html_special_chars.items():
+        text = text.replace(char, replacement)
+
+    # Handle newlines for HTML
+    # Handle double newlines as paragraph breaks
+    text = text.replace('\n\n', '</p><p>')
+    # Handle single newlines as line breaks
+    text = text.replace('\n', '<br>')
+
+    # Wrap the entire text in paragraph tags if it contains paragraph breaks
+    if '</p><p>' in text:
+        text = f'<p>{text}</p>'
+
     return text
 
 
@@ -49,7 +85,7 @@ class LaTeXRenderer(mistune.HTMLRenderer):
         return text
 
     def text(self, text: str) -> str:
-        """Render plain text with LaTeX escaping."""
+        """Render plain text with LaTeX escaping and newline handling."""
         return escape_latex_text(text)
 
 
@@ -59,6 +95,10 @@ class HTMLRenderer(mistune.HTMLRenderer):
     def strong(self, text: str) -> str:
         """Render bold text for HTML."""
         return f"<strong>{text}</strong>"
+
+    def text(self, text: str) -> str:
+        """Render plain text with HTML escaping and newline handling."""
+        return escape_html_text(text)
 
 
 class CVRenderer:
@@ -80,6 +120,7 @@ class CVRenderer:
 
         # Add custom filters
         self.env.filters['escape_latex'] = escape_latex_text
+        self.env.filters['escape_html'] = escape_html_text
         self.env.filters['markdown_latex'] = self._markdown_to_latex
         self.env.filters['markdown_html'] = self._markdown_to_html
 
