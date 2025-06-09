@@ -53,6 +53,8 @@ Examples:
         help='Templates directory (default: templates)'
     )
 
+
+
     args = parser.parse_args()
 
     # Check if data file exists
@@ -82,9 +84,12 @@ Examples:
         # Initialize renderer
         renderer = CVRenderer(templates_dir=args.templates_dir)
 
-        # Load data
+        # Load and validate data (always)
         print(f"📄 Loading data from: {args.data}")
-        data = renderer.load_data(args.data)
+        print("🔍 Validating CV data using Pydantic models...")
+        validated_data = renderer.load_data(args.data)
+        print("✅ Data validation successful!")
+        data = renderer.convert_validated_data_for_templates(validated_data)
 
         # Render CV
         print(f"🔄 Rendering CV using template: {template_file}")

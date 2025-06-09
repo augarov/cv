@@ -9,39 +9,48 @@ personal:
   location: Zürich, Switzerland
   contact:
     email: augarov.swe@gmail.com
-    linkedin: linkedin.com/in/augarov
-    telegram: t.me/augarov_swe
-    github: github.com/augarov
+    linkedin:
+      url: https://linkedin.com/in/augarov
+    telegram:
+      url: https://t.me/augarov_swe
+    github:
+      url: https://github.com/augarov
 
 skills:
-  Programming:
-    - C++ 11-20
-    - STL
-    - Boost
-    - Python
-  Core Concepts:
-    - Multithreading
-    - Performance Optimization
-    - Metaprogramming
-  Networking:
-    - TCP/IP
-    - HTTP
-    - Protobuf
-  Databases:
-    - PostgreSQL
-  Tools:
-    - CMake
-    - Bash
-    - Git
-    - Linux
-    - Docker / Compose
-  Soft Skills:
-    - Responsibility
-    - Attention to Detail
-    - Effective Communication
-    - Problem-Solving
-    - Initiative
-    - "Cross-Functional\nCollaboration"
+  - category: "Programming"
+    skills:
+      - C++ 11-20
+      - STL
+      - Boost
+      - Python
+  - category: "Core Concepts"
+    skills:
+      - Multithreading
+      - Performance Optimization
+      - Metaprogramming
+  - category: "Networking"
+    skills:
+      - TCP/IP
+      - HTTP
+      - Protobuf
+  - category: "Databases"
+    skills:
+      - PostgreSQL
+  - category: "Tools"
+    skills:
+      - CMake
+      - Bash
+      - Git
+      - Linux
+      - Docker / Compose
+  - category: "Soft Skills"
+    skills:
+      - Responsibility
+      - Attention to Detail
+      - Effective Communication
+      - Problem-Solving
+      - Initiative
+      - "Cross-Functional\nCollaboration"
 
 languages:
   - language: English

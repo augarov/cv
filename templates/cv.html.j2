@@ -150,9 +150,9 @@
         <div class="contact">
             <div class="contact-item">📍 {{ personal.location | escape_html }}</div>
             <div class="contact-item">✉️ <a href="mailto:{{ personal.contact.email }}">{{ personal.contact.email | escape_html }}</a></div>
-            <div class="contact-item">💼 <a href="https://{{ personal.contact.linkedin }}">{{ personal.contact.linkedin | escape_html }}</a></div>
-            <div class="contact-item">💬 <a href="https://{{ personal.contact.telegram }}">{{ personal.contact.telegram | escape_html }}</a></div>
-            <div class="contact-item">💻 <a href="https://{{ personal.contact.github }}">{{ personal.contact.github | escape_html }}</a></div>
+            <div class="contact-item">💼 <a href="{{ personal.contact.linkedin.url }}">{{ personal.contact.linkedin.display_name | escape_html }}</a></div>
+            <div class="contact-item">💬 <a href="{{ personal.contact.telegram.url }}">{{ personal.contact.telegram.display_name | escape_html }}</a></div>
+            <div class="contact-item">💻 <a href="{{ personal.contact.github.url }}">{{ personal.contact.github.display_name | escape_html }}</a></div>
         </div>
     </div>
 
@@ -177,11 +177,11 @@
     <div class="section">
         <h2>Skills</h2>
         <div class="skills-grid">
-            {% for category, skill_list in skills.items() %}
+            {% for skill_category in skills %}
             <div class="skill-category">
-                <h3>{{ category | escape_html }}</h3>
+                <h3>{{ skill_category.category | escape_html }}</h3>
                 <ul class="skill-list">
-                    {% for skill in skill_list %}
+                    {% for skill in skill_category.skills %}
                     <li>{{ skill | escape_html }}</li>
                     {% endfor %}
                 </ul>

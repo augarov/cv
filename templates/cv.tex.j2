@@ -1,14 +1,14 @@
 \documentclass[]{deedy-resume}
 
 \hypersetup{
-    pdftitle={ {{- metadata.pdf_title | escape_latex -}} },
-    pdfauthor={ {{- metadata.pdf_author | escape_latex -}} },
-    pdfsubject={ {{- metadata.pdf_subject | escape_latex -}} },
-    pdfkeywords={ {{- metadata.pdf_keywords | escape_latex -}} },
+    pdftitle={ {{- metadata.pdf_title  -}} },
+    pdfauthor={ {{- metadata.pdf_author  -}} },
+    pdfsubject={ {{- metadata.pdf_subject  -}} },
+    pdfkeywords={ {{- metadata.pdf_keywords  -}} },
 }
 
-\title{ {{- metadata.pdf_title | escape_latex -}} }
-\author{ {{- metadata.pdf_author | escape_latex -}} }
+\title{ {{- metadata.pdf_title  -}} }
+\author{ {{- metadata.pdf_author  -}} }
 \date{\today}
 
 \begin{document}
@@ -23,7 +23,7 @@
 
 \blockspace
 \namesection{ {{- personal.name.first | escape_latex -}} }{ {{- personal.name.last | escape_latex -}} }
-{ {{- personal.summary | escape_latex -}} }
+{ {{- personal.summary | markdown_latex -}} }
 
 \end{minipage}
 \hfill
@@ -40,9 +40,9 @@
 \begin{supertabular}{@{\hspace{3pt}} p{0.05\linewidth} p{0.775\linewidth}}
     \raisebox{-1pt}{\faHome} & {{ personal.location | escape_latex }} \\
     \raisebox{-1pt}{\small\faEnvelope} & \href{mailto:{{ personal.contact.email }}}{\bf {{ personal.contact.email | escape_latex }}} \\
-    \raisebox{-1pt}{\faLinkedin} & \href{https://{{ personal.contact.linkedin }}}{\bf {{ personal.contact.linkedin | escape_latex }}} \\
-    \raisebox{-1pt}{\faTelegramPlane} & \href{https://{{ personal.contact.telegram }}}{\bf {{ personal.contact.telegram | escape_latex }}} \\
-    \raisebox{-1pt}{\faGithub} & \href{https://{{ personal.contact.github }}}{\bf {{ personal.contact.github | escape_latex }}} \\
+    \raisebox{-1pt}{\faLinkedin} & \href{ {{ personal.contact.linkedin.url }} }{\bf {{ personal.contact.linkedin.display_name | escape_latex }}} \\
+    \raisebox{-1pt}{\faTelegramPlane} & \href{ {{ personal.contact.telegram.url }} }{\bf {{ personal.contact.telegram.display_name | escape_latex }}} \\
+    \raisebox{-1pt}{\faGithub} & \href{ {{ personal.contact.github.url }} }{\bf {{ personal.contact.github.display_name | escape_latex }}} \\
 \end{supertabular}
 }
 
@@ -61,11 +61,11 @@
 %------------------------------------------------
 
 \section{Skills}
-{% for category, skill_list in skills.items() %}
+{% for skill_category in skills %}
 
-\textbf{ {{- category | escape_latex -}} :}
+\textbf{ {{- skill_category.category | escape_latex -}} :}
 \begin{skillitemize}
-{%- for skill in skill_list %}
+{%- for skill in skill_category.skills %}
     \skillitem {{ skill | escape_latex }}
 {%- endfor %}
 \end{skillitemize}
