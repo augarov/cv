@@ -1,0 +1,241 @@
+---
+description:
+globs: *.py
+alwaysApply: false
+---
+# Clean Code Practices Rule
+
+Enforce clean coding practices to maintain readable, efficient, and maintainable code.
+
+<rule>
+name: clean_code_practices
+description: Best practices for writing clean, maintainable code
+filters:
+  # Apply to all Python files
+  - type: file_name
+    pattern: ".*\\.py$"
+  # Match code-related content
+  - type: content
+    pattern: "(?i)(class|function|method|def|import)"
+
+actions:
+  - type: suggest
+    message: |
+      Follow these clean code practices for maintainable and efficient code:
+
+      ## 🚫 1. Eliminate Duplicate Logic - Create Abstractions
+
+      **❌ Bad: Duplicate logic across classes**
+      ```python
+      class LaTeXRenderer:
+          def render_ast(self, ast):
+              return ''.join(self._render_token(token) for token in ast)
+
+          def _render_token(self, token):
+              if token.get('type') == 'strong':
+                  return f"\\textbf{{{text}}}"
+              # ... more logic
+
+      class HTMLRenderer:
+          def render_ast(self, ast):
+              return ''.join(self._render_token(token) for token in ast)  # DUPLICATE
+
+          def _render_token(self, token):
+              if token.get('type') == 'strong':
+                  return f"<strong>{text}</strong>"
+              # ... same logic structure
+      ```
+
+      **✅ Good: Abstract base class with shared logic**
+      ```python
+      class ASTRenderer(ABC):
+          def render_ast(self, ast):
+              return ''.join(self._render_token(token) for token in ast)
+
+          def _render_token(self, token):
+              match token.get('type'):
+                  case 'strong':
+                      return self._render_strong(self._render_children(token))
+
+          @abstractmethod
+          def _render_strong(self, text: str) -> str:
+              pass
+
+      class LaTeXRenderer(ASTRenderer):
+          def _render_strong(self, text: str) -> str:
+              return f"\\textbf{{{text}}}"
+
+      class HTMLRenderer(ASTRenderer):
+          def _render_strong(self, text: str) -> str:
+              return f"<strong>{text}</strong>"
+      ```
+
+      ## 🗑️ 2. Remove Unused/Redundant Code
+
+      **❌ Bad: Keeping unused methods**
+      ```python
+      class MarkdownText:
+          def get_plain_text(self) -> str:
+              # Complex logic to extract plain text
+              pass
+
+          def has_formatting(self) -> bool:
+              # Check if markdown has formatting
+              pass
+
+          def get_links(self) -> List[str]:
+              # Extract all links
+              pass
+          # ☝️ These methods are never called anywhere!
+      ```
+
+      **✅ Good: Only keep what's actually used**
+      ```python
+      class MarkdownText:
+          text: str
+          ast: List[Dict[str, Any]]
+          # Only essential fields and methods
+      ```
+
+      ## 🔄 3. Remove Legacy Code When Enhancing
+
+      **❌ Bad: Keeping old and new implementations**
+      ```python
+      class CVRenderer:
+          def __init__(self):
+              # Old approach
+              self.latex_markdown = mistune.create_markdown(renderer=LaTeXRenderer())
+              self.html_markdown = mistune.create_markdown(renderer=HTMLRenderer())
+
+              # New approach
+              self.ast_latex_renderer = ASTToLaTeXRenderer()
+              self.ast_html_renderer = ASTToHTMLRenderer()
+
+          def _markdown_to_latex(self, text):  # Legacy method
+              return self.latex_markdown(text)
+
+          def _ast_to_latex(self, ast):  # New method
+              return self.ast_latex_renderer.render_ast(ast)
+      ```
+
+      **✅ Good: Clean transition to new approach**
+      ```python
+      class CVRenderer:
+          def __init__(self):
+              # Only new approach
+              self.ast_latex_renderer = ASTToLaTeXRenderer()
+              self.ast_html_renderer = ASTToHTMLRenderer()
+
+          def _ast_to_latex(self, ast):
+              return self.ast_latex_renderer.render_ast(ast)
+      ```
+
+      ## 🎯 4. Follow KISS - Keep It Simple, Stupid
+
+      ### Don't Validate What's Already Guaranteed
+
+      **❌ Bad: Redundant validation**
+      ```python
+      def validate_ast(self, ast):
+          # Validating mistune's output - mistune already guarantees valid AST!
+          for token in ast:
+              if 'type' not in token:
+                  raise ValueError('Invalid token')
+              if token['type'] not in valid_types:
+                  raise ValueError('Unsupported type')
+          return ast
+      ```
+
+      **✅ Good: Trust the library**
+      ```python
+      # mistune guarantees valid AST structure
+      # Only validate business rules (e.g., supported markup types)
+      def validate_supported_markup(self, ast):
+          # Only check what matters for your use case
+          pass
+      ```
+
+      ### Don't Do Work Until It's Needed
+
+      **❌ Bad: Pre-rendering everything**
+      ```python
+      def process_markdown_fields(self, data):
+          for field in markdown_fields:
+              field['latex'] = render_latex(field['ast'])  # Always render
+              field['html'] = render_html(field['ast'])    # Even if not used
+              field['plain'] = extract_plain(field['ast']) # Unused!
+      ```
+
+      **✅ Good: On-demand rendering**
+      ```python
+      # Let templates use filters when needed
+      # {{ field.ast | ast_to_latex }}  - only when template needs it
+      # {{ field.ast | ast_to_html }}   - only when template needs it
+      ```
+
+      ### Don't Over-Engineer Simple Solutions
+
+      **❌ Bad: Complex when simple works**
+      ```python
+      def _process_markdown_fields(self, data):
+          # 20+ lines of recursive traversal
+          # Complex type checking
+          # Unnecessary data transformation
+          if isinstance(data, dict):
+              for key, value in data.items():
+                  if self._is_markdown_field(value):
+                      data[key] = self._transform_markdown(value)
+                  # ... more complexity
+      ```
+
+      **✅ Good: Simple and direct**
+      ```python
+      def convert_data_for_templates(self, cv_data):
+          return cv_data.model_dump()  # Pydantic handles it
+      ```
+
+      ## 🔧 Quick Checklist
+
+      Before committing code, ask:
+      - [ ] Am I duplicating logic that could be abstracted?
+      - [ ] Are all my methods/functions actually used?
+      - [ ] Can I remove old code now that I have a better solution?
+      - [ ] Am I doing unnecessary work or validation?
+      - [ ] Is this the simplest solution that works?
+
+examples:
+  - input: |
+      # Bad: Duplicate rendering logic
+      class LaTeXRenderer:
+          def render_tokens(self, tokens):
+              result = []
+              for token in tokens:
+                  if token['type'] == 'strong':
+                      result.append(f"\\textbf{{{token['text']}}}")
+              return ''.join(result)
+
+      class HTMLRenderer:
+          def render_tokens(self, tokens):
+              result = []
+              for token in tokens:
+                  if token['type'] == 'strong':
+                      result.append(f"<strong>{token['text']}</strong>")
+              return ''.join(result)
+    output: |
+      # Good: Shared base class
+      class BaseRenderer(ABC):
+          def render_tokens(self, tokens):
+              return ''.join(self._render_token(token) for token in tokens)
+
+          @abstractmethod
+          def _render_strong(self, text): pass
+
+      class LaTeXRenderer(BaseRenderer):
+          def _render_strong(self, text):
+              return f"\\textbf{{{text}}}"
+
+metadata:
+  priority: high
+  version: 1.0
+  principle: "Clean code is simple, non-redundant, and does only what's necessary"
+</rule>
