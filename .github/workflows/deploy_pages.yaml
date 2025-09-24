@@ -35,6 +35,16 @@ jobs:
           fileName: cv.pdf
           out-file-path: gh-pages
 
+      - name: Download latest generated bundle
+        uses: actions/download-artifact@v4
+        with:
+          name: gh-pages-bundle
+          path: gh-pages-bundle
+
+      - name: Copy generated bundle to gh-pages
+        run: |
+          cp -r gh-pages-bundle/* gh-pages/
+
       - name: Fix permissions
         run: |
           chmod -v -R +rX "gh-pages" | while read line; do

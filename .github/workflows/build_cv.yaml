@@ -44,10 +44,10 @@ jobs:
           cd cv_renderer
           poetry install
 
-      - name: 🔄 Generate CV using cv_renderer 🔄
+      - name: 🔄 Generate HTML using cv_renderer 🔄
         run: |
           source venv/bin/activate
-          python -m cv_renderer --format latex --output tex/cv.tex --data cv_data.yaml
+          python -m cv_renderer --format html --output gh-pages-bundle/index.html --data cv_data.yaml
 
       - name: 📕 Compile LaTeX document 📕
         uses: xu-cheng/latex-action@v2
@@ -64,6 +64,18 @@ jobs:
           overwrite: true
           release_name: cv-latest
           body: "Latest build"
+
+      - name: 🔄 Generate PDF using cv_renderer 🔄
+        run: |
+          source venv/bin/activate
+          python -m cv_renderer --format latex --output tex/cv.tex --data cv_data.yaml
+
+      - name: Upload HTML artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: gh-pages-bundle
+          path: gh-pages-bundle
+
 
   run_deploy_pages:
     name: Deploy GH Pages

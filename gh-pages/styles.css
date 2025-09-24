@@ -39,11 +39,6 @@ body {
 }
 
 #fallback-container p {
-    color: #666;
-    margin: 10px 0;
-}
-
-#fallback-container p:last-of-type {
     color: #999;
     margin: 20px 0;
 }

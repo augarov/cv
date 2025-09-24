@@ -19,14 +19,14 @@ PYPROJECT_TOML = $(RENDERER_DIR)/pyproject.toml
 
 # Source files
 CV_DATA = $(BASE_DIR)/cv_data.yaml
-CV_TEX_TEMPLATE = $(TEMPLATES_DIR)/cv.tex.j2
-CV_HTML_TEMPLATE = $(TEMPLATES_DIR)/cv.html.j2
-CV_TEX = $(TEX_DIR)/cv.tex
+OUT_TEX_TEMPLATE = $(TEMPLATES_DIR)/cv.tex.j2
+OUT_HTML_TEMPLATE = $(TEMPLATES_DIR)/cv.html.j2
+OUT_TEX = $(TEX_DIR)/cv.tex
 CV_CLS = $(TEX_DIR)/deedy-resume.cls
 
 # Target files
-CV_PDF = $(TEX_DIR)/cv.pdf
-CV_HTML = $(WEBSITE_DIR)/cv.html
+OUT_PDF = $(TEX_DIR)/cv.pdf
+OUT_HTML = $(WEBSITE_DIR)/index.html
 DEPLOY_PDF = $(WEBSITE_DIR)/cv.pdf
 MODULES_MARKER = $(WEBSITE_DIR)/node_modules/.install-deps-node.stamp
 VENV_MARKER = $(VENV_DIR)/.setup-env-python.stamp
@@ -51,22 +51,22 @@ help :
 	@echo " - clear-deps-node        : remove Node.js dependencies"
 	@echo " - clear-deps-python      : remove Python virtual environment and cache"
 
-build-cv : $(CV_PDF)
+build-cv : $(OUT_PDF)
 
 deploy-cv : $(DEPLOY_PDF)
 
-render-tex : $(CV_TEX)
+render-tex : $(OUT_TEX)
 
-render-html : $(CV_HTML)
+render-html : $(OUT_HTML)
 
 install-deps-node : $(MODULES_MARKER)
 
 install-deps-python : $(PYTHON_DEPS_MARKER)
 
 clear-cv :
-	rm -f $(CV_TEX)
-	rm -f $(CV_HTML)
-	rm -f $(CV_PDF)
+	rm -f $(OUT_TEX)
+	rm -f $(OUT_HTML)
+	rm -f $(OUT_PDF)
 	rm -f $(DEPLOY_PDF)
 
 clear-deps-node :
@@ -84,18 +84,18 @@ clear-deps-python :
 #                           BUILD RULES                              #
 ######################################################################
 
-$(CV_PDF) : $(CV_TEX) $(CV_CLS)
+$(OUT_PDF) : $(OUT_TEX) $(CV_CLS)
 	cd $(TEX_DIR) && latexmk -xelatex -interaction=nonstopmode -synctex=1 -file-line-error cv.tex
-	touch $(CV_PDF)
+	touch $(OUT_PDF)
 
-$(CV_TEX) : $(PYTHON_DEPS_MARKER) $(CV_DATA) $(CV_TEX_TEMPLATE)
-	. $(VENV_DIR)/bin/activate && python -m cv_renderer --format latex --output $(CV_TEX)
+$(OUT_TEX) : $(PYTHON_DEPS_MARKER) $(CV_DATA) $(OUT_TEX_TEMPLATE)
+	. $(VENV_DIR)/bin/activate && python -m cv_renderer --format latex --output $(OUT_TEX)
 
-$(CV_HTML) : $(PYTHON_DEPS_MARKER) $(CV_DATA) $(CV_HTML_TEMPLATE)
-	. $(VENV_DIR)/bin/activate && python -m cv_renderer --format html --output $(CV_HTML)
+$(OUT_HTML) : $(PYTHON_DEPS_MARKER) $(CV_DATA) $(OUT_HTML_TEMPLATE)
+	. $(VENV_DIR)/bin/activate && python -m cv_renderer --format html --output $(OUT_HTML)
 
-$(DEPLOY_PDF) : $(CV_PDF)
-	cp $(CV_PDF) $(WEBSITE_DIR)/
+$(DEPLOY_PDF) : $(OUT_PDF)
+	cp $(OUT_PDF) $(WEBSITE_DIR)/
 
 $(MODULES_MARKER) :
 	cd $(WEBSITE_DIR) && pnpm install && touch $(MODULES_MARKER)
