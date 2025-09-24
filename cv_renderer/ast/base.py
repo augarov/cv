@@ -11,7 +11,21 @@ class ASTRenderer(ABC):
 
     def render_ast(self, ast: List[Dict[str, Any]]) -> str:
         """Render AST tokens to output format."""
-        return ''.join(self._render_token(token) for token in ast)
+        if len(ast) == 1:
+            return self._render_root_token(ast[0])
+        return self._render_tokens(ast)
+
+    def _render_tokens(self, tokens: List[Dict[str, Any]]) -> str:
+        """Render a list of AST tokens to output format."""
+        return ''.join(self._render_token(token) for token in tokens)
+
+    def _render_root_token(self, token: Dict[str, Any]) -> str:
+        token_type = token.get('type', '')
+        match token_type:
+            case 'paragraph':
+                return self._render_children(token)
+            case _:
+                return self._render_token(token)
 
     def _render_token(self, token: Dict[str, Any]) -> str:
         """Render a single AST token to output format."""
@@ -36,14 +50,12 @@ class ASTRenderer(ABC):
                 return self._render_softbreak()
 
             case _:
-                # Handle unknown token types by rendering children if they
-                # exist
-                return self._render_children(token)
+                raise ValueError(f"Unsupported token type: {token_type}")
 
     def _render_children(self, token: Dict[str, Any]) -> str:
         """Render children of a token."""
         children = token.get('children', [])
-        return ''.join(self._render_token(child) for child in children)
+        return self._render_tokens(children)
 
     # Abstract methods that subclasses must implement
     @abstractmethod

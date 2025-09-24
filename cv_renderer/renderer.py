@@ -14,6 +14,7 @@ from .models import CVData
 from .ast import (
     ASTToLaTeXRenderer,
     ASTToHTMLRenderer,
+    ASTToPlainRenderer,
     escape_latex_text,
     escape_html_text
 )
@@ -77,12 +78,14 @@ class CVRenderer:
         # Initialize AST renderers
         self.ast_latex_renderer = ASTToLaTeXRenderer()
         self.ast_html_renderer = ASTToHTMLRenderer()
+        self.ast_plain_renderer = ASTToPlainRenderer()
 
         # Add custom filters
         self.env.filters['escape_latex'] = escape_latex_text
         self.env.filters['escape_html'] = escape_html_text
         self.env.filters['markdown_latex'] = self._markdown_to_latex
         self.env.filters['markdown_html'] = self._markdown_to_html
+        self.env.filters['markdown_plain'] = self._markdown_to_plain
 
     def load_raw_data(self, data_file: str) -> Dict[str, Any]:
         """Load raw CV data from YAML file without validation."""
@@ -171,7 +174,8 @@ class CVRenderer:
     def _process_markdown(self, markdown_text: Dict[str, Any], process) -> str:
         if "ast" not in markdown_text:
             raise ValueError("Markdown text must contain an 'ast' field")
-        return process(markdown_text['ast'])
+        res = process(markdown_text['ast'])
+        return res
 
     def _markdown_to_latex(self, markdown_text: Dict[str, Any]) -> str:
         """Convert markdown text to LaTeX."""
@@ -192,3 +196,13 @@ class CVRenderer:
     def _ast_to_html(self, ast: List[Dict[str, Any]]) -> str:
         """Convert AST to HTML."""
         return self.ast_html_renderer.render_ast(ast)
+
+    def _markdown_to_plain(self, markdown_text: Dict[str, Any]) -> str:
+        """Convert markdown text to plain text."""
+        return self._process_markdown(
+            markdown_text, self._ast_to_plain
+        )
+
+    def _ast_to_plain(self, ast: List[Dict[str, Any]]) -> str:
+        """Convert AST to plain text."""
+        return self.ast_plain_renderer.render_ast(ast)

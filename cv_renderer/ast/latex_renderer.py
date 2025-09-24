@@ -43,7 +43,7 @@ class ASTToLaTeXRenderer(ASTRenderer):
 
     def _render_paragraph(self, children_text: str) -> str:
         """Render a paragraph for LaTeX."""
-        return f"{children_text}\n\n"
+        return f"{children_text}\n\n\\par\n"
 
     def _render_text(self, text: str) -> str:
         """Render plain text for LaTeX."""
