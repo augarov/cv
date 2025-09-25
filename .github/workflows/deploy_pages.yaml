@@ -32,17 +32,15 @@ jobs:
         uses: robinraju/release-downloader@v1.9
         with:
           latest: true
-          fileName: cv.pdf
-          out-file-path: gh-pages
+          fileName: gh-pages-bundle.tar.gz
+          out-file-path: gh-pages-bundle
+          extract: true
+          tarBall: false
+          zipBall: false
 
-      - name: Download latest generated bundle
-        uses: actions/download-artifact@v4
-        with:
-          name: gh-pages-bundle
-          path: gh-pages-bundle
-
-      - name: Copy generated bundle to gh-pages
+      - name: Copy release bundle to gh-pages
         run: |
+          ls -la gh-pages-bundle
           cp -r gh-pages-bundle/* gh-pages/
 
       - name: Fix permissions
