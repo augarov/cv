@@ -33,7 +33,6 @@ jobs:
         with:
           latest: true
           fileName: gh-pages-bundle.tar.gz
-          out-file-path: gh-pages-bundle
           extract: true
           tarBall: false
           zipBall: false
