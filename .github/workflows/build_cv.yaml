@@ -65,7 +65,7 @@ jobs:
         run: |
           mkdir -p release
           cp tex/cv.pdf release/
-          cp tex/cv.tex gh-pages-bundle/
+          cp tex/cv.pdf gh-pages-bundle/
           tar -czvf release/gh-pages-bundle.tar.gz gh-pages-bundle/
 
       - name: Upload files to release
