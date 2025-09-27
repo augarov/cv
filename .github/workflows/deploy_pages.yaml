@@ -30,6 +30,7 @@ jobs:
         with:
           node-version: '22'
           cache: 'pnpm'
+          cache-dependency-path: gh-pages/pnpm-lock.yaml
 
       - name: Install pnpm dependencies
         shell: bash
