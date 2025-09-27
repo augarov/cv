@@ -39,4 +39,7 @@
         "${workspaceFolder}/cv_renderer"
     ],
     "python.analysis.autoSearchPaths": true,
+    "vite.buildCommand": "cd gh-pages && pnpm run build",
+    "vite.devCommand": "cd gh-pages && pnpm run dev",
+    "vite.autoStart": true,
 }

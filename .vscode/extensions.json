@@ -1,6 +1,5 @@
 {
     "recommendations": [
-        "ms-vscode.live-server",
         "james-yu.latex-workshop",
         "ms-python.python",
         "ms-python.vscode-pylance",
@@ -9,6 +8,7 @@
         "ms-python.mypy-type-checker",
         "ms-python.flake8",
         "ms-python.bandit",
-        "samuelcolvin.jinjahtml"
+        "samuelcolvin.jinjahtml",
+        "antfu.vite",
     ]
 }

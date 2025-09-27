@@ -62,7 +62,7 @@ repos:
 # Global exclusions
 exclude: |
   (?x)^(
-    gh-pages/pdfjs/.*|
+    gh-pages/public/pdfjs/.*|
     node_modules/.*|
     \.git/.*
   )$

@@ -1,4 +1,4 @@
-.PHONY: all build-cv build-website render-tex render-html install-deps-node install-deps-python clear-cv clear-deps-node clear-deps-python
+.PHONY: all build-cv build-website render-tex render-html install-deps-node install-deps-python clear-cv clear-deps-node clear-deps-python build-vite-website
 
 ######################################################################
 #                            VARIABLES                               #
@@ -27,7 +27,8 @@ CV_CLS = $(TEX_DIR)/deedy-resume.cls
 # Target files
 OUT_PDF = $(TEX_DIR)/cv.pdf
 OUT_HTML = $(WEBSITE_DIR)/index.html
-DEPLOY_PDF = $(WEBSITE_DIR)/cv.pdf
+DEPLOY_PDF = $(WEBSITE_DIR)/public/cv.pdf
+WEBSITE_DIST = $(WEBSITE_DIR)/dist
 MODULES_MARKER = $(WEBSITE_DIR)/node_modules/.install-deps-node.stamp
 VENV_MARKER = $(VENV_DIR)/.setup-env-python.stamp
 PYTHON_DEPS_MARKER = $(VENV_DIR)/.install-deps-python.stamp
@@ -45,7 +46,7 @@ help :
 	@echo "Available targets:"
 	@echo " - all                    : build and deploy CV locally"
 	@echo " - build-cv               : build CV PDF from LaTeX"
-	@echo " - build-website          : build website from HTML and PDF"
+	@echo " - build-website          : build website"
 	@echo " - render-tex             : generate LaTeX file from YAML data"
 	@echo " - render-html            : generate HTML file from YAML data"
 	@echo " - install-deps-node      : install Node.js dependencies"
@@ -56,7 +57,7 @@ help :
 
 build-cv : $(OUT_PDF)
 
-build-website : $(DEPLOY_PDF) $(OUT_HTML)
+build-website : $(WEBSITE_DIST)
 
 validate-pre-commit : $(PYTHON_DEPS_MARKER)
 	$(ACTIVATE_VENV) && pre-commit run --all-files
@@ -74,6 +75,7 @@ clear-cv :
 	rm -f $(OUT_HTML)
 	rm -f $(OUT_PDF)
 	rm -f $(DEPLOY_PDF)
+	rm -rf $(WEBSITE_DIST)
 
 clear-deps-node :
 	rm -rf $(WEBSITE_DIR)/node_modules
@@ -101,7 +103,10 @@ $(OUT_HTML) : $(PYTHON_DEPS_MARKER) $(CV_DATA) $(OUT_HTML_TEMPLATE)
 	$(ACTIVATE_VENV) && python -m cv_renderer --format html --output $(OUT_HTML)
 
 $(DEPLOY_PDF) : $(OUT_PDF)
-	cp $(OUT_PDF) $(WEBSITE_DIR)/
+	cp $(OUT_PDF) $(DEPLOY_PDF)
+
+$(WEBSITE_DIST) : $(OUT_HTML) $(DEPLOY_PDF) $(MODULES_MARKER)
+	cd $(WEBSITE_DIR) && pnpm run build
 
 $(MODULES_MARKER) :
 	cd $(WEBSITE_DIR) && pnpm install && touch $(MODULES_MARKER)
