@@ -26,28 +26,13 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: 📦 Install Poetry 📦
-        uses: snok/install-poetry@v1
-        with:
-          version: latest
-          virtualenvs-create: false
-
-      - name: 🔧 Create virtual environment 🔧
-        run: |
-          python -m venv venv
-          source venv/bin/activate
-          pip install --upgrade pip
-
       - name: 📦 Install cv_renderer dependencies 📦
         run: |
-          source venv/bin/activate
-          cd cv_renderer
-          poetry install
+          make install-deps-python
 
       - name: 🔄 Generate PDF using cv_renderer 🔄
         run: |
-          source venv/bin/activate
-          python -m cv_renderer --format latex --output tex/cv.tex --data cv_data.yaml
+          make render-tex
 
       - name: 📕 Compile LaTeX document 📕
         uses: xu-cheng/latex-action@v2
@@ -58,15 +43,18 @@ jobs:
 
       - name: 🔄 Generate HTML using cv_renderer 🔄
         run: |
-          source venv/bin/activate
-          python -m cv_renderer --format html --output gh-pages-bundle/index.html --data cv_data.yaml
+          make render-html
 
       - name: Prepare release files
         run: |
+          mkdir -p gh-pages-bundle/public
+          cp tex/cv.pdf gh-pages-bundle/public/
+          cp gh-pages/index.html gh-pages-bundle/
+
           mkdir -p release
           cp tex/cv.pdf release/
-          cp tex/cv.pdf gh-pages-bundle/
           tar -czvf release/gh-pages-bundle.tar.gz gh-pages-bundle/
+
 
       - name: Upload files to release
         uses: svenstaro/upload-release-action@v2

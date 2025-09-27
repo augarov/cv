@@ -22,11 +22,15 @@ jobs:
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
 
-      - name: Install npm dependencies
+      - name: Install pnpm dependencies
         shell: bash
         working-directory: gh-pages
-        run: npm install
+        run: |
+          make install-deps-node
 
       - name: Download latest release
         uses: robinraju/release-downloader@v1.9
@@ -42,16 +46,20 @@ jobs:
           ls -la gh-pages-bundle
           cp -r gh-pages-bundle/* gh-pages/
 
+      - name: Build website
+        run: |
+          make build-website
+
       - name: Fix permissions
         run: |
-          chmod -v -R +rX "gh-pages" | while read line; do
+          chmod -v -R +rX "gh-pages/dist" | while read line; do
             echo "::warning title=Invalid file permissions automatically fixed::$line"
           done
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: gh-pages/
+          path: gh-pages/dist
 
   deploy:
     name: Deploy
