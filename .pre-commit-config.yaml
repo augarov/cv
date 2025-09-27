@@ -1,0 +1,72 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+repos:
+  # General pre-commit hooks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+      - id: check-case-conflict
+      - id: check-merge-conflict
+      - id: debug-statements
+      - id: check-toml
+
+  # Python formatting with black
+  - repo: https://github.com/psf/black
+    rev: 24.8.0
+    hooks:
+      - id: black
+        files: ^cv_renderer/
+        language_version: python3
+
+  # Import sorting with isort
+  - repo: https://github.com/pycqa/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+        files: ^cv_renderer/
+        args: ["--profile", "black"]
+
+  # Linting with flake8
+  - repo: https://github.com/pycqa/flake8
+    rev: 7.1.1
+    hooks:
+      - id: flake8
+        files: ^cv_renderer/
+        additional_dependencies: [flake8-docstrings]
+        args: ["--config", "cv_renderer/.flake8"]
+
+  # Type checking with mypy
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.11.2
+    hooks:
+      - id: mypy
+        files: ^cv_renderer/
+        additional_dependencies:
+          - types-PyYAML
+          - pydantic >= 2.0.0
+          - pydantic[email]
+        args: [--config-file=cv_renderer/pyproject.toml]
+
+  # Python security linting
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.7.10
+    hooks:
+      - id: bandit
+        files: ^cv_renderer/
+        args: ["-c", "cv_renderer/pyproject.toml"]
+
+# Global exclusions
+exclude: |
+  (?x)^(
+    gh-pages/pdfjs/.*|
+    node_modules/.*|
+    \.git/.*
+  )$
+
+# Configuration for specific file types
+default_stages: [pre-commit]
+fail_fast: false

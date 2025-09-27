@@ -1,27 +1,31 @@
 """
+Renderer module for CV rendering.
+
 Core CV rendering functionality using Jinja2 templates with AST-based
 markdown processing.
 """
 
-import yaml
-from pathlib import Path
-from typing import Dict, Any, List
-from jinja2 import Environment, FileSystemLoader, select_autoescape
 from datetime import datetime
 from enum import Enum
+from pathlib import Path
+from typing import Any, Dict, List
 
-from .models import CVData
+import yaml
+from jinja2 import Environment, FileSystemLoader, select_autoescape
+
 from .ast import (
-    ASTToLaTeXRenderer,
     ASTToHTMLRenderer,
+    ASTToLaTeXRenderer,
     ASTToPlainRenderer,
+    escape_html_text,
     escape_latex_text,
-    escape_html_text
 )
+from .models import CVData
 
 
 class TemplateFormat(Enum):
     """Supported template formats based on template file extensions."""
+
     LATEX = "latex"
     HTML = "html"
 
@@ -50,9 +54,9 @@ def detect_template_format(template_name: str) -> TemplateFormat:
         else:
             format_extension = template_path.suffixes[-1].lower()
 
-        if format_extension in ['.tex', '.latex']:
+        if format_extension in [".tex", ".latex"]:
             return TemplateFormat.LATEX
-        elif format_extension in ['.html', '.htm']:
+        elif format_extension in [".html", ".htm"]:
             return TemplateFormat.HTML
 
     raise ValueError(
@@ -62,17 +66,16 @@ def detect_template_format(template_name: str) -> TemplateFormat:
 
 
 class CVRenderer:
-    """CV Renderer using Jinja2 templates with AST-based markdown
-    processing."""
+    """CV Renderer using Jinja2 templates with AST-based markdown processing."""
 
-    def __init__(self, templates_dir: str = "templates"):
+    def __init__(self, templates_dir: str = "templates") -> None:
         """Initialize the renderer with templates directory."""
         self.templates_dir = Path(templates_dir)
         self.env = Environment(
             loader=FileSystemLoader(self.templates_dir),
-            autoescape=select_autoescape(['html', 'xml']),
+            autoescape=select_autoescape(["html", "xml"]),
             trim_blocks=True,
-            lstrip_blocks=True
+            lstrip_blocks=True,
         )
 
         # Initialize AST renderers
@@ -81,17 +84,18 @@ class CVRenderer:
         self.ast_plain_renderer = ASTToPlainRenderer()
 
         # Add custom filters
-        self.env.filters['escape_latex'] = escape_latex_text
-        self.env.filters['escape_html'] = escape_html_text
-        self.env.filters['markdown_latex'] = self._markdown_to_latex
-        self.env.filters['markdown_html'] = self._markdown_to_html
-        self.env.filters['markdown_plain'] = self._markdown_to_plain
+        self.env.filters["escape_latex"] = escape_latex_text
+        self.env.filters["escape_html"] = escape_html_text
+        self.env.filters["markdown_latex"] = self._markdown_to_latex
+        self.env.filters["markdown_html"] = self._markdown_to_html
+        self.env.filters["markdown_plain"] = self._markdown_to_plain
 
     def load_raw_data(self, data_file: str) -> Dict[str, Any]:
         """Load raw CV data from YAML file without validation."""
-        with open(data_file, 'r', encoding='utf-8') as f:
+        with open(data_file, "r", encoding="utf-8") as f:
             try:
-                return yaml.safe_load(f)
+                data: Dict[str, Any] = yaml.safe_load(f)
+                return data
             except yaml.YAMLError as e:
                 raise ValueError(f"Unable to parse {data_file} as YAML: {e}")
 
@@ -109,38 +113,39 @@ class CVRenderer:
         raw_data = self.load_raw_data(data_file)
         return self.validate_cv_data(raw_data)
 
-    def convert_validated_data_for_templates(
-            self, cv_data: CVData) -> Dict[str, Any]:
+    def convert_validated_data_for_templates(self, cv_data: CVData) -> Dict[str, Any]:
         """Convert validated CVData to template-friendly format."""
-        return cv_data.model_dump()
+        data: Dict[str, Any] = cv_data.model_dump()
+        return data
 
     def render(self, template_name: str, data: Dict[str, Any]) -> str:
         """Render CV using specified template and data."""
         template = self.env.get_template(template_name)
-        return template.render(**data)
+        result: str = template.render(**data)
+        return result
 
-    def render_to_file(self, template_name: str, data: Dict[str, Any],
-                       output_file: str):
+    def render_to_file(
+        self, template_name: str, data: Dict[str, Any], output_file: str
+    ) -> None:
         """Render CV and save to file with disclaimer comment."""
         rendered = self.render(template_name, data)
 
         # Detect template format and generate disclaimer
         template_format = detect_template_format(template_name)
-        disclaimer = self._generate_disclaimer(
-            template_format, template_name
-        )
+        disclaimer = self._generate_disclaimer(template_format, template_name)
         final_content = disclaimer + rendered
 
         output_path = Path(output_file)
         output_path.parent.mkdir(parents=True, exist_ok=True)
 
-        with open(output_path, 'w', encoding='utf-8') as f:
+        with open(output_path, "w", encoding="utf-8") as f:
             f.write(final_content)
 
         print(f"CV rendered to: {output_path}")
 
-    def _generate_disclaimer(self, template_format: TemplateFormat,
-                             template_name: str) -> str:
+    def _generate_disclaimer(
+        self, template_format: TemplateFormat, template_name: str
+    ) -> str:
         """Generate disclaimer comment based on template format."""
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
@@ -149,7 +154,7 @@ class CVRenderer:
             "DO NOT EDIT THIS FILE DIRECTLY - your changes will be lost!",
             f"Generated on: {timestamp}",
             f"Template: {template_name}",
-            "Generator: cv_renderer"
+            "Generator: cv_renderer",
         ]
 
         # Choose comment style based on template format
@@ -164,30 +169,24 @@ class CVRenderer:
             case TemplateFormat.HTML:
                 # HTML comment style
                 disclaimer = "<!--\n"
-                disclaimer += "\n".join(
-                    ["  " + line for line in disclaimer_lines]
-                )
+                disclaimer += "\n".join(["  " + line for line in disclaimer_lines])
                 disclaimer += "\n-->\n\n"
 
         return disclaimer
 
-    def _process_markdown(self, markdown_text: Dict[str, Any], process) -> str:
+    def _process_markdown(self, markdown_text: Dict[str, Any], process: Any) -> str:
         if "ast" not in markdown_text:
             raise ValueError("Markdown text must contain an 'ast' field")
-        res = process(markdown_text['ast'])
-        return res
+        result: str = process(markdown_text["ast"])
+        return result
 
     def _markdown_to_latex(self, markdown_text: Dict[str, Any]) -> str:
         """Convert markdown text to LaTeX."""
-        return self._process_markdown(
-            markdown_text, self._ast_to_latex
-        )
+        return self._process_markdown(markdown_text, self._ast_to_latex)
 
     def _markdown_to_html(self, markdown_text: Dict[str, Any]) -> str:
         """Convert markdown text to HTML."""
-        return self._process_markdown(
-            markdown_text, self._ast_to_html
-        )
+        return self._process_markdown(markdown_text, self._ast_to_html)
 
     def _ast_to_latex(self, ast: List[Dict[str, Any]]) -> str:
         """Convert AST to LaTeX."""
@@ -199,9 +198,7 @@ class CVRenderer:
 
     def _markdown_to_plain(self, markdown_text: Dict[str, Any]) -> str:
         """Convert markdown text to plain text."""
-        return self._process_markdown(
-            markdown_text, self._ast_to_plain
-        )
+        return self._process_markdown(markdown_text, self._ast_to_plain)
 
     def _ast_to_plain(self, ast: List[Dict[str, Any]]) -> str:
         """Convert AST to plain text."""

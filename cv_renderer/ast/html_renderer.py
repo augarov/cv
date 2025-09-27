@@ -1,15 +1,10 @@
-"""
-HTML AST renderer implementation.
-"""
+"""HTML AST renderer implementation."""
 
 from .base import ASTRenderer
 
 
 def escape_html_text(text: str) -> str:
     """Escape special HTML characters and handle newlines in plain text."""
-    if not isinstance(text, str):
-        return text
-
     # Escape special HTML characters
     html_special_chars = {
         "&": "&amp;",

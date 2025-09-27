@@ -1,29 +1,28 @@
 """
 Pydantic models for CV data validation.
 
-This module defines validation models for different field types and the complete CV data structure.
+This module defines validation models
+for different field types and the complete CV data structure.
 """
 
-from typing import Dict, List, Optional, Union, Any
+from typing import Any, Dict, List, Optional
+
+import mistune
 from pydantic import (
     BaseModel,
-    EmailStr,
-    HttpUrl,
-    Field,
-    field_validator,
     BeforeValidator,
+    EmailStr,
+    Field,
+    HttpUrl,
+    field_validator,
     model_validator,
 )
 from typing_extensions import Annotated
-import re
-import mistune
 
 
 def strip_str(v: str) -> str:
     """Strip whitespace from string values."""
-    if isinstance(v, str):
-        return v.strip()
-    return v
+    return v.strip()
 
 
 # Type alias for string fields that need stripping and validation
@@ -38,7 +37,7 @@ class MarkdownText(BaseModel):
         default_factory=list, description="Parsed AST representation"
     )
 
-    def __init__(self, **data):
+    def __init__(self, **data: Any) -> None:
         """Initialize MarkdownText with AST parsing."""
         # If only text is provided, parse it into AST
         if "text" in data and "ast" not in data:
@@ -71,26 +70,25 @@ class MarkdownText(BaseModel):
         def check_tokens(tokens: List[Dict[str, Any]], path: str = "root") -> None:
             """Recursively check all tokens for unsupported types."""
             for i, token in enumerate(tokens):
-                if not isinstance(token, dict):
-                    continue
+                if isinstance(token, dict):
+                    token_type: str = token.get("type", "")
+                    if token_type and token_type not in supported_token_types:
+                        raise ValueError(
+                            f"Unsupported markdown markup '{token_type}' found at "
+                            f"{path}[{i}]. Supported markup: "
+                            f"{', '.join(sorted(supported_token_types))}"
+                        )
 
-                token_type = token.get("type")
-                if token_type and token_type not in supported_token_types:
-                    raise ValueError(
-                        f"Unsupported markdown markup '{token_type}' found at {path}[{i}]. "
-                        f"Supported markup: {', '.join(sorted(supported_token_types))}"
-                    )
-
-                # Recursively check children
-                if "children" in token and isinstance(token["children"], list):
-                    check_tokens(token["children"], f"{path}[{i}].children")
+                    # Recursively check children
+                    if "children" in token and isinstance(token["children"], list):
+                        check_tokens(token["children"], f"{path}[{i}].children")
 
         check_tokens(v)
         return v
 
     @model_validator(mode="before")
     @classmethod
-    def convert_string_to_markdown_text(cls, data):
+    def convert_string_to_markdown_text(cls, data: Any) -> Any:
         """Convert string inputs to MarkdownText objects automatically."""
         if isinstance(data, str):
             # Convert string input to expected dictionary format
@@ -118,7 +116,7 @@ class Link(BaseModel):
     url: HttpUrl = Field(..., description="Full URL starting with http:// or https://")
     display_name: Optional[str] = Field(None, description="Display name for the link")
 
-    def __init__(self, **data):
+    def __init__(self, **data: Any) -> None:
         """Initialize Link with auto-generated display_name if not provided."""
         super().__init__(**data)
         if self.display_name is None:
@@ -190,7 +188,9 @@ class Experience(BaseModel):
         ..., description="Job description with markdown support"
     )
     achievements: List[MarkdownText] = Field(
-        ..., min_length=1, description="List of achievements with markdown support"
+        ...,
+        min_length=1,
+        description="List of achievements with markdown support",
     )
     stack: StrippedStr = Field(..., min_length=1, max_length=200)
 

@@ -1,6 +1,4 @@
-"""
-Plain text AST renderer implementation.
-"""
+"""Plain text AST renderer implementation."""
 
 from .base import ASTRenderer
 
@@ -17,8 +15,10 @@ class ASTToPlainRenderer(ASTRenderer):
         return text
 
     def _render_strong(self, children_text: str) -> str:
-        """Render bold text for plain text - just return the text without
-        formatting."""
+        """Render bold text for plain text.
+
+        Just return the text without formatting.
+        """
         return children_text
 
     def _render_linebreak(self) -> str:

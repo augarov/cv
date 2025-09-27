@@ -1,9 +1,7 @@
-"""
-Base AST renderer abstract class.
-"""
+"""Base AST renderer abstract class."""
 
 from abc import ABC, abstractmethod
-from typing import Dict, Any, List
+from typing import Any, Dict, List
 
 
 class ASTRenderer(ABC):
@@ -17,36 +15,36 @@ class ASTRenderer(ABC):
 
     def _render_tokens(self, tokens: List[Dict[str, Any]]) -> str:
         """Render a list of AST tokens to output format."""
-        return ''.join(self._render_token(token) for token in tokens)
+        return "".join(self._render_token(token) for token in tokens)
 
     def _render_root_token(self, token: Dict[str, Any]) -> str:
-        token_type = token.get('type', '')
+        token_type = token.get("type", "")
         match token_type:
-            case 'paragraph':
+            case "paragraph":
                 return self._render_children(token)
             case _:
                 return self._render_token(token)
 
     def _render_token(self, token: Dict[str, Any]) -> str:
         """Render a single AST token to output format."""
-        token_type = token.get('type', '')
+        token_type = token.get("type", "")
 
         match token_type:
-            case 'paragraph':
+            case "paragraph":
                 children_text = self._render_children(token)
                 return self._render_paragraph(children_text)
 
-            case 'text':
-                return self._render_text(token.get('raw', ''))
+            case "text":
+                return self._render_text(token.get("raw", ""))
 
-            case 'strong':
+            case "strong":
                 children_text = self._render_children(token)
                 return self._render_strong(children_text)
 
-            case 'linebreak':
+            case "linebreak":
                 return self._render_linebreak()
 
-            case 'softbreak':
+            case "softbreak":
                 return self._render_softbreak()
 
             case _:
@@ -54,7 +52,7 @@ class ASTRenderer(ABC):
 
     def _render_children(self, token: Dict[str, Any]) -> str:
         """Render children of a token."""
-        children = token.get('children', [])
+        children = token.get("children", [])
         return self._render_tokens(children)
 
     # Abstract methods that subclasses must implement

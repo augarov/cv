@@ -32,6 +32,9 @@ MODULES_MARKER = $(WEBSITE_DIR)/node_modules/.install-deps-node.stamp
 VENV_MARKER = $(VENV_DIR)/.setup-env-python.stamp
 PYTHON_DEPS_MARKER = $(VENV_DIR)/.install-deps-python.stamp
 
+# Commands
+ACTIVATE_VENV = . $(VENV_DIR)/bin/activate
+
 ######################################################################
 #                             TARGETS                                #
 ######################################################################
@@ -54,6 +57,9 @@ help :
 build-cv : $(OUT_PDF)
 
 build-website : $(DEPLOY_PDF) $(OUT_HTML)
+
+validate-pre-commit : $(PYTHON_DEPS_MARKER)
+	$(ACTIVATE_VENV) && pre-commit run --all-files
 
 render-tex : $(OUT_TEX)
 
@@ -89,10 +95,10 @@ $(OUT_PDF) : $(OUT_TEX) $(CV_CLS)
 	touch $(OUT_PDF)
 
 $(OUT_TEX) : $(PYTHON_DEPS_MARKER) $(CV_DATA) $(OUT_TEX_TEMPLATE)
-	. $(VENV_DIR)/bin/activate && python -m cv_renderer --format latex --output $(OUT_TEX)
+	$(ACTIVATE_VENV) && python -m cv_renderer --format latex --output $(OUT_TEX)
 
 $(OUT_HTML) : $(PYTHON_DEPS_MARKER) $(CV_DATA) $(OUT_HTML_TEMPLATE)
-	. $(VENV_DIR)/bin/activate && python -m cv_renderer --format html --output $(OUT_HTML)
+	$(ACTIVATE_VENV) && python -m cv_renderer --format html --output $(OUT_HTML)
 
 $(DEPLOY_PDF) : $(OUT_PDF)
 	cp $(OUT_PDF) $(WEBSITE_DIR)/
@@ -101,11 +107,11 @@ $(MODULES_MARKER) :
 	cd $(WEBSITE_DIR) && pnpm install && touch $(MODULES_MARKER)
 
 $(PYTHON_DEPS_MARKER) : $(VENV_MARKER) $(PYPROJECT_TOML)
-	. $(VENV_DIR)/bin/activate && cd $(RENDERER_DIR) && poetry install
+	$(ACTIVATE_VENV) && cd $(RENDERER_DIR) && poetry install
 	touch $(PYTHON_DEPS_MARKER)
 
 $(VENV_MARKER) :
 	python -m venv $(VENV_DIR)
-	. $(VENV_DIR)/bin/activate && pip install --upgrade pip
-	. $(VENV_DIR)/bin/activate && pip install poetry
+	$(ACTIVATE_VENV) && pip install --upgrade pip
+	$(ACTIVATE_VENV) && pip install poetry
 	touch $(VENV_MARKER)

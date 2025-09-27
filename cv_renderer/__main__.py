@@ -16,8 +16,8 @@ from pathlib import Path
 from .renderer import CVRenderer
 
 
-def main():
-    """Main CLI interface."""
+def main() -> int:
+    """Provide main CLI interface."""
     parser = argparse.ArgumentParser(
         description="Render CV from YAML data using Jinja2 templates",
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -25,35 +25,37 @@ def main():
 Examples:
   %(prog)s --format latex --output tex/cv.tex
   %(prog)s --format html --output cv.html --data custom_data.yaml
-        """
+        """,
     )
 
     parser.add_argument(
-        '--format', '-f',
-        choices=['latex', 'html'],
-        default='latex',
-        help='Output format (default: latex)'
+        "--format",
+        "-f",
+        choices=["latex", "html"],
+        default="latex",
+        help="Output format (default: latex)",
     )
 
     parser.add_argument(
-        '--output', '-o',
-        default='tex/cv.tex',
-        help='Output file path (default: tex/cv.tex)'
+        "--output",
+        "-o",
+        default="tex/cv.tex",
+        help="Output file path (default: tex/cv.tex)",
     )
 
     parser.add_argument(
-        '--data', '-d',
-        default='cv_data.yaml',
-        help='YAML data file path (default: cv_data.yaml)'
+        "--data",
+        "-d",
+        default="cv_data.yaml",
+        help="YAML data file path (default: cv_data.yaml)",
     )
 
     parser.add_argument(
-        '--templates-dir', '-t',
-        default='templates',
-        help='Templates directory (default: templates)'
+        "--templates-dir",
+        "-t",
+        default="templates",
+        help="Templates directory (default: templates)",
     )
-
-
 
     args = parser.parse_args()
 
@@ -63,10 +65,7 @@ Examples:
         return 1
 
     # Template file mapping
-    template_files = {
-        'latex': 'cv.tex.j2',
-        'html': 'cv.html.j2'
-    }
+    template_files = {"latex": "cv.tex.j2", "html": "cv.html.j2"}
 
     template_file = template_files.get(args.format)
     if not template_file:
@@ -77,7 +76,7 @@ Examples:
     template_path = Path(args.templates_dir) / template_file
     if not template_path.exists():
         print(f"❌ Error: Template file '{template_path}' not found")
-        print(f"💡 Please create the template file or check the templates directory")
+        print("💡 Please create the template file or check the templates directory")
         return 1
 
     try:
@@ -102,5 +101,5 @@ Examples:
         return 1
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     exit(main())

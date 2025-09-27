@@ -1,16 +1,10 @@
-"""
-LaTeX AST renderer implementation.
-"""
+"""LaTeX AST renderer implementation."""
 
 from .base import ASTRenderer
 
 
 def escape_latex_text(text: str) -> str:
     """Escape special LaTeX characters and handle newlines in plain text."""
-    if not isinstance(text, str):
-        return text
-
-    # Process backslashes first to avoid double-escaping
     text = text.replace("\\", r"\textbackslash{}")
 
     # Then process other special characters

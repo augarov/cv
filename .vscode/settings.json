@@ -16,4 +16,27 @@
         "**/__pycache__": true
     },
     "makefile.configureOnOpen": false,
+    "editor.formatOnSave": true,
+    "files.insertFinalNewline": true,
+    // Python formatting and linting configuration to match pre-commit
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.black-formatter",
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": "explicit"
+        }
+    },
+    "isort.check": true,
+    "flake8.args": [
+        "--config",
+        "${workspaceFolder}/cv_renderer/.flake8"
+    ],
+    "mypy-type-checker.args": [
+        "--config-file=${workspaceFolder}/cv_renderer/pyproject.toml",
+    ],
+    // Python path configuration
+    "python.analysis.extraPaths": [
+        "${workspaceFolder}/cv_renderer"
+    ],
+    "python.analysis.autoSearchPaths": true,
 }
