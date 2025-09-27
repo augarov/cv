@@ -1,4 +1,4 @@
-.PHONY: all build-cv deploy-cv render-tex render-html install-deps-node install-deps-python clear-cv clear-deps-node clear-deps-python
+.PHONY: all build-cv build-website render-tex render-html install-deps-node install-deps-python clear-cv clear-deps-node clear-deps-python
 
 ######################################################################
 #                            VARIABLES                               #
@@ -36,13 +36,13 @@ PYTHON_DEPS_MARKER = $(VENV_DIR)/.install-deps-python.stamp
 #                             TARGETS                                #
 ######################################################################
 
-all : build-cv deploy-cv
+all : build-cv build-website
 
 help :
 	@echo "Available targets:"
 	@echo " - all                    : build and deploy CV locally"
 	@echo " - build-cv               : build CV PDF from LaTeX"
-	@echo " - deploy-cv              : copy CV PDF to website directory"
+	@echo " - build-website          : build website from HTML and PDF"
 	@echo " - render-tex             : generate LaTeX file from YAML data"
 	@echo " - render-html            : generate HTML file from YAML data"
 	@echo " - install-deps-node      : install Node.js dependencies"
@@ -53,7 +53,7 @@ help :
 
 build-cv : $(OUT_PDF)
 
-deploy-cv : $(DEPLOY_PDF)
+build-website : $(DEPLOY_PDF) $(OUT_HTML)
 
 render-tex : $(OUT_TEX)
 
