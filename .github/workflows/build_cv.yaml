@@ -31,6 +31,10 @@ jobs:
         run: |
           make install-deps-python
 
+      - name: ✅ Run validations ✅
+        run: |
+          make validate-pre-commit
+
       - name: 🔄 Generate PDF using cv_renderer 🔄
         run: |
           make render-tex
