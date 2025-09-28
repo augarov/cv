@@ -35,7 +35,7 @@ jobs:
       - name: Install pnpm dependencies
         shell: bash
         run: |
-          make install-deps-node
+          make install-deps-node-frozen
 
       - name: Download latest release
         uses: robinraju/release-downloader@v1.9
@@ -53,7 +53,8 @@ jobs:
 
       - name: Build website
         run: |
-          make build-website
+          ls -la gh-pages/
+          make build-website -d
 
       - name: Fix permissions
         run: |

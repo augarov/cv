@@ -1,4 +1,4 @@
-.PHONY: all build-cv build-website render-tex render-html install-deps-node install-deps-python clear-cv clear-deps-node clear-deps-python build-vite-website
+.PHONY: all build-cv build-website render-tex render-html install-deps-node install-deps-python clear-cv clear-deps-node clear-deps-python build-vite-website build-release validate-pre-commit install-deps-node-frozen
 
 ######################################################################
 #                            VARIABLES                               #
@@ -37,6 +37,7 @@ WEBSITE_DIST = $(WEBSITE_DIR)/dist
 WEBSITE_BUILD_MARKER = $(BUILD_DIR)/.build-website.stamp
 RELEASE_BUILD_MARKER = $(BUILD_DIR)/.build-release.stamp
 MODULES_MARKER = $(WEBSITE_DIR)/node_modules/.install-deps-node.stamp
+MODULES_FROZEN_MARKER = $(WEBSITE_DIR)/node_modules/.install-deps-node-frozen.stamp
 VENV_MARKER = $(VENV_DIR)/.setup-env-python.stamp
 PYTHON_DEPS_MARKER = $(VENV_DIR)/.install-deps-python.stamp
 
@@ -47,21 +48,22 @@ ACTIVATE_VENV = . $(VENV_DIR)/bin/activate
 #                             TARGETS                                #
 ######################################################################
 
-all : build-cv build-website
+all : build-cv build-website build-release
 
 help :
 	@echo "Available targets:"
-	@echo " - all                    : build and deploy CV locally"
-	@echo " - build-cv               : build CV PDF from LaTeX"
-	@echo " - build-website          : build website"
-	@echo " - build-release          : build release bundle"
-	@echo " - render-tex             : generate LaTeX file from YAML data"
-	@echo " - render-html            : generate HTML file from YAML data"
-	@echo " - install-deps-node      : install Node.js dependencies"
-	@echo " - install-deps-python    : install Python dependencies with Poetry"
-	@echo " - clear-cv               : remove built CV files"
-	@echo " - clear-deps-node        : remove Node.js dependencies"
-	@echo " - clear-deps-python      : remove Python virtual environment and cache"
+	@echo " - all                       : build and deploy CV locally"
+	@echo " - build-cv                  : build CV PDF from LaTeX"
+	@echo " - build-website             : build website"
+	@echo " - build-release             : build release bundle"
+	@echo " - render-tex                : generate LaTeX file from YAML data"
+	@echo " - render-html               : generate HTML file from YAML data"
+	@echo " - install-deps-node         : install Node.js dependencies"
+	@echo " - install-deps-node-frozen  : install Node.js dependencies (frozen)"
+	@echo " - install-deps-python       : install Python dependencies with Poetry"
+	@echo " - clear-cv                  : remove built CV files"
+	@echo " - clear-deps-node           : remove Node.js dependencies"
+	@echo " - clear-deps-python         : remove Python virtual environment and cache"
 
 build-cv : $(OUT_PDF)
 
@@ -78,6 +80,8 @@ render-html : $(OUT_HTML)
 
 install-deps-node : $(MODULES_MARKER)
 
+install-deps-node-frozen : $(MODULES_FROZEN_MARKER)
+
 install-deps-python : $(PYTHON_DEPS_MARKER)
 
 clear-cv :
@@ -91,6 +95,7 @@ clear-cv :
 clear-deps-node :
 	rm -rf $(WEBSITE_DIR)/node_modules
 	rm -f $(MODULES_MARKER)
+	rm -f $(MODULES_FROZEN_MARKER)
 
 clear-deps-python :
 	rm -rf $(VENV_DIR)
@@ -137,7 +142,13 @@ $(RELEASE_BUILD_MARKER) : $(BUILD_DIR) $(OUT_PDF) $(OUT_HTML)
 	touch $(RELEASE_BUILD_MARKER)
 
 $(MODULES_MARKER) :
-	cd $(WEBSITE_DIR) && pnpm install && touch $(MODULES_MARKER)
+	cd $(WEBSITE_DIR) && pnpm install
+	touch $(MODULES_MARKER)
+
+$(MODULES_FROZEN_MARKER) :
+	cd $(WEBSITE_DIR) && pnpm install --frozen-lockfile
+	touch $(MODULES_FROZEN_MARKER)
+	touch $(MODULES_MARKER)
 
 $(PYTHON_DEPS_MARKER) : $(VENV_MARKER) $(PYPROJECT_TOML)
 	$(ACTIVATE_VENV) && cd $(RENDERER_DIR) && poetry install
