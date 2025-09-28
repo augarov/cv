@@ -42,19 +42,14 @@ jobs:
         with:
           latest: true
           fileName: gh-pages-bundle.tar.gz
-          extract: true
+          out-file-path: downloads
           tarBall: false
           zipBall: false
 
-      - name: Copy release bundle to gh-pages
-        run: |
-          ls -la gh-pages-bundle
-          cp -r gh-pages-bundle/* gh-pages/
-
       - name: Build website
         run: |
-          ls -la gh-pages/
-          make build-website -d
+          ls -la downloads
+          make build-website-from-bundle
 
       - name: Fix permissions
         run: |

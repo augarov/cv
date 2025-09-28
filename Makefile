@@ -1,4 +1,9 @@
-.PHONY: all build-cv build-website render-tex render-html install-deps-node install-deps-python clear-cv clear-deps-node clear-deps-python build-vite-website build-release validate-pre-commit install-deps-node-frozen
+.PHONY: all \
+        build-cv build-website build-website-from-bundle build-release \
+        render-tex render-html \
+        install-deps-node install-deps-python install-deps-node-frozen \
+        clear-cv clear-deps-node clear-deps-python \
+        validate-pre-commit
 
 ######################################################################
 #                            VARIABLES                               #
@@ -15,6 +20,7 @@ TEMPLATES_DIR = $(BASE_DIR)/templates
 BUILD_DIR = $(BASE_DIR)/build
 RELEASE_DIR = $(BUILD_DIR)/release
 WEBSITE_BUNDLE_DIR = $(BUILD_DIR)/gh-pages-bundle
+DOWNLOADS_DIR = $(BASE_DIR)/downloads
 
 # Python setup
 VENV_DIR = $(BASE_DIR)/.venv
@@ -33,8 +39,12 @@ OUT_HTML = $(WEBSITE_DIR)/index.html
 DEPLOY_PDF = $(WEBSITE_DIR)/public/cv.pdf
 WEBSITE_DIST = $(WEBSITE_DIR)/dist
 
+# CI downloads
+WEBSITE_BUNDLE_ARCHIVE = $(DOWNLOADS_DIR)/gh-pages-bundle.tar.gz
+
 # Marker files
 WEBSITE_BUILD_MARKER = $(BUILD_DIR)/.build-website.stamp
+WEBSITE_BUILD_FROM_BUNDLE_MARKER = $(BUILD_DIR)/.build-website-from-bundle.stamp
 RELEASE_BUILD_MARKER = $(BUILD_DIR)/.build-release.stamp
 MODULES_MARKER = $(WEBSITE_DIR)/node_modules/.install-deps-node.stamp
 MODULES_FROZEN_MARKER = $(WEBSITE_DIR)/node_modules/.install-deps-node-frozen.stamp
@@ -52,22 +62,26 @@ all : build-cv build-website build-release
 
 help :
 	@echo "Available targets:"
-	@echo " - all                       : build and deploy CV locally"
-	@echo " - build-cv                  : build CV PDF from LaTeX"
-	@echo " - build-website             : build website"
-	@echo " - build-release             : build release bundle"
-	@echo " - render-tex                : generate LaTeX file from YAML data"
-	@echo " - render-html               : generate HTML file from YAML data"
-	@echo " - install-deps-node         : install Node.js dependencies"
-	@echo " - install-deps-node-frozen  : install Node.js dependencies (frozen)"
-	@echo " - install-deps-python       : install Python dependencies with Poetry"
-	@echo " - clear-cv                  : remove built CV files"
-	@echo " - clear-deps-node           : remove Node.js dependencies"
-	@echo " - clear-deps-python         : remove Python virtual environment and cache"
+	@echo " - all                         : build and deploy CV locally"
+	@echo " - build-cv                    : build CV PDF from LaTeX"
+	@echo " - build-website               : build website"
+	@echo " - build-website-from-bundle   : build website from release bundle"
+	@echo " - build-release               : build release bundle"
+	@echo " - render-tex                  : generate LaTeX file from YAML data"
+	@echo " - render-html                 : generate HTML file from YAML data"
+	@echo " - install-deps-node           : install Node.js dependencies"
+	@echo " - install-deps-node-frozen    : install Node.js dependencies (frozen)"
+	@echo " - install-deps-python         : install Python dependencies with Poetry"
+	@echo " - clear-cv                    : remove built CV files"
+	@echo " - clear-deps-node             : remove Node.js dependencies"
+	@echo " - clear-deps-python           : remove Python virtual environment and cache"
+	@echo " - validate-pre-commit         : validate pre-commit hooks"
 
 build-cv : $(OUT_PDF)
 
 build-website : $(WEBSITE_BUILD_MARKER)
+
+build-website-from-bundle : $(WEBSITE_BUILD_FROM_BUNDLE_MARKER)
 
 build-release : $(RELEASE_BUILD_MARKER)
 
@@ -125,6 +139,13 @@ $(WEBSITE_BUILD_MARKER) : $(OUT_HTML) $(DEPLOY_PDF) $(MODULES_MARKER) $(BUILD_DI
 	cd $(WEBSITE_DIR) && pnpm run build
 	touch $(WEBSITE_BUILD_MARKER)
 
+$(WEBSITE_BUILD_FROM_BUNDLE_MARKER) : $(WEBSITE_BUNDLE_ARCHIVE) $(MODULES_FROZEN_MARKER) $(BUILD_DIR)
+	mkdir -p $(BUILD_DIR)/gh-pages-bundle
+	tar -xzvf $(WEBSITE_BUNDLE_ARCHIVE) -C $(BUILD_DIR)/gh-pages-bundle
+	cp -r $(BUILD_DIR)/gh-pages-bundle/* $(WEBSITE_DIR)/
+	cd $(WEBSITE_DIR) && pnpm run build
+	touch $(WEBSITE_BUILD_FROM_BUNDLE_MARKER)
+
 $(BUILD_DIR) :
 	mkdir -p $(BUILD_DIR)
 
@@ -137,7 +158,7 @@ $(RELEASE_BUILD_MARKER) : $(BUILD_DIR) $(OUT_PDF) $(OUT_HTML)
 
 	mkdir -p $(RELEASE_DIR)
 	cp $(OUT_PDF) $(RELEASE_DIR)/
-	tar -czvf $(RELEASE_DIR)/gh-pages-bundle.tar.gz $(WEBSITE_BUNDLE_DIR)/
+	tar -czvf $(RELEASE_DIR)/gh-pages-bundle.tar.gz -C $(WEBSITE_BUNDLE_DIR)/ .
 
 	touch $(RELEASE_BUILD_MARKER)
 
