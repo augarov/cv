@@ -1,6 +1,9 @@
 # Created by https://www.toptal.com/developers/gitignore/api/latex,python,node
 # Edit at https://www.toptal.com/developers/gitignore?templates=latex,python,node
 
+### Build Directory ###
+build/
+
 ### LaTeX ###
 ## Core latex/pdflatex auxiliary files:
 *.aux

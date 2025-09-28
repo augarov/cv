@@ -34,7 +34,6 @@ jobs:
 
       - name: Install pnpm dependencies
         shell: bash
-        working-directory: gh-pages
         run: |
           make install-deps-node
 

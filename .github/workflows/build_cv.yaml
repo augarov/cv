@@ -47,14 +47,7 @@ jobs:
 
       - name: Prepare release files
         run: |
-          mkdir -p gh-pages-bundle/public
-          cp tex/cv.pdf gh-pages-bundle/public/
-          cp gh-pages/index.html gh-pages-bundle/
-
-          mkdir -p release
-          cp tex/cv.pdf release/
-          tar -czvf release/gh-pages-bundle.tar.gz gh-pages-bundle/
-
+          make build-release
 
       - name: Upload files to release
         uses: svenstaro/upload-release-action@v2
