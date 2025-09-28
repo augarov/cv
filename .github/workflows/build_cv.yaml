@@ -9,7 +9,8 @@ on:
       - 'cv_data.yaml'
       - 'templates/**'
       - 'cv_renderer/**'
-      - 'tex/deedy-resume.cls'
+      - 'tex/**'
+      - 'Makefile'
 
 jobs:
   build_latex:
