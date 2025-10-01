@@ -52,3 +52,16 @@ class ASTToHTMLRenderer(ASTRenderer):
     def _render_softbreak(self) -> str:
         """Render a soft break for HTML."""
         return " "
+
+    def _render_comment_line(self, comment: str) -> str:
+        """Render a single line comment for HTML."""
+        return f"<!-- {comment} -->\n"
+
+    def _render_comment_block(self, lines: list[str]) -> str:
+        """Render a block comment for HTML."""
+        comment_prefix = "  "
+
+        comment = "<!--\n"
+        comment += "\n".join([comment_prefix + line for line in lines])
+        comment += "\n-->\n\n"
+        return comment

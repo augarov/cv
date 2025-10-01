@@ -54,3 +54,14 @@ class ASTToLaTeXRenderer(ASTRenderer):
     def _render_softbreak(self) -> str:
         """Render a soft break for LaTeX."""
         return " "
+
+    def _render_comment_line(self, comment: str) -> str:
+        """Render a single line comment for LaTeX."""
+        return f"% {comment}\n"
+
+    def _render_comment_block(self, lines: list[str]) -> str:
+        """Render a block comment for LaTeX."""
+        comment_prefix = "% "
+        comment = "\n".join([comment_prefix + line for line in lines])
+        comment += "\n" + "%" * 60 + "\n\n"
+        return comment

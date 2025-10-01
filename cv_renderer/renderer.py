@@ -6,7 +6,6 @@ markdown processing.
 """
 
 from datetime import datetime
-from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, List
 
@@ -23,72 +22,50 @@ from .ast import (
 from .models import CVData
 
 
-class TemplateFormat(Enum):
-    """Supported template formats based on template file extensions."""
-
-    LATEX = "latex"
-    HTML = "html"
-
-
-def detect_template_format(template_name: str) -> TemplateFormat:
-    """Detect template format from template file extension.
-
-    Args:
-        template_name: Name of the template file (e.g., 'cv.tex.j2',
-                       'cv.html.j2')
-
-    Returns:
-        TemplateFormat enum value
-
-    Raises:
-        ValueError: If template format is not supported (neither LaTeX
-                    nor HTML)
-    """
-    template_path = Path(template_name)
-
-    # Check for compound extensions like .tex.j2, .html.j2
-    if template_path.suffixes:
-        # Get the second-to-last suffix (e.g., .tex from .tex.j2)
-        if len(template_path.suffixes) >= 2:
-            format_extension = template_path.suffixes[-2].lower()
-        else:
-            format_extension = template_path.suffixes[-1].lower()
-
-        if format_extension in [".tex", ".latex"]:
-            return TemplateFormat.LATEX
-        elif format_extension in [".html", ".htm"]:
-            return TemplateFormat.HTML
-
-    raise ValueError(
-        f"Unsupported template format for '{template_name}'. "
-        f"Only LaTeX (.tex.j2) and HTML (.html.j2) templates are supported."
-    )
-
-
 class CVRenderer:
     """CV Renderer using Jinja2 templates with AST-based markdown processing."""
 
-    def __init__(self, templates_dir: str = "templates") -> None:
+    def __init__(self, templates_dir: Path) -> None:
         """Initialize the renderer with templates directory."""
-        self.templates_dir = Path(templates_dir)
-        self.env = Environment(
+        self.templates_dir = templates_dir
+
+        self._filters = self._build_filters()
+        self._globals = self._build_globals()
+
+        self._env = self._build_env()
+
+        # Initialize AST renderers
+        self._ast_latex_renderer = ASTToLaTeXRenderer()
+        self._ast_html_renderer = ASTToHTMLRenderer()
+        self._ast_plain_renderer = ASTToPlainRenderer()
+
+    def _build_filters(self) -> Dict[str, Any]:
+        return {
+            "escape_latex": escape_latex_text,
+            "escape_html": escape_html_text,
+            "markdown_latex": self._markdown_to_latex,
+            "markdown_html": self._markdown_to_html,
+            "markdown_plain": self._markdown_to_plain,
+        }
+
+    def _build_globals(self) -> Dict[str, Any]:
+        return {}
+
+    def _build_env(self) -> Environment:
+        env = Environment(
             loader=FileSystemLoader(self.templates_dir),
             autoescape=select_autoescape(["html", "xml"]),
             trim_blocks=True,
             lstrip_blocks=True,
         )
 
-        # Initialize AST renderers
-        self.ast_latex_renderer = ASTToLaTeXRenderer()
-        self.ast_html_renderer = ASTToHTMLRenderer()
-        self.ast_plain_renderer = ASTToPlainRenderer()
+        for filter_name, filter_func in self._filters.items():
+            env.filters[filter_name] = filter_func
 
-        # Add custom filters
-        self.env.filters["escape_latex"] = escape_latex_text
-        self.env.filters["escape_html"] = escape_html_text
-        self.env.filters["markdown_latex"] = self._markdown_to_latex
-        self.env.filters["markdown_html"] = self._markdown_to_html
-        self.env.filters["markdown_plain"] = self._markdown_to_plain
+        for global_name, global_func in self._globals.items():
+            env.globals[global_name] = global_func
+
+        return env
 
     def load_raw_data(self, data_file: str) -> Dict[str, Any]:
         """Load raw CV data from YAML file without validation."""
@@ -118,34 +95,42 @@ class CVRenderer:
         data: Dict[str, Any] = cv_data.model_dump()
         return data
 
-    def render(self, template_name: str, data: Dict[str, Any]) -> str:
-        """Render CV using specified template and data."""
-        template = self.env.get_template(template_name)
-        result: str = template.render(**data)
-        return result
-
     def render_to_file(
-        self, template_name: str, data: Dict[str, Any], output_file: str
+        self, template_name: str, data: Dict[str, Any], output_path: Path
     ) -> None:
-        """Render CV and save to file with disclaimer comment."""
+        """Render CV and save to file."""
         rendered = self.render(template_name, data)
 
-        # Detect template format and generate disclaimer
-        template_format = detect_template_format(template_name)
-        disclaimer = self._generate_disclaimer(template_format, template_name)
-        final_content = disclaimer + rendered
-
-        output_path = Path(output_file)
-        output_path.parent.mkdir(parents=True, exist_ok=True)
-
         with open(output_path, "w", encoding="utf-8") as f:
-            f.write(final_content)
+            f.write(rendered)
 
         print(f"CV rendered to: {output_path}")
 
-    def _generate_disclaimer(
-        self, template_format: TemplateFormat, template_name: str
-    ) -> str:
+    def _build_context(self, template_name: str) -> Dict[str, Any]:
+        return {
+            "template_name": template_name,
+        }
+
+    def _build_static(self, template_name: str) -> Dict[str, Any]:
+        return {
+            "disclaimer_latex": self._render_disclaimer_latex(template_name),
+            "disclaimer_html": self._render_disclaimer_html(template_name),
+        }
+
+    def _build_inject(self, template_name: str) -> Dict[str, Any]:
+        inject = {}
+        inject["context"] = self._build_context(template_name)
+        inject["static"] = self._build_static(template_name)
+        return inject
+
+    def render(self, template_name: str, data: Dict[str, Any]) -> str:
+        """Render CV using specified template and data."""
+        template = self._env.get_template(template_name)
+        render_data = {**data, **self._build_inject(template_name)}
+        result: str = template.render(render_data)
+        return result
+
+    def _generate_disclaimer(self, template_name: str) -> str:
         """Generate disclaimer comment based on template format."""
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
@@ -157,22 +142,17 @@ class CVRenderer:
             "Generator: cv_renderer",
         ]
 
-        # Choose comment style based on template format
-        match template_format:
-            case TemplateFormat.LATEX:
-                # LaTeX comment style
-                comment_prefix = "% "
-                disclaimer = "\n".join(
-                    [comment_prefix + line for line in disclaimer_lines]
-                )
-                disclaimer += "\n" + "%" * 60 + "\n\n"
-            case TemplateFormat.HTML:
-                # HTML comment style
-                disclaimer = "<!--\n"
-                disclaimer += "\n".join(["  " + line for line in disclaimer_lines])
-                disclaimer += "\n-->\n\n"
+        return "\n".join(disclaimer_lines)
 
-        return disclaimer
+    def _render_disclaimer_latex(self, template_name: str) -> str:
+        return self._ast_latex_renderer.render_comment(
+            self._generate_disclaimer(template_name)
+        )
+
+    def _render_disclaimer_html(self, template_name: str) -> str:
+        return self._ast_html_renderer.render_comment(
+            self._generate_disclaimer(template_name)
+        )
 
     def _process_markdown(self, markdown_text: Dict[str, Any], process: Any) -> str:
         if "ast" not in markdown_text:
@@ -188,18 +168,18 @@ class CVRenderer:
         """Convert markdown text to HTML."""
         return self._process_markdown(markdown_text, self._ast_to_html)
 
-    def _ast_to_latex(self, ast: List[Dict[str, Any]]) -> str:
-        """Convert AST to LaTeX."""
-        return self.ast_latex_renderer.render_ast(ast)
-
-    def _ast_to_html(self, ast: List[Dict[str, Any]]) -> str:
-        """Convert AST to HTML."""
-        return self.ast_html_renderer.render_ast(ast)
-
     def _markdown_to_plain(self, markdown_text: Dict[str, Any]) -> str:
         """Convert markdown text to plain text."""
         return self._process_markdown(markdown_text, self._ast_to_plain)
 
+    def _ast_to_latex(self, ast: List[Dict[str, Any]]) -> str:
+        """Convert AST to LaTeX."""
+        return self._ast_latex_renderer.render_ast(ast)
+
+    def _ast_to_html(self, ast: List[Dict[str, Any]]) -> str:
+        """Convert AST to HTML."""
+        return self._ast_html_renderer.render_ast(ast)
+
     def _ast_to_plain(self, ast: List[Dict[str, Any]]) -> str:
         """Convert AST to plain text."""
-        return self.ast_plain_renderer.render_ast(ast)
+        return self._ast_plain_renderer.render_ast(ast)

@@ -13,14 +13,12 @@ poetry run python -m cv_renderer
 ## Usage
 
 ```bash
-# Generate LaTeX (default)
-poetry run python -m cv_renderer
+python -m cv_renderer [--output OUTPUT] [--data DATA] [--template TEMPLATE]
+```
 
-# Generate HTML
-poetry run python -m cv_renderer --format html --output cv.html
-
-# Custom data file
-poetry run python -m cv_renderer --data custom_data.yaml
+```bash
+python -m cv_renderer --data cv_data.yaml --template templates/cv.html.j2
+python -m cv_renderer --output cv.tex --data cv_data.yaml --template templates/cv.tex.j2
 ```
 
 ## Data Format

@@ -13,6 +13,12 @@ class ASTRenderer(ABC):
             return self._render_root_token(ast[0])
         return self._render_tokens(ast)
 
+    def render_comment(self, comment: str) -> str:
+        """Render a comment."""
+        if comment.find("\n") == -1:
+            return self._render_comment_line(comment)
+        return self._render_comment_block(comment.split("\n"))
+
     def _render_tokens(self, tokens: List[Dict[str, Any]]) -> str:
         """Render a list of AST tokens to output format."""
         return "".join(self._render_token(token) for token in tokens)
@@ -79,4 +85,14 @@ class ASTRenderer(ABC):
     @abstractmethod
     def _render_softbreak(self) -> str:
         """Render a soft break."""
+        pass
+
+    @abstractmethod
+    def _render_comment_line(self, comment: str) -> str:
+        """Render a comment."""
+        pass
+
+    @abstractmethod
+    def _render_comment_block(self, lines: list[str]) -> str:
+        """Render a comment block."""
         pass

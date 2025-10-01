@@ -7,12 +7,13 @@
       "request": "launch",
       "module": "cv_renderer",
       "args": [
-        "--format",
-        "latex",
-        "--output",
-        "tex/cv.tex",
         "--data",
-        "cv_data.yaml"
+        "cv_data.yaml",
+        "--template",
+        "templates/cv.tex.j2",
+        "--output",
+        "build/debug/cv.tex",
+        "--force"
       ]
     },
     {
@@ -21,12 +22,13 @@
       "request": "launch",
       "module": "cv_renderer",
       "args": [
-        "--format",
-        "html",
-        "--output",
-        "gh-pages/cv.html",
         "--data",
-        "cv_data.yaml"
+        "cv_data.yaml",
+        "--template",
+        "templates/cv.html.j2",
+        "--output",
+        "build/debug/cv.html",
+        "--force"
       ]
     }
   ]

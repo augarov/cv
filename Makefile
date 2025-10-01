@@ -127,10 +127,10 @@ $(OUT_PDF) : $(OUT_TEX) $(CV_CLS)
 	touch $(OUT_PDF)
 
 $(OUT_TEX) : $(PYTHON_DEPS_MARKER) $(CV_DATA) $(OUT_TEX_TEMPLATE)
-	$(ACTIVATE_VENV) && python -m cv_renderer --format latex --output $(OUT_TEX)
+	$(ACTIVATE_VENV) && python -m cv_renderer --output $(OUT_TEX) --template $(OUT_TEX_TEMPLATE) --data $(CV_DATA)
 
 $(OUT_HTML) : $(PYTHON_DEPS_MARKER) $(CV_DATA) $(OUT_HTML_TEMPLATE)
-	$(ACTIVATE_VENV) && python -m cv_renderer --format html --output $(OUT_HTML)
+	$(ACTIVATE_VENV) && python -m cv_renderer --output $(OUT_HTML) --template $(OUT_HTML_TEMPLATE) --data $(CV_DATA)
 
 $(DEPLOY_PDF) : $(OUT_PDF)
 	cp $(OUT_PDF) $(DEPLOY_PDF)

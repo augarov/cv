@@ -28,3 +28,11 @@ class ASTToPlainRenderer(ASTRenderer):
     def _render_softbreak(self) -> str:
         """Render a soft break for plain text."""
         return " "
+
+    def _render_comment_line(self, comment: str) -> str:
+        """Render a single line comment for plain text."""
+        return ""
+
+    def _render_comment_block(self, lines: list[str]) -> str:
+        """Render a block comment for plain text."""
+        return ""
