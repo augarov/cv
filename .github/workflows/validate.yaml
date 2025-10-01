@@ -1,0 +1,48 @@
+name: Validate
+
+on:
+  push:
+    branches:
+      - main
+
+  workflow_call:
+
+jobs:
+  validate:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🛎️ Checkout 🛎️
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "pnpm"
+          cache-dependency-path: gh-pages/pnpm-lock.yaml
+
+      - name: 🐍 Set up Python 🐍
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+
+      - name: 📦 Install pnpm dependencies 📦
+        shell: bash
+        run: |
+          make install-deps-node-frozen
+
+      - name: 📦 Install poetry dependencies 📦
+        run: |
+          make install-deps-python
+
+      - name: ✅ Run validations ✅
+        run: |
+          make validate-pre-commit

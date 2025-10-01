@@ -85,7 +85,7 @@ build-website-from-bundle : $(WEBSITE_BUILD_FROM_BUNDLE_MARKER)
 
 build-release : $(RELEASE_BUILD_MARKER)
 
-validate-pre-commit : $(PYTHON_DEPS_MARKER)
+validate-pre-commit : $(PYTHON_DEPS_MARKER) $(MODULES_MARKER)
 	$(ACTIVATE_VENV) && pre-commit run --all-files
 
 render-tex : $(OUT_TEX)
