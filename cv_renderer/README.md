@@ -29,7 +29,7 @@ Edit `cv_data.yaml` with your information:
 
 ```yaml
 personal:
-  name: {first: "Your", last: "Name"}
+  name: { first: "Your", last: "Name" }
   title: "Your Title"
   contact:
     email: your.email@example.com

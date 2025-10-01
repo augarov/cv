@@ -1,33 +1,33 @@
 {
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "name": "cv_renderer - latex - debug",
-            "type": "debugpy",
-            "request": "launch",
-            "module": "cv_renderer",
-            "args": [
-                "--format",
-                "latex",
-                "--output",
-                "tex/cv.tex",
-                "--data",
-                "cv_data.yaml",
-            ]
-        },
-        {
-            "name": "cv_renderer - html - debug",
-            "type": "debugpy",
-            "request": "launch",
-            "module": "cv_renderer",
-            "args": [
-                "--format",
-                "html",
-                "--output",
-                "gh-pages/cv.html",
-                "--data",
-                "cv_data.yaml",
-            ]
-        }
-    ]
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "cv_renderer - latex - debug",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "cv_renderer",
+      "args": [
+        "--format",
+        "latex",
+        "--output",
+        "tex/cv.tex",
+        "--data",
+        "cv_data.yaml"
+      ]
+    },
+    {
+      "name": "cv_renderer - html - debug",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "cv_renderer",
+      "args": [
+        "--format",
+        "html",
+        "--output",
+        "gh-pages/cv.html",
+        "--data",
+        "cv_data.yaml"
+      ]
+    }
+  ]
 }

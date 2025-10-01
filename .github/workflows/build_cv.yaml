@@ -5,12 +5,12 @@ on:
     branches:
       - main
     paths:
-      - '.github/workflows/build_cv.yaml'
-      - 'cv_data.yaml'
-      - 'templates/**'
-      - 'cv_renderer/**'
-      - 'tex/**'
-      - 'Makefile'
+      - ".github/workflows/build_cv.yaml"
+      - "cv_data.yaml"
+      - "templates/**"
+      - "cv_renderer/**"
+      - "tex/**"
+      - "Makefile"
 
 jobs:
   build_latex:
@@ -25,7 +25,7 @@ jobs:
       - name: 🐍 Set up Python 🐍
         uses: actions/setup-python@v4
         with:
-          python-version: '3.12'
+          python-version: "3.12"
 
       - name: 📦 Install cv_renderer dependencies 📦
         run: |
@@ -67,6 +67,6 @@ jobs:
     name: Deploy GH Pages
     needs: build_latex
     permissions:
-      pages: write  # Required to deploy to GitHub Pages.
-      id-token: write  # Required to verify that the deployment originates from this workflow.
+      pages: write # Required to deploy to GitHub Pages.
+      id-token: write # Required to verify that the deployment originates from this workflow.
     uses: ./.github/workflows/deploy_pages.yaml

@@ -1,45 +1,61 @@
 {
-    "latex-workshop.latex.external.build.command": "latexmk",
-    "latex-workshop.latex.external.build.args": [
-        "-xelatex",
-        "-interaction=nonstopmode",
-        "-synctex=1",
-        "-file-line-error"
-    ],
-    "python.terminal.activateEnvironment": true,
-    "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
-    "python.analysis.typeCheckingMode": "standard",
-    "files.exclude": {
-        "**/__pycache__": true
-    },
-    "search.exclude": {
-        "**/__pycache__": true
-    },
-    "makefile.configureOnOpen": false,
+  "latex-workshop.latex.external.build.command": "latexmk",
+  "latex-workshop.latex.external.build.args": [
+    "-xelatex",
+    "-interaction=nonstopmode",
+    "-synctex=1",
+    "-file-line-error"
+  ],
+  "python.terminal.activateEnvironment": true,
+  "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
+  "python.analysis.typeCheckingMode": "standard",
+  "files.exclude": {
+    "**/__pycache__": true
+  },
+  "search.exclude": {
+    "**/__pycache__": true
+  },
+  "makefile.configureOnOpen": false,
+  "editor.formatOnSave": true,
+  "files.insertFinalNewline": true,
+  // Python formatting and linting configuration to match pre-commit
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.black-formatter",
     "editor.formatOnSave": true,
-    "files.insertFinalNewline": true,
-    // Python formatting and linting configuration to match pre-commit
-    "[python]": {
-        "editor.defaultFormatter": "ms-python.black-formatter",
-        "editor.formatOnSave": true,
-        "editor.codeActionsOnSave": {
-            "source.organizeImports": "explicit"
-        }
-    },
-    "isort.check": true,
-    "flake8.args": [
-        "--config",
-        "${workspaceFolder}/cv_renderer/.flake8"
-    ],
-    "mypy-type-checker.args": [
-        "--config-file=${workspaceFolder}/cv_renderer/pyproject.toml",
-    ],
-    // Python path configuration
-    "python.analysis.extraPaths": [
-        "${workspaceFolder}/cv_renderer"
-    ],
-    "python.analysis.autoSearchPaths": true,
-    "vite.buildCommand": "cd gh-pages && pnpm run build",
-    "vite.devCommand": "cd gh-pages && pnpm run dev",
-    "vite.autoStart": true,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "explicit"
+    }
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[css]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[html]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[markdown]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[yaml]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[yml]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "isort.check": true,
+  "flake8.args": ["--config", "${workspaceFolder}/cv_renderer/.flake8"],
+  "mypy-type-checker.args": [
+    "--config-file=${workspaceFolder}/cv_renderer/pyproject.toml"
+  ],
+  // Python path configuration
+  "python.analysis.extraPaths": ["${workspaceFolder}/cv_renderer"],
+  "python.analysis.autoSearchPaths": true,
+  "vite.buildCommand": "cd gh-pages && pnpm run build",
+  "vite.devCommand": "cd gh-pages && pnpm run dev",
+  "vite.autoStart": true
 }

@@ -13,6 +13,7 @@ repos:
       - id: check-merge-conflict
       - id: debug-statements
       - id: check-toml
+      - id: detect-private-key
 
   # Python formatting with black
   - repo: https://github.com/psf/black
@@ -59,12 +60,59 @@ repos:
         files: ^cv_renderer/
         args: ["-c", "cv_renderer/pyproject.toml"]
 
+  # JavaScript linting with local ESLint setup
+  - repo: local
+    hooks:
+      - id: eslint
+        name: ESLint
+        entry: bash -c 'realpath "$@" | xargs pnpm -C gh-pages exec eslint --fix --max-warnings=0' --
+        language: system
+        pass_filenames: true
+        files: ^gh-pages/src/.*\.(js|mjs|cjs|jsx|css)$
+
+  # CSS linting with local Stylelint setup
+  - repo: local
+    hooks:
+      - id: stylelint
+        name: stylelint
+        entry: bash -c 'realpath "$@" | xargs pnpm -C gh-pages exec stylelint --fix' --
+        language: system
+        pass_filenames: true
+        files: ^gh-pages/src/.*\.(css|scss)$
+
+  # HTML validation using local tools
+  - repo: local
+    hooks:
+      - id: htmlhint
+        name: htmlhint
+        entry: bash -c 'realpath "$@" | xargs pnpm -C gh-pages exec htmlhint' --
+        language: system
+        pass_filenames: true
+        files: ^gh-pages/src/.*\.html$
+
+  # Prettier for consistent formatting across JS/HTML/CSS
+  - repo: local
+    hooks:
+      - id: prettier
+        name: prettier
+        entry: bash -c 'realpath "$@" | xargs pnpm -C gh-pages exec prettier --write' --
+        language: system
+        pass_filenames: true
+        files: \.(js|mjs|cjs|jsx|ts|tsx|css|scss|html|json|md|yml|yaml)$
+
 # Global exclusions
 exclude: |
   (?x)^(
     gh-pages/public/pdfjs/.*|
-    node_modules/.*|
-    \.git/.*
+    gh-pages/dist/.*|
+    gh-pages/node_modules/.*|
+    build/.*|
+    tex/.*\.(aux|fdb_latexmk|fls|log|out|synctex\.gz|xdv)$|
+    \.git/.*|
+    .*\.min\.(js|css)$|
+    .*\.bundle\.(js|css)$|
+    \.venv/.*
+    \.mypy_cache/.*
   )$
 
 # Configuration for specific file types
