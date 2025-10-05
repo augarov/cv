@@ -46,3 +46,7 @@ jobs:
       - name: ✅ Run validations ✅
         run: |
           make validate-pre-commit
+
+      - name: ✅ Run tests ✅
+        run: |
+          make test-renderer

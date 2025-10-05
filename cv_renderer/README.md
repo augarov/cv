@@ -5,7 +5,6 @@ Generate CV/Resume from YAML data using Jinja2 templates.
 ## Quick Start
 
 ```bash
-cd cv_renderer
 poetry install
 poetry run python -m cv_renderer
 ```
@@ -13,12 +12,12 @@ poetry run python -m cv_renderer
 ## Usage
 
 ```bash
-python -m cv_renderer --data DATA [--input INPUT [INPUT ...]] [--output OUTPUT] [--force] [--log-level {DEBUG,INFO,WARNING,ERROR}] [--silent]
+poetry run python -m cv_renderer --data DATA [--input INPUT [INPUT ...]] [--output OUTPUT] [--force] [--log-level {DEBUG,INFO,WARNING,ERROR}] [--silent]
 ```
 
 ```bash
-python -m cv_renderer --data cv_data.yaml --input templates/cv.html.j2
-python -m cv_renderer -d cv_data.yaml -i templates/cv.tex.j2 -o cv.tex
+poetry run python -m cv_renderer --data cv_data.yaml --input templates/cv.html.j2
+poetry run python -m cv_renderer -d cv_data.yaml -i templates/cv.tex.j2 -o cv.tex
 ```
 
 ## Data Format
@@ -41,4 +40,10 @@ experience:
   - company: "Company Name"
     position: "Your Position"
     achievements: ["Achievement 1", "Achievement 2"]
+```
+
+### Run Tests
+
+```bash
+poetry run pytest
 ```
