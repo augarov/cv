@@ -45,7 +45,7 @@ repos:
     rev: v1.11.2
     hooks:
       - id: mypy
-        files: ^cv_renderer/
+        files: ^cv_renderer/src
         additional_dependencies:
           - types-PyYAML
           - pydantic >= 2.0.0
@@ -57,7 +57,7 @@ repos:
     rev: 1.7.10
     hooks:
       - id: bandit
-        files: ^cv_renderer/
+        files: ^cv_renderer/src
         args: ["-c", "cv_renderer/pyproject.toml"]
 
   # JavaScript linting with local ESLint setup

@@ -4,7 +4,7 @@ version = "1.0.0"
 description = "A template-based CV generation system using Jinja2"
 authors = ["Anton Ugarov <augarov.swe@gmail.com>"]
 readme = "README.md"
-package-mode = false
+packages = [{include = "cv_renderer", from = "src"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"
@@ -71,6 +71,8 @@ warn_no_return = true
 warn_unreachable = true
 strict_equality = true
 plugins = ["pydantic.mypy"]
+mypy_path = "src"
+exclude = ["tests/"]
 
 [[tool.mypy.overrides]]
 module = [
@@ -95,13 +97,14 @@ addopts = [
     "--strict-config",
     "--verbose",
 ]
+pythonpath = ["src"]
 markers = [
     "slow: marks tests as slow (deselect with '-m \"not slow\"')",
     "integration: marks tests as integration tests",
 ]
 
 [tool.coverage.run]
-source = ["."]
+source = ["src"]
 omit = ["*/tests/*"]
 
 [tool.coverage.report]

@@ -1,8 +1,9 @@
-.PHONY: all \
+.PHONY: all help \
         build-cv build-website build-website-from-bundle build-release \
         render-tex render-html \
+		test-renderer \
         install-deps-node install-deps-python install-deps-node-frozen \
-        clear-cv clear-deps-node clear-deps-python \
+        clear-cv clear-deps-node clear-deps-python clear-all \
         validate-pre-commit
 
 ######################################################################
@@ -53,6 +54,8 @@ PYTHON_DEPS_MARKER = $(VENV_DIR)/.install-deps-python.stamp
 
 # Commands
 ACTIVATE_VENV = . $(VENV_DIR)/bin/activate
+ENTER_RENDERER_DIR = $(ACTIVATE_VENV) && cd $(RENDERER_DIR)
+ENTER_WEBSITE_DIR = cd $(WEBSITE_DIR)
 
 ######################################################################
 #                             TARGETS                                #
@@ -69,12 +72,14 @@ help :
 	@echo " - build-release               : build release bundle"
 	@echo " - render-tex                  : generate LaTeX file from YAML data"
 	@echo " - render-html                 : generate HTML file from YAML data"
+	@echo " - test-renderer               : run tests for renderer"
 	@echo " - install-deps-node           : install Node.js dependencies"
 	@echo " - install-deps-node-frozen    : install Node.js dependencies (frozen)"
 	@echo " - install-deps-python         : install Python dependencies with Poetry"
 	@echo " - clear-cv                    : remove built CV files"
 	@echo " - clear-deps-node             : remove Node.js dependencies"
 	@echo " - clear-deps-python           : remove Python virtual environment and cache"
+	@echo " - clear-all                   : remove all untracked files and directories"
 	@echo " - validate-pre-commit         : validate pre-commit hooks"
 
 build-cv : $(OUT_PDF)
@@ -91,6 +96,9 @@ validate-pre-commit : $(PYTHON_DEPS_MARKER) $(MODULES_MARKER)
 render-tex : $(OUT_TEX)
 
 render-html : $(OUT_HTML)
+
+test-renderer : $(PYTHON_DEPS_MARKER)
+	$(ENTER_RENDERER_DIR) && poetry run pytest
 
 install-deps-node : $(MODULES_MARKER)
 
@@ -118,6 +126,9 @@ clear-deps-python :
 	find . -type d -name "*.egg-info" -exec rm -rf {} + 2>/dev/null || true
 	find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
 
+clear-all :
+	git clean -xdf
+
 ######################################################################
 #                           BUILD RULES                              #
 ######################################################################
@@ -127,23 +138,23 @@ $(OUT_PDF) : $(OUT_TEX) $(CV_CLS)
 	touch $(OUT_PDF)
 
 $(OUT_TEX) : $(PYTHON_DEPS_MARKER) $(CV_DATA) $(OUT_TEX_TEMPLATE)
-	$(ACTIVATE_VENV) && python -m cv_renderer --data $(CV_DATA) --input $(OUT_TEX_TEMPLATE) --output $(OUT_TEX)
+	$(ENTER_RENDERER_DIR) && poetry run python -m cv_renderer --data $(CV_DATA) --input $(OUT_TEX_TEMPLATE) --output $(OUT_TEX) --force
 
 $(OUT_HTML) : $(PYTHON_DEPS_MARKER) $(CV_DATA) $(OUT_HTML_TEMPLATE)
-	$(ACTIVATE_VENV) && python -m cv_renderer --data $(CV_DATA) --input $(OUT_HTML_TEMPLATE) --output $(OUT_HTML)
+	$(ENTER_RENDERER_DIR) && poetry run python -m cv_renderer --data $(CV_DATA) --input $(OUT_HTML_TEMPLATE) --output $(OUT_HTML) --force
 
 $(DEPLOY_PDF) : $(OUT_PDF)
 	cp $(OUT_PDF) $(DEPLOY_PDF)
 
 $(WEBSITE_BUILD_MARKER) : $(OUT_HTML) $(DEPLOY_PDF) $(MODULES_MARKER) $(BUILD_DIR)
-	cd $(WEBSITE_DIR) && pnpm run build
+	$(ENTER_WEBSITE_DIR) && pnpm run build
 	touch $(WEBSITE_BUILD_MARKER)
 
 $(WEBSITE_BUILD_FROM_BUNDLE_MARKER) : $(WEBSITE_BUNDLE_ARCHIVE) $(MODULES_FROZEN_MARKER) $(BUILD_DIR)
 	mkdir -p $(BUILD_DIR)/gh-pages-bundle
 	tar -xzvf $(WEBSITE_BUNDLE_ARCHIVE) -C $(BUILD_DIR)/gh-pages-bundle
 	cp -r $(BUILD_DIR)/gh-pages-bundle/* $(WEBSITE_DIR)/
-	cd $(WEBSITE_DIR) && pnpm run build
+	$(ENTER_WEBSITE_DIR) && pnpm run build
 	touch $(WEBSITE_BUILD_FROM_BUNDLE_MARKER)
 
 $(BUILD_DIR) :
@@ -163,16 +174,16 @@ $(RELEASE_BUILD_MARKER) : $(BUILD_DIR) $(OUT_PDF) $(OUT_HTML)
 	touch $(RELEASE_BUILD_MARKER)
 
 $(MODULES_MARKER) :
-	cd $(WEBSITE_DIR) && pnpm install
+	$(ENTER_WEBSITE_DIR) && pnpm install
 	touch $(MODULES_MARKER)
 
 $(MODULES_FROZEN_MARKER) :
-	cd $(WEBSITE_DIR) && pnpm install --frozen-lockfile
+	$(ENTER_WEBSITE_DIR) && pnpm install --frozen-lockfile
 	touch $(MODULES_FROZEN_MARKER)
 	touch $(MODULES_MARKER)
 
 $(PYTHON_DEPS_MARKER) : $(VENV_MARKER) $(PYPROJECT_TOML)
-	$(ACTIVATE_VENV) && cd $(RENDERER_DIR) && poetry install
+	$(ENTER_RENDERER_DIR) && poetry install
 	touch $(PYTHON_DEPS_MARKER)
 
 $(VENV_MARKER) :
