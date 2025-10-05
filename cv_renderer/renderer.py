@@ -7,7 +7,7 @@ markdown processing.
 
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Callable, Dict, List
 
 import yaml
 from jinja2 import Environment, FileSystemLoader, select_autoescape
@@ -19,7 +19,10 @@ from .ast import (
     escape_html_text,
     escape_latex_text,
 )
+from .logger import make_logger
 from .models import CVData
+
+logger = make_logger(__name__)
 
 
 class CVRenderer:
@@ -27,9 +30,18 @@ class CVRenderer:
 
     def __init__(self, templates_dir: Path) -> None:
         """Initialize the renderer with templates directory."""
+        logger.debug(
+            f"Initializing CVRenderer with templates directory: {templates_dir}"
+        )
+
+        if not templates_dir.exists():
+            logger.error(f"Templates directory does not exist: {templates_dir}")
+            raise FileNotFoundError(f"Templates directory not found: {templates_dir}")
+
         self.templates_dir = templates_dir
 
         self._filters = self._build_filters()
+
         self._globals = self._build_globals()
 
         self._env = self._build_env()
@@ -39,17 +51,23 @@ class CVRenderer:
         self._ast_html_renderer = ASTToHTMLRenderer()
         self._ast_plain_renderer = ASTToPlainRenderer()
 
+        logger.debug("CVRenderer initialization completed successfully")
+
     def _build_filters(self) -> Dict[str, Any]:
-        return {
+        filters: Dict[str, Callable[[Any], Any]] = {
             "escape_latex": escape_latex_text,
             "escape_html": escape_html_text,
             "markdown_latex": self._markdown_to_latex,
             "markdown_html": self._markdown_to_html,
             "markdown_plain": self._markdown_to_plain,
         }
+        logger.debug(f"Built {len(filters)} Jinja2 filters: {list(filters.keys())}")
+        return filters
 
     def _build_globals(self) -> Dict[str, Any]:
-        return {}
+        globals: Dict[str, Any] = {}
+        logger.debug(f"Built {len(globals)} Jinja2 globals: {list(globals.keys())}")
+        return globals
 
     def _build_env(self) -> Environment:
         env = Environment(
@@ -67,44 +85,45 @@ class CVRenderer:
 
         return env
 
-    def load_raw_data(self, data_file: str) -> Dict[str, Any]:
+    def load_raw_data(self, data_file: Path) -> Dict[str, Any]:
         """Load raw CV data from YAML file without validation."""
-        with open(data_file, "r", encoding="utf-8") as f:
-            try:
+        logger.debug(f"Loading raw CV data from: {data_file}")
+
+        try:
+            with open(data_file, "r", encoding="utf-8") as f:
                 data: Dict[str, Any] = yaml.safe_load(f)
+                logger.debug(f"Successfully loaded YAML data: {data}")
                 return data
-            except yaml.YAMLError as e:
-                raise ValueError(f"Unable to parse {data_file} as YAML: {e}")
+        except FileNotFoundError:
+            logger.error(f"CV data file not found: {data_file}")
+            raise
+        except yaml.YAMLError as e:
+            logger.error(f"Failed to parse YAML file {data_file}: {e}")
+            raise ValueError(f"Unable to parse {data_file} as YAML: {e}")
+        except Exception as e:
+            logger.error(f"Unexpected error loading {data_file}: {e}")
+            raise
 
     def validate_cv_data(self, raw_data: Dict[str, Any]) -> CVData:
         """Validate CV data using Pydantic models."""
+        logger.debug("Validating CV data using Pydantic models")
+
         try:
             # Validate using Pydantic model - it handles all conversion
             # automatically
-            return CVData(**raw_data)
+            cv_data = CVData(**raw_data)
+            logger.debug("CV data validation completed successfully")
+            return cv_data
         except Exception as e:
+            logger.error(f"CV data validation failed: {e}")
             raise ValueError(f"CV data validation failed: {e}")
 
-    def load_data(self, data_file: str) -> CVData:
+    def load_data(self, data_file: Path) -> CVData:
         """Load and validate CV data from YAML file."""
         raw_data = self.load_raw_data(data_file)
-        return self.validate_cv_data(raw_data)
-
-    def convert_validated_data_for_templates(self, cv_data: CVData) -> Dict[str, Any]:
-        """Convert validated CVData to template-friendly format."""
-        data: Dict[str, Any] = cv_data.model_dump()
-        return data
-
-    def render_to_file(
-        self, template_name: str, data: Dict[str, Any], output_path: Path
-    ) -> None:
-        """Render CV and save to file."""
-        rendered = self.render(template_name, data)
-
-        with open(output_path, "w", encoding="utf-8") as f:
-            f.write(rendered)
-
-        print(f"CV rendered to: {output_path}")
+        validated_data = self.validate_cv_data(raw_data)
+        logger.debug("CV data loaded and validated successfully")
+        return validated_data
 
     def _build_context(self, template_name: str) -> Dict[str, Any]:
         return {
@@ -123,12 +142,31 @@ class CVRenderer:
         inject["static"] = self._build_static(template_name)
         return inject
 
-    def render(self, template_name: str, data: Dict[str, Any]) -> str:
+    def render(self, template_name: str, cv_data: CVData) -> str:
         """Render CV using specified template and data."""
-        template = self._env.get_template(template_name)
-        render_data = {**data, **self._build_inject(template_name)}
-        result: str = template.render(render_data)
-        return result
+        try:
+            logger.debug(f"Loading template: {template_name}")
+            template = self._env.get_template(template_name)
+
+            logger.debug("Converting CV data to dict")
+            data = cv_data.model_dump()
+
+            logger.debug("Building inject data")
+            inject_data = self._build_inject(template_name)
+
+            render_data = {**data, **inject_data}
+            logger.debug(f"Render data: {render_data}")
+
+            result: str = template.render(render_data)
+
+            logger.debug(
+                f"Template {template_name} rendered successfully "
+                f"({len(result)} characters)"
+            )
+            return result
+        except Exception as e:
+            logger.error(f"Failed to render template {template_name}: {e}")
+            raise
 
     def _generate_disclaimer(self, template_name: str) -> str:
         """Generate disclaimer comment based on template format."""
@@ -155,31 +193,51 @@ class CVRenderer:
         )
 
     def _process_markdown(self, markdown_text: Dict[str, Any], process: Any) -> str:
+        logger.debug("Processing markdown text through AST renderer")
         if "ast" not in markdown_text:
+            logger.error("Markdown text missing required 'ast' field")
             raise ValueError("Markdown text must contain an 'ast' field")
-        result: str = process(markdown_text["ast"])
+
+        ast_data = markdown_text["ast"]
+        logger.debug(f"Processing AST with {len(ast_data)} tokens")
+        result: str = process(ast_data)
+        logger.debug(f"Markdown processing completed ({len(result)} characters)")
         return result
 
     def _markdown_to_latex(self, markdown_text: Dict[str, Any]) -> str:
         """Convert markdown text to LaTeX."""
+        logger.debug("Converting markdown to LaTeX format")
         return self._process_markdown(markdown_text, self._ast_to_latex)
 
     def _markdown_to_html(self, markdown_text: Dict[str, Any]) -> str:
         """Convert markdown text to HTML."""
+        logger.debug("Converting markdown to HTML format")
         return self._process_markdown(markdown_text, self._ast_to_html)
 
     def _markdown_to_plain(self, markdown_text: Dict[str, Any]) -> str:
         """Convert markdown text to plain text."""
+        logger.debug("Converting markdown to plain text format")
         return self._process_markdown(markdown_text, self._ast_to_plain)
 
     def _ast_to_latex(self, ast: List[Dict[str, Any]]) -> str:
         """Convert AST to LaTeX."""
-        return self._ast_latex_renderer.render_ast(ast)
+        logger.debug(f"Converting AST to LaTeX ({len(ast)} tokens)")
+        result = self._ast_latex_renderer.render_ast(ast)
+        logger.debug(f"AST to LaTeX conversion completed ({len(result)} characters)")
+        return result
 
     def _ast_to_html(self, ast: List[Dict[str, Any]]) -> str:
         """Convert AST to HTML."""
-        return self._ast_html_renderer.render_ast(ast)
+        logger.debug(f"Converting AST to HTML ({len(ast)} tokens)")
+        result = self._ast_html_renderer.render_ast(ast)
+        logger.debug(f"AST to HTML conversion completed ({len(result)} characters)")
+        return result
 
     def _ast_to_plain(self, ast: List[Dict[str, Any]]) -> str:
         """Convert AST to plain text."""
-        return self._ast_plain_renderer.render_ast(ast)
+        logger.debug(f"Converting AST to plain text ({len(ast)} tokens)")
+        result = self._ast_plain_renderer.render_ast(ast)
+        logger.debug(
+            f"AST to plain text conversion completed ({len(result)} characters)"
+        )
+        return result
