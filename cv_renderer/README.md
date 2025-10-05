@@ -13,12 +13,12 @@ poetry run python -m cv_renderer
 ## Usage
 
 ```bash
-python -m cv_renderer [--output OUTPUT] [--data DATA] [--template TEMPLATE]
+python -m cv_renderer --data DATA [--input INPUT [INPUT ...]] [--output OUTPUT] [--force] [--log-level {DEBUG,INFO,WARNING,ERROR}] [--silent]
 ```
 
 ```bash
-python -m cv_renderer --data cv_data.yaml --template templates/cv.html.j2
-python -m cv_renderer --output cv.tex --data cv_data.yaml --template templates/cv.tex.j2
+python -m cv_renderer --data cv_data.yaml --input templates/cv.html.j2
+python -m cv_renderer -d cv_data.yaml -i templates/cv.tex.j2 -o cv.tex
 ```
 
 ## Data Format
@@ -33,7 +33,9 @@ personal:
     email: your.email@example.com
 
 skills:
-  Programming: ["Skill 1", "Skill 2"]
+  - category: Programming
+    skills:
+      - Python
 
 experience:
   - company: "Company Name"
