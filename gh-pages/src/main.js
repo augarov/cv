@@ -1,10 +1,12 @@
 import { detectPDFjsCapabilities } from "./fallback-detection.js";
+import { isAccessibilityMode } from "./accessibility.js";
 
 // Run the detection when the page loads
 document.addEventListener("DOMContentLoaded", function () {
-  const isCapable = detectPDFjsCapabilities();
+  const accessibilityModeEnabled = isAccessibilityMode();
+  const isPdfjsCapable = detectPDFjsCapabilities();
 
-  if (isCapable) {
+  if (isPdfjsCapable && !accessibilityModeEnabled) {
     // Hide fallback, show PDF viewer
     document.getElementById("fallback-container").style.display = "none";
     document.getElementById("pdf-viewer-container").style.display = "block";
