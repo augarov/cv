@@ -76,10 +76,10 @@
 
 \setlength{\TPHorizModule}{0.01\paperwidth} % Sets the units for the horizontal position used in the \begin{textblock} argument
 \setlength{\TPVertModule}{0.01\paperwidth} % Sets the units for the vertical position used in the \begin{textblock} argument
-\newcommand{\lastupdated}{ % Create a new command for printing the Last Updated text
+\newcommand{\lastupdated}[1]{ % Create a new command for printing the Last Updated text
 \begin{textblock}{28}(70,2) % The position of the Last Updated text on the page
 \color{date}\fontspec[Path = fonts/raleway/]{Raleway-ExtraLight}\fontsize{8pt}{10pt}\selectfont % Text styling of the text
-\hfill Last Updated on \today % Last Updated text
+\hfill Last Updated on #1 % Last Updated text
 \end{textblock}}
 
 %----------------------------------------------------------------------------------------

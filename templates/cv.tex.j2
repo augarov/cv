@@ -19,7 +19,9 @@
 %	TITLE SECTION
 %----------------------------------------------------------------------------------------
 %
-\lastupdated % Print the Last Updated text at the top right
+
+% Print the Last Updated text in "dd Month YYYY" format
+\lastupdated{ {{- format_current_time("%-d %B %Y") | escape_latex -}} }
 
 \begin{minipage}[t]{0.68\textwidth}
 
