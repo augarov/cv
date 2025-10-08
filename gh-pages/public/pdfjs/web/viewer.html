@@ -90,6 +90,35 @@ See https://github.com/adobe-type-tools/cmap-resources
     </style>
 
   <script src="viewer.mjs" type="module"></script>
+
+  <!-- Custom script to handle dynamic viewSource URL -->
+  <script>
+    // Parse URL parameters to get sourceUrl
+    function parseQueryString(query) {
+      const params = new Map();
+      for (const [key, value] of new URLSearchParams(query)) {
+        params.set(key.toLowerCase(), value);
+      }
+      return params;
+    }
+
+    // Update viewSource button URL when DOM is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+      const queryString = document.location.search.substring(1);
+      const params = parseQueryString(queryString);
+      const sourceUrl = params.get('sourceurl');
+
+      const viewSourceButton = document.getElementById('viewSource');
+      if (viewSourceButton) {
+        if (sourceUrl) {
+          viewSourceButton.href = decodeURIComponent(sourceUrl);
+        } else {
+          viewSourceButton.style.display = 'none';
+        }
+      }
+
+    });
+  </script>
   </head>
 
   <body tabindex="0">
@@ -325,7 +354,7 @@ See https://github.com/adobe-type-tools/cmap-resources
                       <!-- Separator after Presentation Mode (only if Presentation Mode is available) -->
                       <div class="horizontalToolbarSeparator" id="presentationSeparator"></div>
 
-                      <a href="https://github.com/augarov/cv/" id="viewSource" class="toolbarButton labeled" tabindex="0" target="_blank" rel="noopener noreferrer" title="View Source">
+                      <a id="viewSource" class="toolbarButton labeled" tabindex="0" target="_blank" rel="noopener noreferrer" title="View Source">
                         <span>View Source</span>
                       </a>
 

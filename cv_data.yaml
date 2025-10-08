@@ -153,4 +153,6 @@ metadata:
   pdf_filename: Anton_Ugarov_CV.pdf
   pdf_keywords: c++, software engineer, cv, resume
   url: https://augarov.github.io/cv/
+  pdf_url: https://augarov.github.io/cv/cv.pdf
+  source_url: https://github.com/augarov/cv
   app_name: augarov

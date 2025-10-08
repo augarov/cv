@@ -206,20 +206,70 @@ class Experience(BaseModel):
 class Metadata(BaseModel):
     """Model for PDF metadata."""
 
-    pdf_title: StrippedStr = Field(..., min_length=1, max_length=50)
-    pdf_author: StrippedStr = Field(..., min_length=1, max_length=50)
-    pdf_subject: StrippedStr = Field(..., min_length=1, max_length=50)
-    pdf_keywords: StrippedStr = Field(..., min_length=1, max_length=100)
-    pdf_filename: StrippedStr = Field(..., min_length=1, max_length=50)
-    url: HttpUrl = Field(..., description="Full URL starting with http:// or https://")
-    app_name: StrippedStr = Field(..., min_length=1, max_length=20)
+    pdf_title: StrippedStr = Field(
+        ...,
+        min_length=1,
+        max_length=50,
+        description="Title of the CV PDF",
+    )
+    pdf_author: StrippedStr = Field(
+        ...,
+        min_length=1,
+        max_length=50,
+        description="Author of the CV PDF",
+    )
+    pdf_subject: StrippedStr = Field(
+        ...,
+        min_length=1,
+        max_length=50,
+        description="Subject of the CV PDF",
+    )
+    pdf_keywords: StrippedStr = Field(
+        ...,
+        min_length=1,
+        max_length=100,
+        description="Keywords of the CV PDF",
+    )
+    pdf_filename: StrippedStr = Field(
+        ...,
+        min_length=1,
+        max_length=50,
+        description="Filename of the CV PDF",
+    )
+    url: HttpUrl = Field(
+        ...,
+        description="URL of the CV website",
+    )
+    pdf_url: HttpUrl = Field(
+        ...,
+        description="URL of the CV PDF",
+    )
+    source_url: HttpUrl = Field(
+        ...,
+        description="URL of the CV source code",
+    )
+    app_name: StrippedStr = Field(
+        ...,
+        min_length=1,
+        max_length=20,
+        description="Name of the CV app",
+    )
 
 
 class SkillCategory(BaseModel):
     """Model for a skill category with its associated skills."""
 
-    category: StrippedStr = Field(..., min_length=1, max_length=50)
-    skills: List[StrippedStr] = Field(..., min_length=1)
+    category: StrippedStr = Field(
+        ...,
+        min_length=1,
+        max_length=50,
+        description="Category of skills",
+    )
+    skills: List[StrippedStr] = Field(
+        ...,
+        min_length=1,
+        description="List of skills",
+    )
 
     @field_validator("skills")
     @classmethod
@@ -239,9 +289,31 @@ class SkillCategory(BaseModel):
 class CVData(BaseModel):
     """Root model for complete CV data validation."""
 
-    personal: Personal
-    skills: List[SkillCategory] = Field(..., min_length=1)
-    languages: List[Language] = Field(..., min_length=1)
-    education: List[Education] = Field(..., min_length=1)
-    experience: List[Experience] = Field(..., min_length=1)
-    metadata: Metadata
+    personal: Personal = Field(
+        ...,
+        description="Personal information",
+    )
+    skills: List[SkillCategory] = Field(
+        ...,
+        min_length=1,
+        description="List of skill categories",
+    )
+    languages: List[Language] = Field(
+        ...,
+        min_length=1,
+        description="List of languages",
+    )
+    education: List[Education] = Field(
+        ...,
+        min_length=1,
+        description="List of education entries",
+    )
+    experience: List[Experience] = Field(
+        ...,
+        min_length=1,
+        description="List of work experiences",
+    )
+    metadata: Metadata = Field(
+        ...,
+        description="PDF metadata",
+    )

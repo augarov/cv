@@ -3,6 +3,7 @@
         render-tex render-html \
 		test-renderer \
         install-deps-node install-deps-python install-deps-node-frozen \
+		preview-website-prod preview-website-dev \
         clear-cv clear-deps-node clear-deps-python clear-all \
         validate-pre-commit
 
@@ -76,6 +77,8 @@ help :
 	@echo " - install-deps-node           : install Node.js dependencies"
 	@echo " - install-deps-node-frozen    : install Node.js dependencies (frozen)"
 	@echo " - install-deps-python         : install Python dependencies with Poetry"
+	@echo " - preview-website-prod        : preview website in production mode"
+	@echo " - preview-website-dev         : preview website in development mode"
 	@echo " - clear-cv                    : remove built CV files"
 	@echo " - clear-deps-node             : remove Node.js dependencies"
 	@echo " - clear-deps-python           : remove Python virtual environment and cache"
@@ -105,6 +108,12 @@ install-deps-node : $(MODULES_MARKER)
 install-deps-node-frozen : $(MODULES_FROZEN_MARKER)
 
 install-deps-python : $(PYTHON_DEPS_MARKER)
+
+preview-website-prod : $(WEBSITE_BUILD_MARKER)
+	$(ENTER_WEBSITE_DIR) && pnpm run preview
+
+preview-website-dev : $(OUT_HTML) $(DEPLOY_PDF) $(MODULES_MARKER)
+	$(ENTER_WEBSITE_DIR) && pnpm run dev
 
 clear-cv :
 	rm -f $(OUT_TEX)

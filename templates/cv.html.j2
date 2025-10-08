@@ -47,8 +47,9 @@
     <!-- PDF Viewer Resolver -->
     <script type="module">
         const base = import.meta.env.BASE_URL;
+        const sourceUrl = encodeURIComponent('{{ metadata.source_url }}');
         document.getElementById('pdf-viewer-iframe').src =
-            `${base}pdfjs/web/viewer.html?file=${encodeURIComponent(base + 'cv.pdf')}`;
+            `${base}pdfjs/web/viewer.html?file=${encodeURIComponent(base + 'cv.pdf')}&sourceUrl=${sourceUrl}`;
     </script>
 </head>
 
