@@ -4829,7 +4829,7 @@ const defaultOptions = {
   },
   localeProperties: {
     value: {
-      lang: navigator.language || "en-US"
+      lang: new URL(window.location.href).searchParams.get("locale") || navigator.language || "en-US"
     },
     kind: OptionKind.BROWSER
   },

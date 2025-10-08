@@ -244,15 +244,19 @@ class Metadata(BaseModel):
         ...,
         description="URL of the CV PDF",
     )
-    source_url: HttpUrl = Field(
-        ...,
-        description="URL of the CV source code",
-    )
     app_name: StrippedStr = Field(
         ...,
         min_length=1,
         max_length=20,
         description="Name of the CV app",
+    )
+    source_url: Optional[HttpUrl] = Field(
+        None,
+        description="URL of the CV source code",
+    )
+    locale: Optional[StrippedStr] = Field(
+        None,
+        description="Locale of the CV",
     )
 
 
