@@ -5119,7 +5119,7 @@ const defaultOptions = {
     kind: OptionKind.WORKER
   },
   workerSrc: {
-    value: "../build/pdf.worker.mjs",
+    value: "../build/pdf.worker.min.mjs",
     kind: OptionKind.WORKER
   }
 };
@@ -5129,7 +5129,7 @@ const defaultOptions = {
     kind: OptionKind.VIEWER
   };
   defaultOptions.sandboxBundleSrc = {
-    value: "../build/pdf.sandbox.mjs",
+    value: "../build/pdf.sandbox.min.mjs",
     kind: OptionKind.VIEWER
   };
   defaultOptions.enableFakeMLManager = {
