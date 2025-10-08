@@ -81,6 +81,16 @@ See https://github.com/adobe-type-tools/cmap-resources
         mask-image: var(--viewSource-icon) !important;
       }
 
+      /* Custom Accessibility Mode button icon using PDF.js pattern */
+      :root {
+        --accessibilityMode-icon: url("images/accessibility-icon.svg");
+      }
+
+      :is(#secondaryToolbar #secondaryToolbarButtonContainer) #accessibilityMode::before {
+        -webkit-mask-image: var(--accessibilityMode-icon) !important;
+        mask-image: var(--accessibilityMode-icon) !important;
+      }
+
       /* Conditional separator visibility */
       /* Hide presentation separator if presentation mode button is hidden */
       #presentationMode:is(.hidden, [hidden]) ~ #presentationSeparator,
@@ -91,7 +101,7 @@ See https://github.com/adobe-type-tools/cmap-resources
 
   <script src="viewer.mjs" type="module"></script>
 
-  <!-- Custom script to handle dynamic viewSource URL -->
+  <!-- Custom script to handle URL parameters -->
   <script>
     // Parse URL parameters to get sourceUrl
     function parseQueryString(query) {
@@ -102,11 +112,13 @@ See https://github.com/adobe-type-tools/cmap-resources
       return params;
     }
 
-    // Update viewSource button URL when DOM is loaded
+    // Process URL parameters when DOM is loaded
     document.addEventListener('DOMContentLoaded', function() {
       const queryString = document.location.search.substring(1);
       const params = parseQueryString(queryString);
+
       const sourceUrl = params.get('sourceurl');
+      const accessibilityModeUrl = params.get('accessibilitymodeurl');
 
       const viewSourceButton = document.getElementById('viewSource');
       if (viewSourceButton) {
@@ -114,6 +126,15 @@ See https://github.com/adobe-type-tools/cmap-resources
           viewSourceButton.href = decodeURIComponent(sourceUrl);
         } else {
           viewSourceButton.style.display = 'none';
+        }
+      }
+
+      const accessibilityModeButton = document.getElementById('accessibilityMode');
+      if (accessibilityModeButton) {
+        if (accessibilityModeUrl) {
+          accessibilityModeButton.href = decodeURIComponent(accessibilityModeUrl);
+        } else {
+          accessibilityModeButton.style.display = 'none';
         }
       }
     });
@@ -360,6 +381,10 @@ See https://github.com/adobe-type-tools/cmap-resources
                       <button id="documentProperties" class="toolbarButton labeled" type="button" tabindex="0" data-l10n-id="pdfjs-document-properties-button" aria-controls="documentPropertiesDialog">
                         <span data-l10n-id="pdfjs-document-properties-button-label"></span>
                       </button>
+
+                      <a id="accessibilityMode" class="toolbarButton labeled" tabindex="0" target="_blank" rel="noopener noreferrer" title="Accessibility Mode">
+                        <span>Accessibility Mode</span>
+                      </a>
                     </div>
                   </div>  <!-- secondaryToolbar -->
                 </div>
