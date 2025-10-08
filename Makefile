@@ -1,12 +1,3 @@
-.PHONY: all help \
-        build-cv build-website build-website-from-bundle build-release \
-        render-tex render-html \
-		test-renderer \
-        install-deps-node install-deps-python install-deps-node-frozen \
-		preview-website-prod preview-website-dev \
-        clear-cv clear-deps-node clear-deps-python clear-all \
-        validate-pre-commit
-
 ######################################################################
 #                            VARIABLES                               #
 ######################################################################
@@ -30,16 +21,32 @@ PYPROJECT_TOML = $(RENDERER_DIR)/pyproject.toml
 
 # Source files
 CV_DATA = $(BASE_DIR)/cv_data.yaml
-OUT_TEX_TEMPLATE = $(TEMPLATES_DIR)/cv.tex.j2
-OUT_HTML_TEMPLATE = $(TEMPLATES_DIR)/cv.html.j2
-OUT_TEX = $(TEX_DIR)/cv.tex
-CV_CLS = $(TEX_DIR)/deedy-resume.cls
 
-# Target files
-OUT_PDF = $(TEX_DIR)/cv.pdf
+# Website targets
 OUT_HTML = $(WEBSITE_DIR)/index.html
+OUT_SITEMAP = $(WEBSITE_DIR)/public/sitemap.xml
+OUT_PDF = $(TEX_DIR)/cv.pdf
+OUT_TEX = $(TEX_DIR)/cv.tex
 DEPLOY_PDF = $(WEBSITE_DIR)/public/cv.pdf
 WEBSITE_DIST = $(WEBSITE_DIR)/dist
+
+# Input templates
+INPUT_TEMPLATE_tex = $(TEMPLATES_DIR)/tex/cv-deedy.tex.j2
+INPUT_TEMPLATE_html = $(TEMPLATES_DIR)/web/index.html.j2
+INPUT_TEMPLATE_sitemap = $(TEMPLATES_DIR)/web/sitemap.xml.j2
+
+# Output rendered templates
+OUTPUT_RENDERED_tex = $(OUT_TEX)
+OUTPUT_RENDERED_html = $(OUT_HTML)
+OUTPUT_RENDERED_sitemap = $(OUT_SITEMAP)
+
+# Dependencies
+CV_CLS = $(TEX_DIR)/deedy-resume.cls
+
+# Render targets
+RENDER_TARGETS = tex html sitemap
+RENDER_OUTPUTS = $(foreach _target,$(RENDER_TARGETS),$(OUTPUT_RENDERED_$(_target)))
+
 
 # CI downloads
 WEBSITE_BUNDLE_ARCHIVE = $(DOWNLOADS_DIR)/gh-pages-bundle.tar.gz
@@ -62,6 +69,15 @@ ENTER_WEBSITE_DIR = cd $(WEBSITE_DIR)
 #                             TARGETS                                #
 ######################################################################
 
+.PHONY: all help \
+        build-cv build-website build-website-from-bundle build-release \
+        $(foreach _target,$(RENDER_TARGETS),render-$(_target)) \
+		test-renderer \
+        install-deps-node install-deps-python install-deps-node-frozen \
+		preview-website-prod preview-website-dev \
+        clear-cv clear-deps-node clear-deps-python clear-all \
+        validate-pre-commit
+
 all : build-cv build-website build-release
 
 help :
@@ -73,6 +89,7 @@ help :
 	@echo " - build-release               : build release bundle"
 	@echo " - render-tex                  : generate LaTeX file from YAML data"
 	@echo " - render-html                 : generate HTML file from YAML data"
+	@echo " - render-sitemap              : generate sitemap file from YAML data"
 	@echo " - test-renderer               : run tests for renderer"
 	@echo " - install-deps-node           : install Node.js dependencies"
 	@echo " - install-deps-node-frozen    : install Node.js dependencies (frozen)"
@@ -96,9 +113,11 @@ build-release : $(RELEASE_BUILD_MARKER)
 validate-pre-commit : $(PYTHON_DEPS_MARKER) $(MODULES_MARKER)
 	$(ACTIVATE_VENV) && pre-commit run --all-files
 
-render-tex : $(OUT_TEX)
-
-render-html : $(OUT_HTML)
+define RENDER_TARGET_RULE
+render-$(1) : $(OUTPUT_RENDERED_$(1))
+endef
+$(foreach _target, $(RENDER_TARGETS), \
+	$(eval $(call RENDER_TARGET_RULE,$(_target))))
 
 test-renderer : $(PYTHON_DEPS_MARKER)
 	$(ENTER_RENDERER_DIR) && poetry run pytest
@@ -112,13 +131,11 @@ install-deps-python : $(PYTHON_DEPS_MARKER)
 preview-website-prod : $(WEBSITE_BUILD_MARKER)
 	$(ENTER_WEBSITE_DIR) && pnpm run preview
 
-preview-website-dev : $(OUT_HTML) $(DEPLOY_PDF) $(MODULES_MARKER)
+preview-website-dev : $(OUT_HTML) $(OUT_SITEMAP) $(DEPLOY_PDF) $(MODULES_MARKER)
 	$(ENTER_WEBSITE_DIR) && pnpm run dev
 
 clear-cv :
-	rm -f $(OUT_TEX)
-	rm -f $(OUT_HTML)
-	rm -f $(OUT_PDF)
+	rm -f $(RENDER_OUTPUTS)
 	rm -f $(DEPLOY_PDF)
 	rm -rf $(WEBSITE_DIST)
 	rm -rf $(BUILD_DIR)
@@ -146,16 +163,22 @@ $(OUT_PDF) : $(OUT_TEX) $(CV_CLS)
 	cd $(TEX_DIR) && latexmk -xelatex -interaction=nonstopmode -synctex=1 -file-line-error cv.tex
 	touch $(OUT_PDF)
 
-$(OUT_TEX) : $(PYTHON_DEPS_MARKER) $(CV_DATA) $(OUT_TEX_TEMPLATE)
-	$(ENTER_RENDERER_DIR) && poetry run python -m cv_renderer --data $(CV_DATA) --input $(OUT_TEX_TEMPLATE) --output $(OUT_TEX) --force
-
-$(OUT_HTML) : $(PYTHON_DEPS_MARKER) $(CV_DATA) $(OUT_HTML_TEMPLATE)
-	$(ENTER_RENDERER_DIR) && poetry run python -m cv_renderer --data $(CV_DATA) --input $(OUT_HTML_TEMPLATE) --output $(OUT_HTML) --force
+define RENDER_RULE
+$(OUTPUT_RENDERED_$(1)) : $(PYTHON_DEPS_MARKER) $(CV_DATA) $(INPUT_TEMPLATE_$(1))
+	$(ENTER_RENDERER_DIR) \
+		&& poetry run python -m cv_renderer \
+			--data $(CV_DATA) \
+			--input $(INPUT_TEMPLATE_$(1)) \
+			--output $(OUTPUT_RENDERED_$(1)) \
+			--force
+endef
+$(foreach _target, $(RENDER_TARGETS), \
+	$(eval $(call RENDER_RULE,$(_target))))
 
 $(DEPLOY_PDF) : $(OUT_PDF)
 	cp $(OUT_PDF) $(DEPLOY_PDF)
 
-$(WEBSITE_BUILD_MARKER) : $(OUT_HTML) $(DEPLOY_PDF) $(MODULES_MARKER) $(BUILD_DIR)
+$(WEBSITE_BUILD_MARKER) : $(OUT_HTML) $(OUT_SITEMAP) $(DEPLOY_PDF) $(MODULES_MARKER) $(BUILD_DIR)
 	$(ENTER_WEBSITE_DIR) && pnpm run build
 	touch $(WEBSITE_BUILD_MARKER)
 
@@ -169,12 +192,13 @@ $(WEBSITE_BUILD_FROM_BUNDLE_MARKER) : $(WEBSITE_BUNDLE_ARCHIVE) $(MODULES_FROZEN
 $(BUILD_DIR) :
 	mkdir -p $(BUILD_DIR)
 
-$(RELEASE_BUILD_MARKER) : $(BUILD_DIR) $(OUT_PDF) $(OUT_HTML)
+$(RELEASE_BUILD_MARKER) : $(BUILD_DIR) $(OUT_PDF) $(OUT_HTML) $(OUT_SITEMAP)
 	mkdir -p $(WEBSITE_BUNDLE_DIR)
 	cp $(OUT_HTML) $(WEBSITE_BUNDLE_DIR)/
 
 	mkdir -p $(WEBSITE_BUNDLE_DIR)/public
 	cp $(OUT_PDF) $(WEBSITE_BUNDLE_DIR)/public/
+	cp $(OUT_SITEMAP) $(WEBSITE_BUNDLE_DIR)/public/
 
 	mkdir -p $(RELEASE_DIR)
 	cp $(OUT_PDF) $(RELEASE_DIR)/

@@ -53,8 +53,11 @@ actions:
   │   └── README.md           # Package documentation
   │
   ├── templates/               # 📄 Jinja2 Templates
-  │   ├── cv.tex.j2           # LaTeX template (PDF output)
-  │   └── cv.html.j2          # HTML template (web output)
+  │   ├── tex/                # LaTeX templates
+  │   │   └── cv-deedy.tex.j2 # Main LaTeX template (PDF output)
+  │   └── web/                # HTML/web templates
+  |       ├── sitemap.xml.j2  # Sitemap template
+  │       └── index.html.j2   # Main HTML template (web output)
   │
   ├── tex/                     # 📝 LaTeX & PDF Components
   │   ├── cv.tex              # Generated LaTeX file

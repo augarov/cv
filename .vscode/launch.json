@@ -12,9 +12,9 @@
         "--data",
         "cv_data.yaml",
         "--input",
-        "templates/cv.tex.j2",
+        "templates/tex/cv-deedy.tex.j2",
         "--output",
-        "build/debug/cv.tex",
+        "build/debug/cv-deedy.tex",
         "--force"
       ]
     },
@@ -29,9 +29,9 @@
         "--data",
         "cv_data.yaml",
         "--input",
-        "templates/cv.html.j2",
+        "templates/web/index.html.j2",
         "--output",
-        "build/debug/cv.html",
+        "build/debug/index.html",
         "--force"
       ]
     }
