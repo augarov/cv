@@ -47,7 +47,9 @@
     <!-- PDF Viewer Resolver -->
     <script type="module">
         const base = import.meta.env.BASE_URL;
-        let iframeSrc = `${base}pdfjs/web/viewer.html?file=${encodeURIComponent(base + 'cv.pdf')}`;
+        const cvUrl = base + 'cv.pdf';
+
+        let iframeSrc = `${base}pdfjs/web/viewer.html?file=${encodeURIComponent(cvUrl)}`;
 
         const accessibilityModeUrl = encodeURIComponent(`${base}?accessibility=true`);
         iframeSrc += `&accessibilityModeUrl=${accessibilityModeUrl}`;
@@ -62,8 +64,11 @@
         iframeSrc += `&locale=${locale}`;
         {% endif %}
 
-
         document.getElementById('pdf-viewer-iframe').src = iframeSrc;
+
+        document.getElementById('cv-download').href = cvUrl;
+        document.getElementById('cv-open-in-new-tab').href = cvUrl;
+
     </script>
 </head>
 
@@ -78,8 +83,8 @@
     <div id="fallback-container">
         <h1>{{ metadata.pdf_title }}</h1>
         <p>Please download or view the CV</p>
-        <a href="/cv.pdf" download="{{ metadata.pdf_filename }}">Download CV (PDF)</a>
-        <a href="/cv.pdf" target="_blank">Open in New Tab</a>
+        <a id="cv-download" download="{{ metadata.pdf_filename }}">Download CV (PDF)</a>
+        <a id="cv-open-in-new-tab" href="{{ metadata.pdf_url }}" target="_blank">Open in New Tab</a>
     </div>
 </body>
 
