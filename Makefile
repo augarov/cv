@@ -19,6 +19,11 @@ DOWNLOADS_DIR = $(BASE_DIR)/downloads
 VENV_DIR = $(BASE_DIR)/.venv
 PYPROJECT_TOML = $(RENDERER_DIR)/pyproject.toml
 
+# Node setup
+NODE_MODULES_DIR = $(WEBSITE_DIR)/node_modules
+PNPM_LOCK_FILE = $(WEBSITE_DIR)/pnpm-lock.yaml
+PACKAGE_JSON = $(WEBSITE_DIR)/package.json
+
 # Source files
 CV_DATA = $(BASE_DIR)/cv_data.yaml
 
@@ -61,8 +66,8 @@ WEBSITE_BUNDLE_ARCHIVE = $(DOWNLOADS_DIR)/gh-pages-bundle.tar.gz
 WEBSITE_BUILD_MARKER = $(BUILD_DIR)/.build-website.stamp
 WEBSITE_BUILD_FROM_BUNDLE_MARKER = $(BUILD_DIR)/.build-website-from-bundle.stamp
 RELEASE_BUILD_MARKER = $(BUILD_DIR)/.build-release.stamp
-MODULES_MARKER = $(WEBSITE_DIR)/node_modules/.install-deps-node.stamp
-MODULES_FROZEN_MARKER = $(WEBSITE_DIR)/node_modules/.install-deps-node-frozen.stamp
+MODULES_MARKER = $(NODE_MODULES_DIR)/.install-deps-node.stamp
+MODULES_FROZEN_MARKER = $(NODE_MODULES_DIR)/.install-deps-node-frozen.stamp
 VENV_MARKER = $(VENV_DIR)/.setup-env-python.stamp
 PYTHON_DEPS_MARKER = $(VENV_DIR)/.install-deps-python.stamp
 
@@ -215,11 +220,11 @@ $(RELEASE_BUILD_MARKER) : $(BUILD_DIR) $(OUT_PDF) $(WEBSITE_DEPS)
 
 	touch $(RELEASE_BUILD_MARKER)
 
-$(MODULES_MARKER) :
+$(MODULES_MARKER) : $(PACKAGE_JSON)
 	$(ENTER_WEBSITE_DIR) && pnpm install
 	touch $(MODULES_MARKER)
 
-$(MODULES_FROZEN_MARKER) :
+$(MODULES_FROZEN_MARKER) : $(PACKAGE_JSON) $(PNPM_LOCK_FILE)
 	$(ENTER_WEBSITE_DIR) && pnpm install --frozen-lockfile
 	touch $(MODULES_FROZEN_MARKER)
 	touch $(MODULES_MARKER)
