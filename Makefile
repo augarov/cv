@@ -22,29 +22,35 @@ PYPROJECT_TOML = $(RENDERER_DIR)/pyproject.toml
 # Source files
 CV_DATA = $(BASE_DIR)/cv_data.yaml
 
-# Website targets
-OUT_HTML = $(WEBSITE_DIR)/index.html
-OUT_SITEMAP = $(WEBSITE_DIR)/public/sitemap.xml
+# PDF dependencies
 OUT_PDF = $(TEX_DIR)/cv.pdf
 OUT_TEX = $(TEX_DIR)/cv.tex
-DEPLOY_PDF = $(WEBSITE_DIR)/public/cv.pdf
+
+# Website dependencies
+OUT_HTML = $(WEBSITE_DIR)/index.html
+OUT_SITEMAP = $(WEBSITE_DIR)/public/sitemap.xml
+OUT_ROBOTS = $(WEBSITE_DIR)/public/robots.txt
+WEBSITE_PDF = $(WEBSITE_DIR)/public/cv.pdf
 WEBSITE_DIST = $(WEBSITE_DIR)/dist
+WEBSITE_DEPS = $(OUT_HTML) $(OUT_SITEMAP) $(OUT_ROBOTS) $(WEBSITE_PDF)
 
 # Input templates
 INPUT_TEMPLATE_tex = $(TEMPLATES_DIR)/tex/cv-deedy.tex.j2
 INPUT_TEMPLATE_html = $(TEMPLATES_DIR)/web/index.html.j2
 INPUT_TEMPLATE_sitemap = $(TEMPLATES_DIR)/web/sitemap.xml.j2
+INPUT_TEMPLATE_robots = $(TEMPLATES_DIR)/web/robots.txt.j2
 
 # Output rendered templates
 OUTPUT_RENDERED_tex = $(OUT_TEX)
 OUTPUT_RENDERED_html = $(OUT_HTML)
 OUTPUT_RENDERED_sitemap = $(OUT_SITEMAP)
+OUTPUT_RENDERED_robots = $(OUT_ROBOTS)
 
 # Dependencies
 CV_CLS = $(TEX_DIR)/deedy-resume.cls
 
 # Render targets
-RENDER_TARGETS = tex html sitemap
+RENDER_TARGETS = tex html sitemap robots
 RENDER_OUTPUTS = $(foreach _target,$(RENDER_TARGETS),$(OUTPUT_RENDERED_$(_target)))
 
 
@@ -78,29 +84,34 @@ ENTER_WEBSITE_DIR = cd $(WEBSITE_DIR)
         clear-cv clear-deps-node clear-deps-python clear-all \
         validate-pre-commit
 
+.SILENT: help
+
 all : build-cv build-website build-release
 
+define PRINT_TARGET_HELP
+	printf " - %-32s : %s\n"
+endef
+
 help :
-	@echo "Available targets:"
-	@echo " - all                         : build and deploy CV locally"
-	@echo " - build-cv                    : build CV PDF from LaTeX"
-	@echo " - build-website               : build website"
-	@echo " - build-website-from-bundle   : build website from release bundle"
-	@echo " - build-release               : build release bundle"
-	@echo " - render-tex                  : generate LaTeX file from YAML data"
-	@echo " - render-html                 : generate HTML file from YAML data"
-	@echo " - render-sitemap              : generate sitemap file from YAML data"
-	@echo " - test-renderer               : run tests for renderer"
-	@echo " - install-deps-node           : install Node.js dependencies"
-	@echo " - install-deps-node-frozen    : install Node.js dependencies (frozen)"
-	@echo " - install-deps-python         : install Python dependencies with Poetry"
-	@echo " - preview-website-prod        : preview website in production mode"
-	@echo " - preview-website-dev         : preview website in development mode"
-	@echo " - clear-cv                    : remove built CV files"
-	@echo " - clear-deps-node             : remove Node.js dependencies"
-	@echo " - clear-deps-python           : remove Python virtual environment and cache"
-	@echo " - clear-all                   : remove all untracked files and directories"
-	@echo " - validate-pre-commit         : validate pre-commit hooks"
+	echo "Available targets:"
+	$(PRINT_TARGET_HELP)   "all"                         "build and deploy CV locally"
+	$(PRINT_TARGET_HELP)   "build-cv"                    "build CV PDF from LaTeX"
+	$(PRINT_TARGET_HELP)   "build-website"               "build website"
+	$(PRINT_TARGET_HELP)   "build-website-from-bundle"   "build website from release bundle"
+	for _target in $(RENDER_TARGETS); do \
+		$(PRINT_TARGET_HELP)   "render-$${_target}"      "generate $${_target} file from YAML data"; \
+	done
+	$(PRINT_TARGET_HELP)   "test-renderer"              "run tests for renderer"
+	$(PRINT_TARGET_HELP)   "install-deps-node"           "install Node.js dependencies"
+	$(PRINT_TARGET_HELP)   "install-deps-node-frozen"    "install Node.js dependencies (frozen)"
+	$(PRINT_TARGET_HELP)   "install-deps-python"         "install Python dependencies with Poetry"
+	$(PRINT_TARGET_HELP)   "preview-website-prod"        "preview website in production mode"
+	$(PRINT_TARGET_HELP)   "preview-website-dev"         "preview website in development mode"
+	$(PRINT_TARGET_HELP)   "clear-cv"                    "remove built CV files"
+	$(PRINT_TARGET_HELP)   "clear-deps-node"             "remove Node.js dependencies"
+	$(PRINT_TARGET_HELP)   "clear-deps-python"           "remove Python virtual environment and cache"
+	$(PRINT_TARGET_HELP)   "clear-all"                   "remove all untracked files and directories"
+	$(PRINT_TARGET_HELP)   "validate-pre-commit"         "validate pre-commit hooks"
 
 build-cv : $(OUT_PDF)
 
@@ -131,12 +142,12 @@ install-deps-python : $(PYTHON_DEPS_MARKER)
 preview-website-prod : $(WEBSITE_BUILD_MARKER)
 	$(ENTER_WEBSITE_DIR) && pnpm run preview
 
-preview-website-dev : $(OUT_HTML) $(OUT_SITEMAP) $(DEPLOY_PDF) $(MODULES_MARKER)
+preview-website-dev : $(WEBSITE_DEPS) $(MODULES_MARKER)
 	$(ENTER_WEBSITE_DIR) && pnpm run dev
 
 clear-cv :
 	rm -f $(RENDER_OUTPUTS)
-	rm -f $(DEPLOY_PDF)
+	rm -f $(WEBSITE_PDF)
 	rm -rf $(WEBSITE_DIST)
 	rm -rf $(BUILD_DIR)
 
@@ -175,10 +186,10 @@ endef
 $(foreach _target, $(RENDER_TARGETS), \
 	$(eval $(call RENDER_RULE,$(_target))))
 
-$(DEPLOY_PDF) : $(OUT_PDF)
-	cp $(OUT_PDF) $(DEPLOY_PDF)
+$(WEBSITE_PDF) : $(OUT_PDF)
+	cp $(OUT_PDF) $(WEBSITE_PDF)
 
-$(WEBSITE_BUILD_MARKER) : $(OUT_HTML) $(OUT_SITEMAP) $(DEPLOY_PDF) $(MODULES_MARKER) $(BUILD_DIR)
+$(WEBSITE_BUILD_MARKER) : $(WEBSITE_DEPS) $(MODULES_MARKER) $(BUILD_DIR)
 	$(ENTER_WEBSITE_DIR) && pnpm run build
 	touch $(WEBSITE_BUILD_MARKER)
 
@@ -192,17 +203,15 @@ $(WEBSITE_BUILD_FROM_BUNDLE_MARKER) : $(WEBSITE_BUNDLE_ARCHIVE) $(MODULES_FROZEN
 $(BUILD_DIR) :
 	mkdir -p $(BUILD_DIR)
 
-$(RELEASE_BUILD_MARKER) : $(BUILD_DIR) $(OUT_PDF) $(OUT_HTML) $(OUT_SITEMAP)
-	mkdir -p $(WEBSITE_BUNDLE_DIR)
-	cp $(OUT_HTML) $(WEBSITE_BUNDLE_DIR)/
-
-	mkdir -p $(WEBSITE_BUNDLE_DIR)/public
-	cp $(OUT_PDF) $(WEBSITE_BUNDLE_DIR)/public/
-	cp $(OUT_SITEMAP) $(WEBSITE_BUNDLE_DIR)/public/
-
+$(RELEASE_BUILD_MARKER) : $(BUILD_DIR) $(OUT_PDF) $(WEBSITE_DEPS)
+	rm -rf $(RELEASE_DIR)
 	mkdir -p $(RELEASE_DIR)
+
 	cp $(OUT_PDF) $(RELEASE_DIR)/
-	tar -czvf $(RELEASE_DIR)/gh-pages-bundle.tar.gz -C $(WEBSITE_BUNDLE_DIR)/ .
+
+	echo $(WEBSITE_DEPS) \
+	| sed 's|$(WEBSITE_DIR)/||g' \
+	| xargs tar -czvf $(RELEASE_DIR)/gh-pages-bundle.tar.gz -C $(WEBSITE_DIR)/
 
 	touch $(RELEASE_BUILD_MARKER)
 
