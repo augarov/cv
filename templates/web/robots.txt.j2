@@ -5,7 +5,7 @@ Allow: /
 Disallow: /pdfjs/
 
 # Sitemap location
-Sitemap: {{ metadata.url }}/sitemap.xml
+Sitemap: {{ normalize_url(str(metadata.url)) }}/sitemap.xml
 
 # Crawl delay (optional, be respectful)
 Crawl-delay: 1

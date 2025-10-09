@@ -21,7 +21,7 @@ from .ast import (
 )
 from .logger import make_logger
 from .models import CVData
-from .template_utils import format_current_time
+from .template_utils import format_current_time, normalize_url
 
 logger = make_logger(__name__)
 
@@ -68,6 +68,8 @@ class CVRenderer:
     def _build_globals(self) -> Dict[str, Any]:
         globals: Dict[str, Any] = {
             "format_current_time": format_current_time,
+            "normalize_url": normalize_url,
+            "str": str,
         }
         logger.debug(f"Built {len(globals)} Jinja2 globals: {list(globals.keys())}")
         return globals
