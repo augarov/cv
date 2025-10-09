@@ -5,6 +5,7 @@ import coloredlogs
 from .app_params import AppParams, make_parser
 from .logger import make_logger
 from .renderer import CVRenderer
+from .template_type import detect_template_type
 
 logger = make_logger(__name__)
 
@@ -45,7 +46,16 @@ def run() -> int:
         for tp in app_params.templates:
             template_name = tp.template_file_path.name
             logger.info(f"Rendering CV using template: {template_name}")
-            rendered = renderer.render(template_name, cv_data)
+
+            template_type = detect_template_type(tp.template_file_path)
+            if template_type is None:
+                logger.warning(
+                    f"Template type not detected for {tp.template_file_path}"
+                )
+            else:
+                logger.info(f"Detected template type: {template_type.value}")
+
+            rendered = renderer.render(template_name, cv_data, template_type)
 
             output_file = tp.output_file_path
             if output_file:

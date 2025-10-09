@@ -33,6 +33,20 @@ class TestDetectTemplateType:
         result = detect_template_type(template_path)
         assert result == TemplateType.TEX
 
+    def test_xml_template_detection(self):
+        """Test detection of XML templates."""
+        # Simple .xml file
+        template_path = Path("template.xml")
+        result = detect_template_type(template_path)
+        assert result == TemplateType.XML
+
+    def test_plain_template_detection(self):
+        """Test detection of plain text templates."""
+        # Simple .txt file
+        template_path = Path("template.txt")
+        result = detect_template_type(template_path)
+        assert result == TemplateType.PLAIN
+
     def test_jinja2_template_detection(self):
         """Test detection of Jinja2 templates with multiple suffixes."""
         # HTML Jinja2 template
@@ -50,6 +64,16 @@ class TestDetectTemplateType:
         result = detect_template_type(template_path)
         assert result == TemplateType.TEX
 
+        # XML Jinja2 template
+        template_path = Path("cv.xml.j2")
+        result = detect_template_type(template_path)
+        assert result == TemplateType.XML
+
+        # Plain text Jinja2 template
+        template_path = Path("cv.txt.j2")
+        result = detect_template_type(template_path)
+        assert result == TemplateType.PLAIN
+
     def test_complex_path_detection(self):
         """Test detection with complex file paths."""
         # Nested path with HTML template
@@ -62,10 +86,20 @@ class TestDetectTemplateType:
         result = detect_template_type(template_path)
         assert result == TemplateType.TEX
 
+        # Nested path with XML template
+        template_path = Path("templates/xml/cv.xml.j2")
+        result = detect_template_type(template_path)
+        assert result == TemplateType.XML
+
+        # Nested path with plain text template
+        template_path = Path("templates/plain/cv.txt.j2")
+        result = detect_template_type(template_path)
+        assert result == TemplateType.PLAIN
+
     def test_unknown_template_type(self):
         """Test handling of unknown template types."""
         # Unknown extension
-        template_path = Path("template.txt")
+        template_path = Path("template.py")
         result = detect_template_type(template_path)
         assert result is None
 
@@ -75,7 +109,7 @@ class TestDetectTemplateType:
         assert result is None
 
         # Unsupported template type
-        template_path = Path("template.xml")
+        template_path = Path("template.json")
         result = detect_template_type(template_path)
         assert result is None
 
@@ -99,6 +133,14 @@ class TestDetectTemplateType:
         result = detect_template_type(template_path)
         assert result == TemplateType.TEX
 
+        template_path = Path("template.XML")
+        result = detect_template_type(template_path)
+        assert result == TemplateType.XML
+
+        template_path = Path("template.TXT")
+        result = detect_template_type(template_path)
+        assert result == TemplateType.PLAIN
+
     def test_dot_filename(self):
         """Test handling of edge cases filenames starting with a dot (hidden files)."""
         # File with only extension
@@ -111,6 +153,14 @@ class TestDetectTemplateType:
         assert result is None
 
         template_path = Path(".latex")
+        result = detect_template_type(template_path)
+        assert result is None
+
+        template_path = Path(".xml")
+        result = detect_template_type(template_path)
+        assert result is None
+
+        template_path = Path(".txt")
         result = detect_template_type(template_path)
         assert result is None
 
@@ -132,6 +182,14 @@ class TestDetectTemplateType:
         template_path = Path("resume.v2.final.tex")
         result = detect_template_type(template_path)
         assert result == TemplateType.TEX
+
+        template_path = Path("config.app.settings.xml")
+        result = detect_template_type(template_path)
+        assert result == TemplateType.XML
+
+        template_path = Path("readme.project.notes.txt")
+        result = detect_template_type(template_path)
+        assert result == TemplateType.PLAIN
 
 
 class TestMatchSuffixes:
@@ -203,12 +261,16 @@ class TestTemplateTypeEnum:
         """Test that enum values are as expected."""
         assert TemplateType.HTML.value == "html"
         assert TemplateType.TEX.value == "latex"
+        assert TemplateType.XML.value == "xml"
+        assert TemplateType.PLAIN.value == "plain"
 
     def test_enum_members(self):
         """Test that all expected enum members exist."""
         assert hasattr(TemplateType, "HTML")
         assert hasattr(TemplateType, "TEX")
-        assert len(list(TemplateType)) == 2
+        assert hasattr(TemplateType, "XML")
+        assert hasattr(TemplateType, "PLAIN")
+        assert len(list(TemplateType)) == 4
 
 
 # Integration tests with real file paths (if needed)
@@ -232,14 +294,20 @@ class TestRealFilePaths:
             ("cv.html", TemplateType.HTML),
             ("cv.tex", TemplateType.TEX),
             ("cv.latex", TemplateType.TEX),
+            ("cv.xml", TemplateType.XML),
+            ("cv.txt", TemplateType.PLAIN),
             ("cv.html.j2", TemplateType.HTML),
             ("cv.tex.j2", TemplateType.TEX),
             ("cv.latex.j2", TemplateType.TEX),
-            ("cv.txt", None),
+            ("cv.xml.j2", TemplateType.XML),
+            ("cv.txt.j2", TemplateType.PLAIN),
             ("cv.py", None),
+            ("cv.json", None),
             ("cv", None),
             ("resume.HTML", TemplateType.HTML),
             ("template.TEX", TemplateType.TEX),
+            ("config.XML", TemplateType.XML),
+            ("readme.TXT", TemplateType.PLAIN),
         ],
     )
     def test_parametrized_detection(self, filename, expected):

@@ -10,6 +10,8 @@ class TemplateType(Enum):
 
     HTML = "html"
     TEX = "latex"
+    XML = "xml"
+    PLAIN = "plain"
 
 
 def detect_template_type(template_path: Path) -> Optional[TemplateType]:
@@ -17,6 +19,8 @@ def detect_template_type(template_path: Path) -> Optional[TemplateType]:
     SUFFIX_TO_TYPE = [
         ([".html"], TemplateType.HTML),
         ([".tex", ".latex"], TemplateType.TEX),
+        ([".xml"], TemplateType.XML),
+        ([".txt"], TemplateType.PLAIN),
     ]
 
     suffixes = [s.lower() for s in template_path.suffixes]

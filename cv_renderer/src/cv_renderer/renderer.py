@@ -7,7 +7,7 @@ markdown processing.
 
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Callable, Dict, List
+from typing import Any, Callable, Dict, List, Optional
 
 import yaml
 from jinja2 import Environment, FileSystemLoader, select_autoescape
@@ -21,6 +21,7 @@ from .ast import (
 )
 from .logger import make_logger
 from .models import CVData
+from .template_type import TemplateType
 from .template_utils import format_current_time, normalize_url
 
 logger = make_logger(__name__)
@@ -130,24 +131,59 @@ class CVRenderer:
         logger.debug("CV data loaded and validated successfully")
         return validated_data
 
-    def _build_context(self, template_name: str) -> Dict[str, Any]:
-        return {
+    def _build_context(
+        self, template_name: str, template_type: Optional[TemplateType]
+    ) -> Dict[str, Any]:
+        context: Dict[str, Any] = {
             "template_name": template_name,
         }
+        if template_type:
+            context["template_type"] = template_type.value
+        return context
 
     def _build_static(self, template_name: str) -> Dict[str, Any]:
-        return {
+        static: Dict[str, Any] = {
             "disclaimer_latex": self._render_disclaimer_latex(template_name),
             "disclaimer_html": self._render_disclaimer_html(template_name),
         }
+        return static
 
-    def _build_inject(self, template_name: str) -> Dict[str, Any]:
+    def _build_type_specific(
+        self, data: Dict[str, Any], template_type: TemplateType
+    ) -> Dict[str, Any]:
+        type_specific = {}
+        suffix = f"_{template_type.value}"
+        for key, value in data.items():
+            if key.endswith(suffix):
+                short_key = key[: -(len(suffix))]
+                type_specific[short_key] = value
+        return type_specific
+
+    def _build_inject(
+        self, template_name: str, template_type: Optional[TemplateType]
+    ) -> Dict[str, Any]:
         inject = {}
-        inject["context"] = self._build_context(template_name)
-        inject["static"] = self._build_static(template_name)
+
+        inject["context"] = self._build_context(template_name, template_type)
+
+        static_data = self._build_static(template_name)
+        if template_type:
+            type_specific_static = self._build_type_specific(static_data, template_type)
+            if type_specific_static:
+                logger.debug(
+                    "Updating static data with type specific data: "
+                    f"{type_specific_static.keys()}"
+                )
+                static_data.update(type_specific_static)
+            else:
+                logger.debug("No type specific static data found")
+        inject["static"] = static_data
+
         return inject
 
-    def render(self, template_name: str, cv_data: CVData) -> str:
+    def render(
+        self, template_name: str, cv_data: CVData, template_type: Optional[TemplateType]
+    ) -> str:
         """Render CV using specified template and data."""
         try:
             logger.debug(f"Loading template: {template_name}")
@@ -157,7 +193,7 @@ class CVRenderer:
             data = cv_data.model_dump()
 
             logger.debug("Building inject data")
-            inject_data = self._build_inject(template_name)
+            inject_data = self._build_inject(template_name, template_type)
 
             render_data = {**data, **inject_data}
             logger.debug(f"Render data: {render_data}")
