@@ -1,0 +1,172 @@
+---
+alwaysApply: true
+---
+
+# Prefer Make Targets Over Direct Commands
+
+Use standardized make targets from the Makefile instead of executing commands directly.
+
+<rule>
+name: prefer_make_targets
+description: Encourage using make targets instead of direct command execution for consistency and automation
+filters:
+  # Match command execution patterns
+  - type: content
+    pattern: "(?i)(poetry run|pnpm|npm|pytest|python -m|latexmk|pre-commit)"
+  # Match build/test/development activities
+  - type: content
+    pattern: "(?i)(build|test|install|preview|serve|dev|development|unit test|integration test)"
+  # Match file modification events that might trigger builds
+  - type: event
+    pattern: "file_modify"
+
+actions:
+
+- type: suggest
+  message: |
+  Use make targets from the Makefile instead of executing commands directly:
+
+  ## 🎯 Available Make Targets
+
+  ### **Testing & Validation**
+
+  ```bash
+  # ✅ Use make target
+  make test-renderer
+  make validate-pre-commit
+
+  # ❌ Instead of direct commands
+  cd cv_renderer && poetry run pytest
+  poetry run pre-commit run --all-files
+  ```
+
+  ### **Building & Rendering**
+
+  ```bash
+  # ✅ Use make target
+  make build-cv                    # Build PDF from LaTeX
+  make build-website               # Build website
+  make build-release               # Build release bundle
+  make render-tex                  # Generate LaTeX from YAML
+  make render-html                 # Generate HTML from YAML
+  make render-sitemap              # Generate sitemap from YAML
+  make render-robots               # Generate robots.txt from YAML
+
+  # ❌ Instead of direct commands
+  cd tex && latexmk -xelatex cv.tex
+  cd cv_renderer && poetry run python -m cv_renderer --data ...
+  cd gh-pages && pnpm run build
+  ```
+
+  ### **Development & Preview**
+
+  ```bash
+  # ✅ Use make target
+  make preview-website-dev         # Development server
+  make preview-website-prod        # Production preview
+
+  # ❌ Instead of direct commands
+  cd gh-pages && pnpm run dev
+  cd gh-pages && pnpm run preview
+  ```
+
+  ### **Dependency Management**
+
+  ```bash
+  # ✅ Use make target
+  make install-deps-python         # Install Python dependencies
+  make install-deps-node           # Install Node.js dependencies
+  make install-deps-node-frozen    # Install Node.js deps (frozen)
+
+  # ❌ Instead of direct commands
+  cd cv_renderer && poetry install
+  cd gh-pages && pnpm install
+  cd gh-pages && pnpm install --frozen-lockfile
+  ```
+
+  ### **Cleanup Operations**
+
+  ```bash
+  # ✅ Use make target
+  make clear-cv                    # Remove built CV files
+  make clear-deps-node             # Remove Node.js dependencies
+  make clear-deps-python           # Remove Python environment
+  make clear-all                   # Remove all untracked files
+
+  # ❌ Instead of direct commands
+  rm -f tex/cv.pdf tex/cv.tex
+  rm -rf gh-pages/node_modules
+  rm -rf .venv
+  ```
+
+  ## 🔧 Benefits of Using Make Targets
+
+  ### **Consistency**
+
+  - **Standardized commands**: Same interface across different environments
+  - **Proper dependencies**: Make handles prerequisite installation automatically
+  - **Error handling**: Built-in error checking and recovery
+
+  ### **Automation**
+
+  - **Dependency tracking**: Make knows when files need rebuilding
+  - **Marker files**: Prevents unnecessary re-execution of expensive operations
+  - **Parallel execution**: Make can optimize build order and parallelization
+
+  ### **Environment Management**
+
+  - **Virtual environment activation**: Automatically handled by make targets
+  - **Directory navigation**: Make targets handle `cd` operations correctly
+  - **Path resolution**: Consistent path handling across different shells
+
+  ### **Documentation**
+
+  - **Self-documenting**: `make help` shows all available targets
+  - **Centralized**: All build logic in one place (Makefile)
+  - **Maintainable**: Changes to build process only need updating in one file
+
+  ## 📋 Quick Reference
+
+  ```bash
+  # Get help on available targets
+  make help
+
+  # Common development workflow
+  make install-deps-python install-deps-node
+  make test-renderer
+  make build-cv
+  make preview-website-dev
+
+  # Full build and release
+  make all                         # Equivalent to: build-cv build-website build-release
+  ```
+
+  ## 🚫 When NOT to Use Make Targets
+
+  - **One-off debugging commands**: Direct commands are fine for exploration
+  - **IDE integration**: IDEs may need direct command access
+  - **Custom parameters**: When you need specific flags not covered by make targets
+  - **Learning/investigation**: Direct commands help understand underlying processes
+
+examples:
+
+- input: |
+
+  # Bad: Direct command execution
+
+  cd cv_renderer && poetry run pytest
+  cd gh-pages && pnpm run build
+  cd tex && latexmk -xelatex cv.tex
+
+  # Good: Using make targets
+
+  make test-renderer
+  make build-website
+  make build-cv
+  output: "Properly using make targets for consistent automation"
+
+metadata:
+priority: high
+version: 1.0
+principle: "Standardization through automation"
+</rule>
