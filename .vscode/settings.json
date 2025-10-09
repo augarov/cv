@@ -57,5 +57,7 @@
   "python.analysis.autoSearchPaths": true,
   "vite.buildCommand": "cd gh-pages && pnpm run build",
   "vite.devCommand": "cd gh-pages && pnpm run dev",
-  "vite.autoStart": true
+  "vite.autoStart": true,
+  "mypy-type-checker.cwd": "${workspaceFolder}/cv_renderer",
+  "mypy-type-checker.ignorePatterns": ["**/cv_renderer/tests/*"]
 }
