@@ -56,12 +56,75 @@
     <div id="accessibleContainer">
         <h1>{{ metadata.pdf_title }}</h1>
 
+        <p>
+            Email:
+            <a href="mailto:{{ personal.contact.email }}">{{ personal.contact.email }}</a>
+            / LinkedIn:
+            <a href="{{ personal.contact.linkedin.url }}">{{ personal.contact.linkedin.display_name }}</a>
+            / Telegram:
+            <a href="{{ personal.contact.telegram.url }}">{{ personal.contact.telegram.display_name }}</a>
+            / GitHub:
+            <a href="{{ personal.contact.github.url }}">{{ personal.contact.github.display_name }}</a>
+        </p>
+
+        <hr>
+
         <p>Please download or view the CV</p>
         <a id="cvDownloadButton" download="{{ metadata.pdf_filename }}">Download CV as PDF</a>
         <br>
         <a id="cvOpenInNewTabButton" href="{{ metadata.pdf_url }}" target="_blank">Open in New Tab</a>
         <br>
         <a id="cvOpenInPdfViewerButton" href="?" style="display: none;">Open in PDF Viewer</a>
+
+        <hr>
+
+        <h2>Summary</h2>
+        <p>{{ personal.summary | markdown_plain }}</p>
+
+        <hr>
+
+        <h2>Experience</h2>
+        {% for job in experience %}
+        <h3>{{ job.company }}</h3>
+        <p>{{ job.position }} / {{ job.period }}</p>
+        <p>{{ job.location }}</p>
+        <p>{{ job.description | markdown_plain }}</p>
+        <ul>
+            {% for achievement in job.achievements %}
+            <li>{{ achievement | markdown_plain }}</li>
+            {% endfor %}
+        </ul>
+        <p>Tech Stack: {{ job.stack }}</p>
+        {% endfor %}
+
+        <hr>
+
+        <h2>Skills</h2>
+        {% for skill_category in skills %}
+        <h3>{{ skill_category.category }}</h3>
+        <p>{{ skill_category.skills | join(", ") }}</p>
+        {% endfor %}
+
+        <hr>
+
+        <h2>Education</h2>
+        {% for edu in education %}
+        <h3>{{ edu.institution }}</h3>
+        <p>{{ edu.degree }} / {{ edu.period }}</p>
+        <p>{{ edu.location }}</p>
+        <p>{{ edu.specialization }}</p>
+        <p>{{ edu.focus }}</p>
+        <p>Cum. GPA: {{ edu.gpa.cumulative }}</p>
+        <p>Major GPA: {{ edu.gpa.major }}</p>
+        {% endfor %}
+
+        <hr>
+
+        <h2>Languages</h2>
+        {% for lang in languages %}
+        <p>{{ lang.language }} / {{ lang.level }}</p>`
+        {% endfor %}
+
     </div>
 </body>
 
