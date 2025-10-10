@@ -75,8 +75,7 @@ actions:
   │   │   ├── cv.pdf          # PDF copy for web display
   │   │   ├── pdfjs/          # PDF.js viewer files
   │   │   ├── img/            # Web assets/images/favicons
-  │   │   ├── sitemap.xml     # SEO sitemap
-  │   │   └── robots.txt      # Search engine directives
+  │   │   └── sitemap.xml     # SEO sitemap
   │   ├── dist/               # Built/compiled output (GitHub Pages deployment)
   │   │   ├── index.html      # Generated main web CV page
   │   │   ├── assets/         # Bundled CSS/JS assets

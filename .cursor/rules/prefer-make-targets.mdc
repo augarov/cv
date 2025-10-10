@@ -50,7 +50,6 @@ actions:
   make render-tex                  # Generate LaTeX from YAML
   make render-html                 # Generate HTML from YAML
   make render-sitemap              # Generate sitemap from YAML
-  make render-robots               # Generate robots.txt from YAML
 
   # ❌ Instead of direct commands
   cd tex && latexmk -xelatex cv.tex
