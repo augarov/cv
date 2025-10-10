@@ -64,6 +64,9 @@ function testAndShowPDFViewer() {
     return false;
   }
 
+  // Enable PDF viewer mode - add class for full-screen styling
+  document.body.classList.add("pdf-viewer-mode");
+
   // Hide accessible container, show PDF viewer
   accessibleContainer.style.display = "none";
   pdfViewerContainer.style.display = "block";
