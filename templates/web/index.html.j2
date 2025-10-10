@@ -43,48 +43,23 @@
 
     <!-- Main script -->
     <script type="module" src="/src/main.js"></script>
-
-    <!-- PDF Viewer Resolver -->
-    <script type="module">
-        const base = import.meta.env.BASE_URL;
-        const cvUrl = base + 'cv.pdf';
-
-        let iframeSrc = `${base}pdfjs/web/viewer.html?file=${encodeURIComponent(cvUrl)}`;
-
-        const accessibilityModeUrl = encodeURIComponent(`${base}?accessibility=true`);
-        iframeSrc += `&accessibilityModeUrl=${accessibilityModeUrl}`;
-
-        {% if metadata.source_url %}
-        const sourceUrl = encodeURIComponent('{{ metadata.source_url }}');
-        iframeSrc += `&sourceUrl=${sourceUrl}`;
-        {% endif %}
-
-        {% if metadata.locale %}
-        const locale = encodeURIComponent('{{ metadata.locale }}');
-        iframeSrc += `&locale=${locale}`;
-        {% endif %}
-
-        document.getElementById('pdf-viewer-iframe').src = iframeSrc;
-
-        document.getElementById('cv-download').href = cvUrl;
-        document.getElementById('cv-open-in-new-tab').href = cvUrl;
-
-    </script>
 </head>
 
 <body>
     <!-- PDF Viewer (hidden by default) -->
-    <div id="pdf-viewer-container" style="display: none;">
-        <iframe id="pdf-viewer-iframe" width="100%" height="100%" frameborder="0">
+    <div id="pdfViewerContainer" style="display: none;">
+        <iframe id="pdfViewerIframe" width="100%" height="100%" frameborder="0">
         </iframe>
     </div>
 
     <!-- Fallback interface (visible by default) -->
-    <div id="fallback-container">
+    <div id="accessibleContainer">
         <h1>{{ metadata.pdf_title }}</h1>
+
         <p>Please download or view the CV</p>
-        <a id="cv-download" download="{{ metadata.pdf_filename }}">Download CV (PDF)</a>
-        <a id="cv-open-in-new-tab" href="{{ metadata.pdf_url }}" target="_blank">Open in New Tab</a>
+        <a id="cvDownloadButton" download="{{ metadata.pdf_filename }}">Download CV as PDF</a>
+        <br>
+        <a id="cvOpenInNewTabButton" href="{{ metadata.pdf_url }}" target="_blank">Open in New Tab</a>
     </div>
 </body>
 
