@@ -13,12 +13,21 @@ function resolvePDFViewer(base, cvUrl) {
   const locale = encodeURIComponent("en-GB");
   iframeSrc += `&locale=${locale}`;
 
-  document.getElementById("pdfViewerIframe").src = iframeSrc;
+  let pdfViewerIframe = document.getElementById("pdfViewerIframe");
+  if (pdfViewerIframe) {
+    pdfViewerIframe.src = iframeSrc;
+  }
 }
 
 function resolveDownloadButtonLinks(cvUrl) {
-  document.getElementById("cvDownloadButton").href = cvUrl;
-  document.getElementById("cvOpenInNewTabButton").href = cvUrl;
+  let cvDownloadButton = document.getElementById("cvDownloadButton");
+  if (cvDownloadButton) {
+    cvDownloadButton.href = cvUrl;
+  }
+  let cvOpenInNewTabButton = document.getElementById("cvOpenInNewTabButton");
+  if (cvOpenInNewTabButton) {
+    cvOpenInNewTabButton.href = cvUrl;
+  }
 }
 
 function resolveElements() {
@@ -29,18 +38,36 @@ function resolveElements() {
 }
 
 function testAndShowPDFViewer() {
+  let pdfViewerContainer = document.getElementById("pdfViewerContainer");
+  let accessibleContainer = document.getElementById("accessibleContainer");
+  if (!pdfViewerContainer || !accessibleContainer) {
+    return false;
+  }
+
   const accessibilityModeEnabled = isAccessibilityMode();
   const isPdfjsCapable = detectPDFjsCapabilities();
 
-  if (isPdfjsCapable && !accessibilityModeEnabled) {
-    // Hide fallback, show PDF viewer
-    document.getElementById("accessibleContainer").style.display = "none";
-    document.getElementById("pdfViewerContainer").style.display = "block";
-    return true;
+  if (!isPdfjsCapable) {
+    // If not capable, accessible container remains visible (default state)
+    return false;
   }
 
-  // If not capable, fallback remains visible (default state)
-  return false;
+  if (accessibilityModeEnabled) {
+    // Show switch to pdf viewer button
+    let cvOpenInPdfViewerButton = document.getElementById(
+      "cvOpenInPdfViewerButton",
+    );
+    if (cvOpenInPdfViewerButton) {
+      cvOpenInPdfViewerButton.style.display = "block";
+    }
+    // pdf viewer container remains hidden
+    return false;
+  }
+
+  // Hide accessible container, show PDF viewer
+  accessibleContainer.style.display = "none";
+  pdfViewerContainer.style.display = "block";
+  return true;
 }
 
 function main() {
