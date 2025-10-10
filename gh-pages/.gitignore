@@ -1,5 +1,6 @@
 # Ignore generated files
 index.html
+src/template_params.js
 public/sitemap.xml
 public/robots.txt
-src/template_params.js
+public/img/favicon/site.webmanifest
