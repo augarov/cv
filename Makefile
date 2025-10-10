@@ -35,27 +35,30 @@ OUT_TEX = $(TEX_DIR)/cv.tex
 OUT_HTML = $(WEBSITE_DIR)/index.html
 OUT_SITEMAP = $(WEBSITE_DIR)/public/sitemap.xml
 OUT_ROBOTS = $(WEBSITE_DIR)/public/robots.txt
+OUT_JS = $(WEBSITE_DIR)/src/template_params.js
 WEBSITE_PDF = $(WEBSITE_DIR)/public/cv.pdf
 WEBSITE_DIST = $(WEBSITE_DIR)/dist
-WEBSITE_DEPS = $(OUT_HTML) $(OUT_SITEMAP) $(OUT_ROBOTS) $(WEBSITE_PDF)
+WEBSITE_DEPS = $(OUT_HTML) $(OUT_SITEMAP) $(OUT_ROBOTS) $(WEBSITE_PDF) $(OUT_JS)
 
 # Input templates
 INPUT_TEMPLATE_tex = $(TEMPLATES_DIR)/tex/cv-deedy.tex.j2
 INPUT_TEMPLATE_html = $(TEMPLATES_DIR)/web/index.html.j2
 INPUT_TEMPLATE_sitemap = $(TEMPLATES_DIR)/web/sitemap.xml.j2
 INPUT_TEMPLATE_robots = $(TEMPLATES_DIR)/web/robots.txt.j2
+INPUT_TEMPLATE_js = $(TEMPLATES_DIR)/web/template_params.js.j2
 
 # Output rendered templates
 OUTPUT_RENDERED_tex = $(OUT_TEX)
 OUTPUT_RENDERED_html = $(OUT_HTML)
 OUTPUT_RENDERED_sitemap = $(OUT_SITEMAP)
 OUTPUT_RENDERED_robots = $(OUT_ROBOTS)
+OUTPUT_RENDERED_js = $(OUT_JS)
 
 # Dependencies
 CV_CLS = $(TEX_DIR)/deedy-resume.cls
 
 # Render targets
-RENDER_TARGETS = tex html sitemap robots
+RENDER_TARGETS = tex html sitemap robots js
 RENDER_OUTPUTS = $(foreach _target,$(RENDER_TARGETS),$(OUTPUT_RENDERED_$(_target)))
 
 

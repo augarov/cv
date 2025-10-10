@@ -1,0 +1,16 @@
+/**
+ * Get template parameters.
+ *
+ * @returns {Object} Template parameters.
+ */
+
+function getTemplateParams() {
+    const templateParams = {
+        locale: {{ dquoted(metadata.locale) if metadata.locale else "null" }},
+        sourceUrl: {{ dquoted(metadata.source_url) if metadata.source_url else "null" }},
+    };
+
+    return templateParams;
+}
+
+export { getTemplateParams };

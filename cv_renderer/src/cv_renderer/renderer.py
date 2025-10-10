@@ -22,7 +22,7 @@ from .ast import (
 from .logger import make_logger
 from .models import CVData
 from .template_type import TemplateType
-from .template_utils import format_current_time, normalize_url
+from .template_utils import format_current_time, normalize_url, wrap_in_double_quotes
 
 logger = make_logger(__name__)
 
@@ -70,6 +70,7 @@ class CVRenderer:
         globals: Dict[str, Any] = {
             "format_current_time": format_current_time,
             "normalize_url": normalize_url,
+            "dquoted": wrap_in_double_quotes,
             "str": str,
         }
         logger.debug(f"Built {len(globals)} Jinja2 globals: {list(globals.keys())}")

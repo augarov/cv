@@ -1,17 +1,24 @@
-import { detectPDFjsCapabilities } from "./fallback-detection.js";
+import { detectPDFjsCapabilities } from "./fallback_detection.js";
 import { isAccessibilityMode } from "./accessibility.js";
+import { getTemplateParams } from "./template_params.js";
 
 function resolvePDFViewer(base, cvUrl) {
+  const templateParams = getTemplateParams();
+
   let iframeSrc = `${base}pdfjs/web/viewer.html?file=${encodeURIComponent(cvUrl)}`;
 
   const accessibilityModeUrl = encodeURIComponent(`${base}?accessibility=true`);
   iframeSrc += `&accessibilityModeUrl=${accessibilityModeUrl}`;
 
-  const sourceUrl = encodeURIComponent("https://github.com/augarov/cv");
-  iframeSrc += `&sourceUrl=${sourceUrl}`;
+  if (templateParams.sourceUrl) {
+    const sourceUrl = encodeURIComponent(templateParams.sourceUrl);
+    iframeSrc += `&sourceUrl=${sourceUrl}`;
+  }
 
-  const locale = encodeURIComponent("en-GB");
-  iframeSrc += `&locale=${locale}`;
+  if (templateParams.locale) {
+    const locale = encodeURIComponent(templateParams.locale);
+    iframeSrc += `&locale=${locale}`;
+  }
 
   let pdfViewerIframe = document.getElementById("pdfViewerIframe");
   if (pdfViewerIframe) {

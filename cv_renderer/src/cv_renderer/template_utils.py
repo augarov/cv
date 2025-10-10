@@ -26,3 +26,8 @@ def normalize_url(url: str) -> str:
         normalized_path = f"/{normalized_path}"
 
     return f"{parsed_url.scheme}://{parsed_url.netloc}{normalized_path}"
+
+
+def wrap_in_double_quotes(value: str) -> str:
+    """Wrap value in double quotes."""
+    return f'"{value}"'
