@@ -53,79 +53,187 @@
     </div>
 
     <!-- Fallback interface (visible by default) -->
-    <div id="accessibleContainer">
-        <h1>{{ metadata.pdf_title }}</h1>
-
-        <p>
-            Email:
-            <a href="mailto:{{ personal.contact.email }}">{{ personal.contact.email }}</a>
-            / LinkedIn:
-            <a href="{{ personal.contact.linkedin.url }}">{{ personal.contact.linkedin.display_name }}</a>
-            / Telegram:
-            <a href="{{ personal.contact.telegram.url }}">{{ personal.contact.telegram.display_name }}</a>
-            / GitHub:
-            <a href="{{ personal.contact.github.url }}">{{ personal.contact.github.display_name }}</a>
-        </p>
+    <main id="accessibleContainer" class="cvContainer">
+        <!-- Header Section -->
+        <header class="cvHeader">
+            <h1 class="cvName">
+                <span class="firstName">{{ personal.name.first }}</span>
+                <span class="lastName">{{ personal.name.last }}</span>
+                <br>
+                <span class="jobTitle">{{ personal.title }}</span>
+            </h1>
+        </header>
 
         <hr>
 
-        <p>Please download or view the CV</p>
-        <a id="cvDownloadButton" download="{{ metadata.pdf_filename }}">Download CV as PDF</a>
-        <br>
-        <a id="cvOpenInNewTabButton" href="{{ metadata.pdf_url }}" target="_blank">Open in New Tab</a>
-        <br>
-        <a id="cvOpenInPdfViewerButton" href="?" style="display: none;">Open in PDF Viewer</a>
+        <!-- Contact Information Section -->
+        <section class="cvSection cvContact" aria-labelledby="contactHeading">
+            <div class="contactInfoGrid">
+                <div class="contactItem contactEmail">
+                    <span class="contactLabel">Email:</span>
+                    <a href="mailto:{{ personal.contact.email }}" class="contactLink">
+                        {{ personal.contact.email }}
+                    </a>
+                </div>
+                <div class="contactItem contactLinkedin">
+                    <span class="contactLabel">LinkedIn:</span>
+                    <a href="{{ personal.contact.linkedin.url }}" class="contactLink" target="_blank" rel="noopener">
+                        {{ personal.contact.linkedin.display_name }}
+                    </a>
+                </div>
+                <div class="contactItem contactTelegram">
+                    <span class="contactLabel">Telegram:</span>
+                    <a href="{{ personal.contact.telegram.url }}" class="contactLink" target="_blank" rel="noopener">
+                        {{ personal.contact.telegram.display_name }}
+                    </a>
+                </div>
+                <div class="contactItem contactGithub">
+                    <span class="contactLabel">GitHub:</span>
+                    <a href="{{ personal.contact.github.url }}" class="contactLink" target="_blank" rel="noopener">
+                        {{ personal.contact.github.display_name }}
+                    </a>
+                </div>
+            </div>
+        </section>
 
         <hr>
 
-        <h2>Summary</h2>
-        <p>{{ personal.summary | markdown_plain }}</p>
+        <!-- Download Options Section -->
+        <section class="cvSection cvDownload" aria-labelledby="downloadHeading">
+            <div class="downloadInfo">
+                <p class="downloadDescription">Download or view the CV:</p>
+                <ul class="downloadOptions">
+                    <li class="downloadOption">
+                        <a id="cvDownloadButton" download="{{ metadata.pdf_filename }}"
+                            class="downloadLink downloadPdf">Download CV as PDF</a>
+                    </li>
+                    <li class="downloadOption">
+                        <a id="cvOpenInNewTabButton" href="{{ metadata.pdf_url }}" target="_blank"
+                            class="downloadLink openNewTab">Open in New Tab</a>
+                    </li>
+                    <li class="downloadOption">
+                        <a id="cvOpenInPdfViewerButton" href="?" style="display: none;"
+                            class="downloadLink openViewer">Open in PDF Viewer</a>
+                    </li>
+                </ul>
+            </div>
+        </section>
 
         <hr>
 
-        <h2>Experience</h2>
-        {% for job in experience %}
-        <h3>{{ job.company }}</h3>
-        <p>{{ job.position }} / {{ job.period }}</p>
-        <p>{{ job.location }}</p>
-        <p>{{ job.description | markdown_plain }}</p>
-        <ul>
-            {% for achievement in job.achievements %}
-            <li>{{ achievement | markdown_plain }}</li>
-            {% endfor %}
-        </ul>
-        <p>Tech Stack: {{ job.stack }}</p>
-        {% endfor %}
+        <!-- Summary Section -->
+        <section class="cvSection cvSummary" aria-labelledby="summaryHeading">
+            <h2 id="summaryHeading" class="cvSectionTitle">Summary</h2>
+            <div class="summaryContent">
+                <p class="summaryText">{{ personal.summary | markdown_plain }}</p>
+            </div>
+        </section>
 
         <hr>
 
-        <h2>Skills</h2>
-        {% for skill_category in skills %}
-        <h3>{{ skill_category.category }}</h3>
-        <p>{{ skill_category.skills | join(", ") }}</p>
-        {% endfor %}
+        <!-- Experience Section -->
+        <section class="cvSection cvExperience" aria-labelledby="experienceHeading">
+            <h2 id="experienceHeading" class="cvSectionTitle">Experience</h2>
+            <div class="experienceList">
+                {% for job in experience %}
+                <article class="experienceItem">
+                    <header class="experienceHeader">
+                        <h3 class="companyName">{{ job.company }}</h3>
+                        <div class="jobMeta">
+                            <b><span class="jobPosition">{{ job.position }}</span></b>
+                            /
+                            <span class="jobPeriod">{{ job.period }}</span>
+                            /
+                            <span class="jobLocation">{{ job.location }}</span>
+                        </div>
+                    </header>
+                    <div class="experienceContent">
+                        <p class="jobDescription">{{ job.description | markdown_plain }}</p>
+                        <ul class="achievementsList">
+                            {% for achievement in job.achievements %}
+                            <li class="achievementItem">{{ achievement | markdown_plain }}</li>
+                            {% endfor %}
+                        </ul>
+                        <div class="techStack">
+                            <b><span class="techStackLabel">Tech Stack:</span></b>
+                            <i><span class="techStackList">{{ job.stack }}</span></i>
+                        </div>
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+        </section>
 
         <hr>
 
-        <h2>Education</h2>
-        {% for edu in education %}
-        <h3>{{ edu.institution }}</h3>
-        <p>{{ edu.degree }} / {{ edu.period }}</p>
-        <p>{{ edu.location }}</p>
-        <p>{{ edu.specialization }}</p>
-        <p>{{ edu.focus }}</p>
-        <p>Cum. GPA: {{ edu.gpa.cumulative }}</p>
-        <p>Major GPA: {{ edu.gpa.major }}</p>
-        {% endfor %}
+        <!-- Skills Section -->
+        <section class="cvSection cvSkills" aria-labelledby="skillsHeading">
+            <h2 id="skillsHeading" class="cvSectionTitle">Skills</h2>
+            <div class="skillsList">
+                {% for skill_category in skills %}
+                <div class="skillCategory">
+                    <h3 class="skillCategoryName">{{ skill_category.category }}</h3>
+                    <div class="skillItems">
+                        <span class="skillList">{{ skill_category.skills | join(", ") }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
 
         <hr>
 
-        <h2>Languages</h2>
-        {% for lang in languages %}
-        <p>{{ lang.language }} / {{ lang.level }}</p>
-        {% endfor %}
+        <!-- Education Section -->
+        <section class="cvSection cvEducation" aria-labelledby="educationHeading">
+            <h2 id="educationHeading" class="cvSectionTitle">Education</h2>
+            <div class="educationList">
+                {% for edu in education %}
+                <article class="educationItem">
+                    <header class="educationHeader">
+                        <h3 class="institutionName">{{ edu.institution }}</h3>
+                        <div class="educationMeta">
+                            <span class="degreeName">{{ edu.degree }}</span>
+                            <span class="educationPeriod">{{ edu.period }}</span>
+                            <span class="educationLocation">{{ edu.location }}</span>
+                        </div>
+                    </header>
+                    <div class="educationContent">
+                        <p class="specialization">{{ edu.specialization }}</p>
+                        <p class="focusArea">{{ edu.focus }}</p>
+                        <div class="gpaInfo">
+                            <span class="gpaItem">
+                                <b><span class="gpaLabel">Cum. GPA:</span></b>
+                                <span class="gpaValue">{{ edu.gpa.cumulative }}</span>
+                            </span>
+                            <br>
+                            <span class="gpaItem">
+                                <b><span class="gpaLabel">Major GPA:</span></b>
+                                <span class="gpaValue">{{ edu.gpa.major }}</span>
+                            </span>
+                        </div>
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+        </section>
 
-    </div>
+        <hr>
+
+        <!-- Languages Section -->
+        <section class="cvSection cvLanguages" aria-labelledby="languagesHeading">
+            <h2 id="languagesHeading" class="cvSectionTitle">Languages</h2>
+            <div class="languagesList">
+                {% for lang in languages %}
+                <div class="languageItem">
+                    <span class="languageName">{{ lang.language }}</span>
+                    /
+                    <span class="languageLevel">{{ lang.level }}</span>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+    </main>
 </body>
 
 </html>
