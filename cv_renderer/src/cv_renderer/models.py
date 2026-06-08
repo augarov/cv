@@ -65,6 +65,7 @@ class MarkdownText(BaseModel):
             "text",
             "strong",
             "emphasis",
+            "link",
             "linebreak",
             "softbreak",
         }
@@ -279,6 +280,20 @@ class Metadata(BaseModel):
     )
 
 
+class Competition(BaseModel):
+    """Model for a competition entry."""
+
+    date: StrippedStr = Field(
+        ..., min_length=1, max_length=50, description="Date of the competition"
+    )
+    title: StrippedStr = Field(
+        ..., min_length=1, max_length=100, description="Title of the competition"
+    )
+    description: MarkdownText = Field(
+        ..., description="Competition description with markdown support"
+    )
+
+
 class Publication(BaseModel):
     """Model for a publication entry."""
 
@@ -342,6 +357,9 @@ class CVData(BaseModel):
         ...,
         min_length=1,
         description="List of work experiences",
+    )
+    competitions: List[Competition] = Field(
+        default_factory=list, description="List of competitions"
     )
     publications: List[Publication] = Field(
         default_factory=list, description="List of publications"

@@ -172,6 +172,26 @@
             </div>
         </section>
 
+        {% if competitions %}
+        <hr>
+
+        <!-- Competitions Section -->
+        <section class="cvSection cvCompetitions" aria-labelledby="competitionsHeading">
+            <h2 id="competitionsHeading" class="cvSectionTitle">Competitions</h2>
+            <div class="competitionsList">
+                {% for comp in competitions %}
+                <article class="competitionItem">
+                    <header class="competitionHeader">
+                        <h3 class="competitionTitle">{{ comp.title }}</h3>
+                        <span class="competitionDate">{{ comp.date }}</span>
+                    </header>
+                    <div class="competitionDescription">{{ comp.description | markdown_plain }}</div>
+                </article>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+
         <hr>
 
         <!-- Skills Section -->

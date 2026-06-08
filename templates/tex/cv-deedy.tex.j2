@@ -157,6 +157,22 @@
 {% endfor %}
 
 %------------------------------------------------
+% Competitions
+%------------------------------------------------
+{% if competitions %}
+
+\section{Competitions}
+{% for comp in competitions %}
+\runsubsection{ {{- comp.title | escape_latex -}} }
+\location{ {{- comp.date | escape_latex -}} }
+
+{{ comp.description | markdown_latex }}
+
+\sectionspace
+{% endfor %}
+{% endif %}
+
+%------------------------------------------------
 
 \end{minipage}
 

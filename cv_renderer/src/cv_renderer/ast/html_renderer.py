@@ -49,6 +49,10 @@ class ASTToHTMLRenderer(ASTRenderer):
         """Render italic text for HTML."""
         return f"<em>{children_text}</em>"
 
+    def _render_link(self, url: str, children_text: str) -> str:
+        """Render a hyperlink for HTML."""
+        return f'<a href="{url}" target="_blank" rel="noopener">{children_text}</a>'
+
     def _render_linebreak(self) -> str:
         """Render a line break for HTML."""
         return "<br>\n"

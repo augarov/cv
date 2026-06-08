@@ -51,6 +51,10 @@ class ASTToLaTeXRenderer(ASTRenderer):
         """Render italic text for LaTeX."""
         return f"\\textit{{{children_text}}}"
 
+    def _render_link(self, url: str, children_text: str) -> str:
+        """Render a hyperlink for LaTeX."""
+        return f"\\href{{{url}}}{{{children_text}}}"
+
     def _render_linebreak(self) -> str:
         """Render a line break for LaTeX."""
         return " \\\\\n"

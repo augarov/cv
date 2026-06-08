@@ -51,6 +51,11 @@ class ASTRenderer(ABC):
                 children_text = self._render_children(token)
                 return self._render_em(children_text)
 
+            case "link":
+                url: str = token.get("attrs", {}).get("url", "")
+                children_text = self._render_children(token)
+                return self._render_link(url, children_text)
+
             case "linebreak":
                 return self._render_linebreak()
 
@@ -84,6 +89,11 @@ class ASTRenderer(ABC):
     @abstractmethod
     def _render_em(self, children_text: str) -> str:
         """Render italic text."""
+        pass
+
+    @abstractmethod
+    def _render_link(self, url: str, children_text: str) -> str:
+        """Render a hyperlink."""
         pass
 
     @abstractmethod
