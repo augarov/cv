@@ -5,6 +5,7 @@ This module defines validation models
 for different field types and the complete CV data structure.
 """
 
+import re
 from typing import Any, Dict, List, Optional
 
 import mistune
@@ -134,9 +135,25 @@ class Contact(BaseModel):
     """Model for contact information."""
 
     email: EmailStr
+    phone: Optional[StrippedStr] = Field(
+        None, description="Phone number in E.164 format"
+    )
     linkedin: Optional[Link] = Field(None, description="LinkedIn profile URL")
     telegram: Optional[Link] = Field(None, description="Telegram profile URL")
     github: Optional[Link] = Field(None, description="GitHub profile URL")
+
+    @field_validator("phone")
+    @classmethod
+    def validate_phone(cls, v: Optional[str]) -> Optional[str]:
+        """Validate phone number is in E.164 format (+<country code><number>)."""
+        if v is None:
+            return v
+        if not re.fullmatch(r"\+[1-9]\d{6,14}", v):
+            raise ValueError(
+                "Phone must be in E.164 format: '+' followed by 7–15 digits "
+                "(e.g. +12025551234)"
+            )
+        return v
 
 
 class Personal(BaseModel):

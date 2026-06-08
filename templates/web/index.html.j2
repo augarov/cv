@@ -75,6 +75,14 @@
                         {{ personal.contact.email }}
                     </a>
                 </div>
+                {% if personal.contact.phone %}
+                <div class="contactItem contactPhone">
+                    <span class="contactLabel">Phone:</span>
+                    <a href="tel:{{ personal.contact.phone }}" class="contactLink">
+                        {{ personal.contact.phone }}
+                    </a>
+                </div>
+                {% endif %}
                 <div class="contactItem contactLinkedin">
                     <span class="contactLabel">LinkedIn:</span>
                     <a href="{{ personal.contact.linkedin.url }}" class="contactLink" target="_blank" rel="noopener">
