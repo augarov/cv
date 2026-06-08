@@ -109,6 +109,19 @@
 
 \sectionspace
 
+%------------------------------------------------
+% Publications
+%------------------------------------------------
+{% if publications %}
+
+\section{Publications}
+{% for pub in publications %}
+\href{ {{ pub.link.url }} }{\bf {{ pub.link.display_name | escape_latex }}} ({{ pub.year }}){% if not loop.last %} \\{% endif %}
+{% endfor %}
+
+\sectionspace
+{% endif %}
+
 %----------------------------------------------------------------------------------------
 
 \end{minipage}

@@ -226,6 +226,25 @@
             </div>
         </section>
 
+        {% if publications %}
+        <hr>
+
+        <!-- Publications Section -->
+        <section class="cvSection cvPublications" aria-labelledby="publicationsHeading">
+            <h2 id="publicationsHeading" class="cvSectionTitle">Publications</h2>
+            <ul class="publicationsList">
+                {% for pub in publications %}
+                <li class="publicationItem">
+                    <a href="{{ pub.link.url }}" class="publicationLink" target="_blank" rel="noopener">
+                        {{ pub.link.display_name }}
+                    </a>
+                    <span class="publicationYear">({{ pub.year }})</span>
+                </li>
+                {% endfor %}
+            </ul>
+        </section>
+        {% endif %}
+
         <hr>
 
         <!-- Languages Section -->

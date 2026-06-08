@@ -279,6 +279,13 @@ class Metadata(BaseModel):
     )
 
 
+class Publication(BaseModel):
+    """Model for a publication entry."""
+
+    link: Link = Field(..., description="Link to the publication")
+    year: int = Field(..., ge=1900, le=2100, description="Year of publication")
+
+
 class SkillCategory(BaseModel):
     """Model for a skill category with its associated skills."""
 
@@ -335,6 +342,9 @@ class CVData(BaseModel):
         ...,
         min_length=1,
         description="List of work experiences",
+    )
+    publications: List[Publication] = Field(
+        default_factory=list, description="List of publications"
     )
     metadata: Metadata = Field(
         ...,
