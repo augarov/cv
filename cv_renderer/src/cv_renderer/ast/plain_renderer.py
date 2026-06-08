@@ -15,10 +15,9 @@ class ASTToPlainRenderer(ASTRenderer):
         return text
 
     def _render_strong(self, children_text: str) -> str:
-        """Render bold text for plain text.
+        return children_text
 
-        Just return the text without formatting.
-        """
+    def _render_em(self, children_text: str) -> str:
         return children_text
 
     def _render_linebreak(self) -> str:

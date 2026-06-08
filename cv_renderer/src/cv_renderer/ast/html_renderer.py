@@ -45,6 +45,10 @@ class ASTToHTMLRenderer(ASTRenderer):
         """Render bold text for HTML."""
         return f"<strong>{children_text}</strong>"
 
+    def _render_em(self, children_text: str) -> str:
+        """Render italic text for HTML."""
+        return f"<em>{children_text}</em>"
+
     def _render_linebreak(self) -> str:
         """Render a line break for HTML."""
         return "<br>\n"

@@ -47,6 +47,10 @@ class ASTToLaTeXRenderer(ASTRenderer):
         """Render bold text for LaTeX."""
         return f"\\textbf{{{children_text}}}"
 
+    def _render_em(self, children_text: str) -> str:
+        """Render italic text for LaTeX."""
+        return f"\\textit{{{children_text}}}"
+
     def _render_linebreak(self) -> str:
         """Render a line break for LaTeX."""
         return " \\\\\n"

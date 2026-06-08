@@ -64,6 +64,7 @@ class MarkdownText(BaseModel):
             "paragraph",
             "text",
             "strong",
+            "emphasis",
             "linebreak",
             "softbreak",
         }
@@ -189,9 +190,10 @@ class Education(BaseModel):
     degree: StrippedStr = Field(..., min_length=1, max_length=50)
     period: StrippedStr = Field(..., min_length=1, max_length=200)
     location: StrippedStr = Field(..., min_length=1, max_length=50)
-    specialization: StrippedStr = Field(..., min_length=1, max_length=50)
-    focus: StrippedStr = Field(..., min_length=1, max_length=50)
-    gpa: GPA
+    description: MarkdownText = Field(
+        ..., description="Education description with markdown support"
+    )
+    gpa: Optional[GPA] = Field(None, description="GPA information")
 
 
 class Experience(BaseModel):

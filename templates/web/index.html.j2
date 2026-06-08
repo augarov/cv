@@ -206,8 +206,8 @@
                         </div>
                     </header>
                     <div class="educationContent">
-                        <p class="specialization">{{ edu.specialization }}</p>
-                        <p class="focusArea">{{ edu.focus }}</p>
+                        <div class="educationDescription">{{ edu.description | markdown_plain }}</div>
+                        {% if edu.gpa %}
                         <div class="gpaInfo">
                             <span class="gpaItem">
                                 <b><span class="gpaLabel">Cum. GPA:</span></b>
@@ -219,6 +219,7 @@
                                 <span class="gpaValue">{{ edu.gpa.major }}</span>
                             </span>
                         </div>
+                        {% endif %}
                     </div>
                 </article>
                 {% endfor %}
