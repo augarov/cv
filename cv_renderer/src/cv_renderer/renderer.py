@@ -24,6 +24,7 @@ from .models import CVData
 from .template_type import TemplateType
 from .template_utils import (
     format_current_time,
+    format_phone,
     normalize_url,
     url_path,
     wrap_in_double_quotes,
@@ -67,6 +68,7 @@ class CVRenderer:
             "markdown_latex": self._markdown_to_latex,
             "markdown_html": self._markdown_to_html,
             "markdown_plain": self._markdown_to_plain,
+            "format_phone": format_phone,
         }
         logger.debug(f"Built {len(filters)} Jinja2 filters: {list(filters.keys())}")
         return filters

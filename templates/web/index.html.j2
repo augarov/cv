@@ -79,7 +79,7 @@
                 <div class="contactItem contactPhone">
                     <span class="contactLabel">Phone:</span>
                     <a href="tel:{{ personal.contact.phone }}" class="contactLink">
-                        {{ personal.contact.phone }}
+                        {{ personal.contact.phone | format_phone }}
                     </a>
                 </div>
                 {% endif %}

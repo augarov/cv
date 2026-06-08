@@ -7,6 +7,8 @@ This module provides utilities exposed to Jinja2 templates.
 from datetime import datetime
 from urllib.parse import urlparse
 
+import phonenumbers
+
 
 def _now() -> datetime:
     return datetime.now()
@@ -40,3 +42,11 @@ def url_path(url: str) -> str:
 def wrap_in_double_quotes(value: str) -> str:
     """Wrap value in double quotes."""
     return f'"{value}"'
+
+
+def format_phone(phone: str) -> str:
+    """Format E.164 phone number in international format with spaces."""
+    parsed = phonenumbers.parse(phone)
+    return str(
+        phonenumbers.format_number(parsed, phonenumbers.PhoneNumberFormat.INTERNATIONAL)
+    )

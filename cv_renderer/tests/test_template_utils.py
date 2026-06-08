@@ -5,7 +5,7 @@ from unittest.mock import patch
 
 import pytest
 
-from cv_renderer.template_utils import format_current_time, normalize_url
+from cv_renderer.template_utils import format_current_time, format_phone, normalize_url
 
 
 class TestFormatCurrentTime:
@@ -172,3 +172,20 @@ class TestNormalizeUrl:
     def test_parametrized_normalization(self, input_url, expected_output):
         """Parametrized test for various URL normalization scenarios."""
         assert normalize_url(input_url) == expected_output
+
+
+class TestFormatPhone:
+    """Test cases for format_phone function."""
+
+    @pytest.mark.parametrize(
+        "e164,expected",
+        [
+            ("+46700123456", "+46 70 012 34 56"),
+            ("+12025551234", "+1 202-555-1234"),
+            ("+447911123456", "+44 7911 123456"),
+            ("+4930123456", "+49 30 123456"),
+        ],
+    )
+    def test_international_format(self, e164, expected):
+        """Test formatting of E.164 numbers into international format."""
+        assert format_phone(e164) == expected

@@ -13,6 +13,7 @@ pyyaml = "^6.0"
 mistune = "^3.0.0"
 pydantic = {extras = ["email"], version = "^2.0.0"}
 coloredlogs = "^15.0"
+phonenumbers = "^8.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.0"
@@ -84,6 +85,8 @@ module = [
     "jinja2.*",
     "coloredlogs",
     "coloredlogs.*",
+    "phonenumbers",
+    "phonenumbers.*",
 ]
 ignore_missing_imports = true
 
