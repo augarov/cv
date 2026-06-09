@@ -69,9 +69,8 @@ OUTPUT_RENDERED_js = $(OUT_JS)
 OUTPUT_RENDERED_webmanifest = $(OUT_WEBMANIFEST)
 
 # Dependencies
-CV_CLS = $(TEX_DIR)/deedy-resume-ng.cls
-CV_CLS_deedy-ng = $(CV_CLS)
-CV_CLS_jake-ng =
+CV_CLS_deedy-ng = $(TEX_DIR)/deedy-resume-ng.cls
+CV_CLS_jake-ng = $(TEX_DIR)/jake-resume-ng.cls
 CV_EXTRA_DEPS = $(CV_CLS_$(CV_TEMPLATE))
 
 # Render targets
