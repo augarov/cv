@@ -29,10 +29,13 @@
 {% endif %}
 \end{center}
 
+\sectionspace
 
 %-----------PROFILE-----------
 \section{Profile}
 {{ personal.summary | markdown_latex }}
+
+\sectionspace
 
 %-----------EDUCATION-----------
 \section{Education}
@@ -44,6 +47,7 @@
 {% endfor %}
   \resumeSubHeadingListEnd
 
+\sectionspace
 
 %-----------EXPERIENCE-----------
 \section{Experience}
@@ -53,10 +57,7 @@
       { {{- job.position | escape_latex -}} }{ {{- job.period | escape_latex -}} }
       { {{- job.company | escape_latex -}} }{ {{- job.location | escape_latex -}} }
 {% if job.description %}
-
-      \vspace{7pt}
       \resumeSubsectionText{ {{- job.description | markdown_latex -}} }
-
 {% endif %}
 {% if job.achievements %}
       \resumeItemListStart
@@ -71,9 +72,10 @@
 {% endfor %}
   \resumeSubHeadingListEnd
 
+{% if competitions %}
+\sectionspace
 
 %-----------PROJECTS-----------
-{% if competitions %}
 \section{Projects}
     \resumeSubHeadingListStart
 {% for comp in competitions %}
@@ -86,10 +88,11 @@
     \resumeSubHeadingListEnd
 {% endif %}
 
+\sectionspace
 
 %-----------TECHNICAL SKILLS-----------
 \section{Technical Skills}
- \begin{itemize}[leftmargin=0.15in, label={}]
+ \begin{itemize}[leftmargin=0.15in, label={}, topsep=0pt, parsep=0pt, partopsep=0pt]
     \small{\item{
 {% for skill_category in skills %}
      \textbf{ {{- skill_category.category | escape_latex -}} }{: {% for skill in skill_category.skills %}{{ skill | escape_latex }}{% if not loop.last %}, {% endif %}{% endfor %}}{% if not loop.last %} \\{% endif %}

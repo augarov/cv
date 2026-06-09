@@ -47,51 +47,70 @@
 \raggedright
 \setlength{\tabcolsep}{0in}
 
-% Sections formatting
-\titleformat{\section}{
-  \vspace{-4pt}\scshape\raggedright\large
-}{}{0em}{}[\color{black}\titlerule \vspace{-5pt}]
+%----------------------------------------------------------------------------------------
+%   SECTION TITLE FORMATTING AND SPACING
+%   Spacing is set explicitly via \titlespacing — no embedded \vspace tricks.
+%----------------------------------------------------------------------------------------
 
-% Ensure that generate pdf is machine readable/ATS parsable
+\titleformat{\section}{\scshape\raggedright\large}{}{0em}{}[\color{black}\titlerule]
+\titlespacing*{\section}{0pt}{0pt}{4pt}
+
+% Named spacing commands (following deedy-resume-ng.cls pattern)
+\newcommand{\sectionspace}{\vspace{8pt}} % gap between consecutive section entries
+
+% Ensure that generated pdf is machine readable/ATS parsable
 \pdfgentounicode=1
 
-%-------------------------
-% Custom commands
-\newcommand{\resumeItem}[1]{
-  \item\small{
-    {#1 \vspace{-2pt}}
-  }
-}
+%----------------------------------------------------------------------------------------
+%   CUSTOM COMMANDS
+%   No ad-hoc \vspace adjustments — all spacing controlled via enumitem list options.
+%----------------------------------------------------------------------------------------
+
+\newcommand{\resumeItem}[1]{\item\small{#1}}
 
 \newcommand{\resumeSubheading}[4]{
-  \vspace{-2pt}\item
+  \item
     \begin{tabular*}{0.97\textwidth}[t]{l@{\extracolsep{\fill}}r}
       \textbf{#1} & #2 \\
       \textit{\small#3} & \textit{\small #4} \\
-    \end{tabular*}\vspace{-7pt}
+    \end{tabular*}
 }
 
 \newcommand{\resumeSubSubheading}[2]{
-    \item
+  \item
     \begin{tabular*}{0.97\textwidth}{l@{\extracolsep{\fill}}r}
       \textit{\small#1} & \textit{\small #2} \\
-    \end{tabular*}\vspace{-7pt}
+    \end{tabular*}
 }
 
 \newcommand{\resumeProjectHeading}[2]{
-    \item
+  \item
     \begin{tabular*}{0.97\textwidth}{l@{\extracolsep{\fill}}r}
       \small#1 & #2 \\
-    \end{tabular*}\vspace{-7pt}
+    \end{tabular*}
 }
 
-\newcommand{\resumeSubItem}[1]{\resumeItem{#1}\vspace{-4pt}}
+\newcommand{\resumeSubItem}[1]{\resumeItem{#1}}
 
 \newcommand{\resumeSubsectionText}[1]{\noindent{\small #1}}
 
 \renewcommand\labelitemii{$\vcenter{\hbox{\tiny$\bullet$}}$}
 
-\newcommand{\resumeSubHeadingListStart}{\begin{itemize}[leftmargin=0.15in, label={}]}
+%----------------------------------------------------------------------------------------
+%   LIST ENVIRONMENTS
+%   All spacing set via enumitem options — consistent regardless of what content
+%   follows a subheading (description, bullets, or technology stack).
+%----------------------------------------------------------------------------------------
+
+% Outer list: top-level section entries (jobs, education items, projects).
+% itemsep controls the vertical gap between consecutive entries.
+\newcommand{\resumeSubHeadingListStart}{%
+  \begin{itemize}[leftmargin=0.15in, label={},
+    topsep=0pt, itemsep=6pt, parsep=0pt, partopsep=0pt]}
 \newcommand{\resumeSubHeadingListEnd}{\end{itemize}}
-\newcommand{\resumeItemListStart}{\begin{itemize}}
-\newcommand{\resumeItemListEnd}{\end{itemize}\vspace{-5pt}}
+
+% Inner list: achievement bullets within a section entry.
+% topsep provides a small gap after the preceding subheading or description text.
+\newcommand{\resumeItemListStart}{%
+  \begin{itemize}[topsep=0pt, itemsep=0pt, parsep=0pt, partopsep=0pt]}
+\newcommand{\resumeItemListEnd}{\end{itemize}}
