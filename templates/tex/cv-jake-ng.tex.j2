@@ -37,20 +37,8 @@
 
 \sectionspace
 
-%-----------EDUCATION-----------
-\section{Education}
-  \resumeSubHeadingListStart
-{% for edu in education %}
-    \resumeSubheading
-      { {{- edu.institution | escape_latex -}} }{ {{- edu.location | escape_latex -}} }
-      { {{- edu.degree | escape_latex -}} }{ {{- edu.period | escape_latex -}} }
-{% endfor %}
-  \resumeSubHeadingListEnd
-
-\sectionspace
-
-%-----------EXPERIENCE-----------
-\section{Experience}
+%-----------EMPLOYMENT HISTORY-----------
+\section{Employment History}
   \resumeSubHeadingListStart
 {% for job in experience %}
     \resumeSubheading
@@ -72,11 +60,36 @@
 {% endfor %}
   \resumeSubHeadingListEnd
 
+\sectionspace
+
+%-----------EDUCATION-----------
+\section{Education}
+  \resumeSubHeadingListStart
+{% for edu in education %}
+    \resumeSubheading
+      { {{- edu.institution | escape_latex -}} }{ {{- edu.location | escape_latex -}} }
+      { {{- edu.degree | escape_latex -}} }{ {{- edu.period | escape_latex -}} }
+{% endfor %}
+  \resumeSubHeadingListEnd
+
+\sectionspace
+
+%-----------SKILLS-----------
+\section{Skills}
+ \begin{itemize}[leftmargin=0.15in, label={}, topsep=0pt, parsep=0pt, partopsep=0pt]
+    \small{\item{
+{% for skill_category in skills %}
+     \textbf{ {{- skill_category.category | escape_latex -}} }{: {% for skill in skill_category.skills %}{{ skill | escape_latex }}{% if not loop.last %}, {% endif %}{% endfor %}}{% if not loop.last %} \\{% endif %}
+
+{% endfor %}
+    }}
+ \end{itemize}
+
 {% if competitions %}
 \sectionspace
 
-%-----------PROJECTS-----------
-\section{Projects}
+%-----------COMPETITIONS-----------
+\section{Competitions}
     \resumeSubHeadingListStart
 {% for comp in competitions %}
       \resumeProjectHeading
@@ -87,19 +100,6 @@
 {% endfor %}
     \resumeSubHeadingListEnd
 {% endif %}
-
-\sectionspace
-
-%-----------TECHNICAL SKILLS-----------
-\section{Technical Skills}
- \begin{itemize}[leftmargin=0.15in, label={}, topsep=0pt, parsep=0pt, partopsep=0pt]
-    \small{\item{
-{% for skill_category in skills %}
-     \textbf{ {{- skill_category.category | escape_latex -}} }{: {% for skill in skill_category.skills %}{{ skill | escape_latex }}{% if not loop.last %}, {% endif %}{% endfor %}}{% if not loop.last %} \\{% endif %}
-
-{% endfor %}
-    }}
- \end{itemize}
 
 
 %-------------------------------------------
