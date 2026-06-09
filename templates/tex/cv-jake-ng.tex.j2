@@ -52,14 +52,16 @@
     \resumeSubheading
       { {{- job.position | escape_latex -}} }{ {{- job.period | escape_latex -}} }
       { {{- job.company | escape_latex -}} }{ {{- job.location | escape_latex -}} }
+
       \vspace{7pt}
-      {{ job.description | markdown_latex }}
+      \resumeSubsectionText{ {{- job.description | markdown_latex -}} }
+
       \resumeItemListStart
 {% for achievement in job.achievements %}
         \resumeItem{ {{- achievement | markdown_latex -}} }
 {% endfor %}
       \resumeItemListEnd
-      \small\textbf{Technologies}: \textit{ {{- job.stack | escape_latex -}} }
+      \resumeSubsectionText{\textbf{Technologies}: \textit{ {{- job.stack | escape_latex -}} }}
 {% endfor %}
   \resumeSubHeadingListEnd
 
