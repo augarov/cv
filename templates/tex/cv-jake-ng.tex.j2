@@ -94,9 +94,7 @@
 {% for comp in competitions %}
       \resumeProjectHeading
           {\textbf{ {{- comp.title | escape_latex -}} }}{ {{- comp.date | escape_latex -}} }
-          \resumeItemListStart
-            \resumeItem{ {{- comp.description | markdown_latex -}} }
-          \resumeItemListEnd
+          \resumeSubsectionText{ {{- comp.description | markdown_latex -}} }
 {% endfor %}
     \resumeSubHeadingListEnd
 {% endif %}
