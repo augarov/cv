@@ -52,6 +52,7 @@
     \resumeSubheading
       { {{- job.position | escape_latex -}} }{ {{- job.period | escape_latex -}} }
       { {{- job.company | escape_latex -}} }{ {{- job.location | escape_latex -}} }
+      \vspace{7pt}
       {{ job.description | markdown_latex }}
       \resumeItemListStart
 {% for achievement in job.achievements %}
