@@ -145,13 +145,19 @@
 \descript{| {{ job.position | escape_latex }}}
 \location{ {{- job.period | escape_latex }} | {{ job.location | escape_latex }}}
 
+{% if job.description %}
 {{ job.description | markdown_latex }}
+{% endif %}
+{% if job.achievements %}
 \begin{descritemize}
 {%- for achievement in job.achievements %}
     \descritem {{ achievement | markdown_latex }}
 {%- endfor %}
 \end{descritemize}
+{% endif %}
+{% if job.stack %}
 \textbf{Stack}: \textit{ {{- job.stack | escape_latex -}} }
+{% endif %}
 
 \sectionspace
 {% endfor %}

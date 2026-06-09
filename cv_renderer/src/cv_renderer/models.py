@@ -204,21 +204,22 @@ class Experience(BaseModel):
     position: StrippedStr = Field(..., min_length=1, max_length=50)
     period: StrippedStr = Field(..., min_length=1, max_length=50)
     location: StrippedStr = Field(..., min_length=1, max_length=50)
-    description: MarkdownText = Field(
-        ..., description="Job description with markdown support"
+    description: Optional[MarkdownText] = Field(
+        None, description="Job description with markdown support"
     )
-    achievements: List[MarkdownText] = Field(
-        ...,
-        min_length=1,
+    achievements: Optional[List[MarkdownText]] = Field(
+        None,
         description="List of achievements with markdown support",
     )
-    stack: StrippedStr = Field(..., min_length=1, max_length=200)
+    stack: Optional[StrippedStr] = Field(None, max_length=200)
 
     @field_validator("achievements")
     @classmethod
-    def validate_achievements(cls, v: List[MarkdownText]) -> List[MarkdownText]:
-        """Validate achievements list."""
-        if not v:
+    def validate_achievements(
+        cls, v: Optional[List[MarkdownText]]
+    ) -> Optional[List[MarkdownText]]:
+        """Validate achievements list is non-empty when provided."""
+        if v is not None and not v:
             raise ValueError("Achievements list cannot be empty")
         return v
 

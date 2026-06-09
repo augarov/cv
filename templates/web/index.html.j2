@@ -156,16 +156,22 @@
                         </div>
                     </header>
                     <div class="experienceContent">
+                        {% if job.description %}
                         <p class="jobDescription">{{ job.description | markdown_plain }}</p>
+                        {% endif %}
+                        {% if job.achievements %}
                         <ul class="achievementsList">
                             {% for achievement in job.achievements %}
                             <li class="achievementItem">{{ achievement | markdown_plain }}</li>
                             {% endfor %}
                         </ul>
+                        {% endif %}
+                        {% if job.stack %}
                         <div class="techStack">
                             <b><span class="techStackLabel">Tech Stack:</span></b>
                             <i><span class="techStackList">{{ job.stack }}</span></i>
                         </div>
+                        {% endif %}
                     </div>
                 </article>
                 {% endfor %}
