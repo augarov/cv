@@ -27,6 +27,9 @@ PACKAGE_JSON = $(WEBSITE_DIR)/package.json
 # Source files
 CV_DATA = $(BASE_DIR)/cv_data.yaml
 
+# Load local overrides (e.g. CV_TEMPLATE) from .env if present
+-include .env
+
 # Template selection (override with CV_TEMPLATE=jake make ...)
 CV_TEMPLATE ?= deedy-ng
 
