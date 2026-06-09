@@ -101,6 +101,19 @@
     \resumeSubHeadingListEnd
 {% endif %}
 
+{% if publications %}
+\sectionspace
+
+%-----------PUBLICATIONS-----------
+\section{Publications}
+  \resumeSubHeadingListStart
+{% for pub in publications %}
+    \resumeProjectHeading
+        {\href{ {{- pub.link.url -}} }{ {{- pub.link.display_name | escape_latex -}} }}{ {{- pub.year -}} }
+{% endfor %}
+  \resumeSubHeadingListEnd
+{% endif %}
+
 
 %-------------------------------------------
 \end{document}
