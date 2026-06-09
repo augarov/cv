@@ -90,6 +90,9 @@ class CVRenderer:
             autoescape=select_autoescape(["html", "xml"]),
             trim_blocks=True,
             lstrip_blocks=True,
+            # {# conflicts with LaTeX parameter syntax ({#1}, {#2}, ...)
+            comment_start_string="{##",
+            comment_end_string="##}",
         )
 
         for filter_name, filter_func in self._filters.items():

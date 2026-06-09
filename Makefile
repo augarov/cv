@@ -27,8 +27,19 @@ PACKAGE_JSON = $(WEBSITE_DIR)/package.json
 # Source files
 CV_DATA = $(BASE_DIR)/cv_data.yaml
 
-# Template selection (override with CV_TEMPLATE=onecol make ...)
-CV_TEMPLATE ?= deedy
+# Template selection (override with CV_TEMPLATE=jake make ...)
+CV_TEMPLATE ?= deedy-ng
+
+# LaTeX engine defaults per template (override with CV_ENGINE=pdflatex make ...)
+CV_ENGINE_deedy-ng = xelatex
+CV_ENGINE_jake-ng = pdflatex
+CV_ENGINE ?= $(CV_ENGINE_$(CV_TEMPLATE))
+
+# latexmk flag for each engine
+LATEXMK_ENGINE_FLAG_xelatex = -xelatex
+LATEXMK_ENGINE_FLAG_pdflatex = -pdf
+LATEXMK_ENGINE_FLAG_lualatex = -lualatex
+LATEXMK_ENGINE_FLAG = $(LATEXMK_ENGINE_FLAG_$(CV_ENGINE))
 
 # PDF dependencies
 OUT_PDF = $(TEX_DIR)/cv.pdf
@@ -58,7 +69,10 @@ OUTPUT_RENDERED_js = $(OUT_JS)
 OUTPUT_RENDERED_webmanifest = $(OUT_WEBMANIFEST)
 
 # Dependencies
-CV_CLS = $(TEX_DIR)/deedy-resume.cls
+CV_CLS = $(TEX_DIR)/deedy-resume-ng.cls
+CV_CLS_deedy-ng = $(CV_CLS)
+CV_CLS_jake-ng =
+CV_EXTRA_DEPS = $(CV_CLS_$(CV_TEMPLATE))
 
 # Render targets
 RENDER_TARGETS = tex html sitemap js webmanifest
@@ -180,8 +194,8 @@ clear-all :
 #                           BUILD RULES                              #
 ######################################################################
 
-$(OUT_PDF) : $(OUT_TEX) $(CV_CLS)
-	cd $(TEX_DIR) && latexmk -xelatex -interaction=nonstopmode -synctex=1 -file-line-error cv.tex
+$(OUT_PDF) : $(OUT_TEX) $(CV_EXTRA_DEPS)
+	cd $(TEX_DIR) && latexmk $(LATEXMK_ENGINE_FLAG) -interaction=nonstopmode -synctex=1 -file-line-error cv.tex
 	touch $(OUT_PDF)
 
 
