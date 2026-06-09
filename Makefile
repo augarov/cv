@@ -27,6 +27,9 @@ PACKAGE_JSON = $(WEBSITE_DIR)/package.json
 # Source files
 CV_DATA = $(BASE_DIR)/cv_data.yaml
 
+# Template selection (override with CV_TEMPLATE=onecol make ...)
+CV_TEMPLATE ?= deedy
+
 # PDF dependencies
 OUT_PDF = $(TEX_DIR)/cv.pdf
 OUT_TEX = $(TEX_DIR)/cv.tex
@@ -41,7 +44,7 @@ WEBSITE_DIST = $(WEBSITE_DIR)/dist
 WEBSITE_DEPS = $(OUT_HTML) $(OUT_SITEMAP) $(WEBSITE_PDF) $(OUT_JS) $(OUT_WEBMANIFEST)
 
 # Input templates
-INPUT_TEMPLATE_tex = $(TEMPLATES_DIR)/tex/cv-deedy.tex.j2
+INPUT_TEMPLATE_tex = $(TEMPLATES_DIR)/tex/cv-$(CV_TEMPLATE).tex.j2
 INPUT_TEMPLATE_html = $(TEMPLATES_DIR)/web/index.html.j2
 INPUT_TEMPLATE_sitemap = $(TEMPLATES_DIR)/web/sitemap.xml.j2
 INPUT_TEMPLATE_js = $(TEMPLATES_DIR)/web/template_params.js.j2
@@ -102,7 +105,7 @@ endef
 help :
 	echo "Available targets:"
 	$(PRINT_TARGET_HELP)   "all"                         "build and deploy CV locally"
-	$(PRINT_TARGET_HELP)   "build-cv"                    "build CV PDF from LaTeX"
+	$(PRINT_TARGET_HELP)   "build-cv"                    "build CV PDF from LaTeX (CV_TEMPLATE=deedy|onecol)"
 	$(PRINT_TARGET_HELP)   "build-website"               "build website"
 	$(PRINT_TARGET_HELP)   "build-website-from-bundle"   "build website from release bundle"
 	for _target in $(RENDER_TARGETS); do \
@@ -180,6 +183,7 @@ clear-all :
 $(OUT_PDF) : $(OUT_TEX) $(CV_CLS)
 	cd $(TEX_DIR) && latexmk -xelatex -interaction=nonstopmode -synctex=1 -file-line-error cv.tex
 	touch $(OUT_PDF)
+
 
 define RENDER_RULE
 $(OUTPUT_RENDERED_$(1)) : $(PYTHON_DEPS_MARKER) $(CV_DATA) $(INPUT_TEMPLATE_$(1))
