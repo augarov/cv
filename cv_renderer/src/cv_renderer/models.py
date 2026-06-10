@@ -125,7 +125,9 @@ class Link(BaseModel):
     """Model for a URL link with optional display name."""
 
     url: HttpUrl = Field(..., description="Full URL starting with http:// or https://")
-    display_name: Optional[str] = Field(None, description="Display name for the link")
+    display_name: Optional[StrippedStr] = Field(
+        None, description="Display name for the link"
+    )
 
     def __init__(self, **data: Any) -> None:
         """Initialize Link with auto-generated display_name if not provided."""
