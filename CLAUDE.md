@@ -10,6 +10,8 @@ A CV/résumé generation system that reads structured data from `cv_data.yaml` a
 
 All orchestration goes through `make`. Python deps require Poetry inside a venv; Node deps use pnpm inside `gh-pages/`.
 
+Prefer `make all` for full builds rather than running individual render/build targets. Use `make clear-cv` to clear the LaTeX build directory before a clean rebuild. Use `make test-renderer` to run Python tests rather than invoking `poetry run pytest` directly.
+
 ```bash
 make install-deps-python      # set up .venv and install Poetry deps
 make install-deps-node        # install pnpm deps for gh-pages
