@@ -15,6 +15,8 @@
 \usepackage{fancyhdr}
 \usepackage[english]{babel}
 \usepackage{tabularx}
+\usepackage{multicol}
+\setlength{\multicolsep}{0pt}
 \input{glyphtounicode}
 
 %----------FONT OPTIONS----------
@@ -86,15 +88,22 @@
 \newcommand{\resumeProjectHeading}[2]{
   \item
     \begin{tabular*}{0.97\textwidth}{l@{\extracolsep{\fill}}r}
-      \small#1 & #2 \\
+      #1 & #2 \\
     \end{tabular*}
 }
 
 \newcommand{\resumeSubItem}[1]{\resumeItem{#1}}
 
-\newcommand{\resumeSubsectionText}[1]{\noindent{\small #1}}
+\newcommand{\resumebullet}{$\vcenter{\hbox{\tiny$\bullet$}}$}
 
-\renewcommand\labelitemii{$\vcenter{\hbox{\tiny$\bullet$}}$}
+\newcommand{\resumeSkillCategoryHeading}[1]{\item\textbf{#1}}
+
+\newcommand{\resumeMulticolItemListStart}[1]{%
+  \begin{multicols}{#1}
+  \begin{itemize}[topsep=0pt, itemsep=0pt, parsep=0pt, partopsep=0pt, label=\resumebullet]}
+\newcommand{\resumeMulticolItemListEnd}{\end{itemize}\end{multicols}}
+
+\newcommand{\resumeSubsectionText}[1]{\noindent{\small #1}}
 
 %----------------------------------------------------------------------------------------
 %   LIST ENVIRONMENTS
@@ -112,5 +121,5 @@
 % Inner list: achievement bullets within a section entry.
 % topsep provides a small gap after the preceding subheading or description text.
 \newcommand{\resumeItemListStart}{%
-  \begin{itemize}[topsep=0pt, itemsep=0pt, parsep=0pt, partopsep=0pt]}
+  \begin{itemize}[topsep=0pt, itemsep=0pt, parsep=0pt, partopsep=0pt, label=\resumebullet]}
 \newcommand{\resumeItemListEnd}{\end{itemize}}

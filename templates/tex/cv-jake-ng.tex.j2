@@ -69,6 +69,10 @@
     \resumeSubheading
       { {{- edu.institution | escape_latex -}} }{ {{- edu.location | escape_latex -}} }
       { {{- edu.degree | escape_latex -}} }{ {{- edu.period | escape_latex -}} }
+      \resumeSubsectionText{ {{- edu.description | markdown_latex -}} }
+{% if edu.gpa %}
+      \resumeSubsectionText{\textbf{GPA}: \textit{ {{- edu.gpa.cumulative | escape_latex -}} } (cumulative), \textit{ {{- edu.gpa.major | escape_latex -}} } (major)}
+{% endif %}
 {% endfor %}
   \resumeSubHeadingListEnd
 
@@ -76,14 +80,16 @@
 
 %-----------SKILLS-----------
 \section{Skills}
- \begin{itemize}[leftmargin=0.15in, label={}, topsep=0pt, parsep=0pt, partopsep=0pt]
-    \small{\item{
+  \resumeSubHeadingListStart
 {% for skill_category in skills %}
-     \textbf{ {{- skill_category.category | escape_latex -}} }{: {% for skill in skill_category.skills %}{{ skill | escape_latex }}{% if not loop.last %}, {% endif %}{% endfor %}}{% if not loop.last %} \\{% endif %}
-
+    \resumeSkillCategoryHeading{ {{- skill_category.category | escape_latex -}} }
+    \resumeMulticolItemListStart{3}
+{% for skill in skill_category.skills %}
+      \resumeItem{ {{- skill | escape_latex -}} }
 {% endfor %}
-    }}
- \end{itemize}
+    \resumeMulticolItemListEnd
+{% endfor %}
+  \resumeSubHeadingListEnd
 
 {% if competitions %}
 \sectionspace
