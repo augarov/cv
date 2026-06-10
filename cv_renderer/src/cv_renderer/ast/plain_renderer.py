@@ -20,6 +20,9 @@ class ASTToPlainRenderer(ASTRenderer):
     def _render_em(self, children_text: str) -> str:
         return children_text
 
+    def _render_underline(self, children_text: str) -> str:
+        return children_text
+
     def _render_link(self, url: str, children_text: str) -> str:
         return children_text
 

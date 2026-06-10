@@ -51,6 +51,10 @@ class ASTRenderer(ABC):
                 children_text = self._render_children(token)
                 return self._render_em(children_text)
 
+            case "underlined":
+                children_text = self._render_children(token)
+                return self._render_underline(children_text)
+
             case "link":
                 url: str = token.get("attrs", {}).get("url", "")
                 children_text = self._render_children(token)
@@ -89,6 +93,11 @@ class ASTRenderer(ABC):
     @abstractmethod
     def _render_em(self, children_text: str) -> str:
         """Render italic text."""
+        pass
+
+    @abstractmethod
+    def _render_underline(self, children_text: str) -> str:
+        """Render underlined text."""
         pass
 
     @abstractmethod

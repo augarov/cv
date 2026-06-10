@@ -49,6 +49,9 @@ class ASTToHTMLRenderer(ASTRenderer):
         """Render italic text for HTML."""
         return f"<em>{children_text}</em>"
 
+    def _render_underline(self, children_text: str) -> str:
+        return f"<u>{children_text}</u>"
+
     def _render_link(self, url: str, children_text: str) -> str:
         """Render a hyperlink for HTML."""
         return f'<a href="{url}" target="_blank" rel="noopener">{children_text}</a>'

@@ -20,6 +20,13 @@ from pydantic import (
 )
 from typing_extensions import Annotated
 
+from cv_renderer.plugins.underlined import underlined as underlined_plugin
+
+
+def _make_markdown_parser() -> mistune.Markdown:
+    """Create a mistune AST parser with all supported plugins enabled."""
+    return mistune.create_markdown(renderer="ast", plugins=[underlined_plugin])
+
 
 def strip_str(v: str) -> str:
     """Strip whitespace from string values."""
@@ -45,7 +52,7 @@ class MarkdownText(BaseModel):
             text = data["text"]
             if isinstance(text, str) and text.strip():
                 # Create markdown parser with AST renderer
-                markdown_parser = mistune.create_markdown(renderer="ast")
+                markdown_parser = _make_markdown_parser()
                 data["ast"] = markdown_parser(text.strip())
             else:
                 data["ast"] = []
@@ -65,6 +72,7 @@ class MarkdownText(BaseModel):
             "text",
             "strong",
             "emphasis",
+            "underlined",
             "link",
             "linebreak",
             "softbreak",
@@ -98,7 +106,7 @@ class MarkdownText(BaseModel):
             text = data.strip()
             if text:
                 # Create markdown parser with AST renderer
-                markdown_parser = mistune.create_markdown(renderer="ast")
+                markdown_parser = _make_markdown_parser()
                 ast = markdown_parser(text)
                 return {"text": text, "ast": ast}
             else:
