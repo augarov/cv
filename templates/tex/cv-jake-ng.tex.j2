@@ -123,7 +123,7 @@
     \resumeItemListStart
 {% for pub in publications %}
       \resumeItem{\begin{tabularx}{\linewidth}[t]{X @{\hspace{1em}} r}
-        \href{ {{- pub.link.url -}} }{ {{- pub.link.display_name | escape_latex -}} } & {{- pub.year -}} \\
+        \href{ {{- pub.link.url -}} }{\underline{ {{- pub.link.display_name | escape_latex -}} }} & {{- pub.year -}} \\
       \end{tabularx}}
 {% endfor %}
     \resumeItemListEnd
