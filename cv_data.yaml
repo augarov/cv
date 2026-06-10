@@ -65,8 +65,9 @@ education:
     degree: BS in Computer Science
     period: 2015 - 2019
     location: St. Petersburg
-    specialization: Computer Systems Engineering and Informatics
-    focus: Computer Aided Design Systems
+    description: |
+      Computer Systems Engineering and Informatics \
+      Specialization: Computer Aided Design Systems
     gpa:
       cumulative: 4.57 / 5.0
       major: 4.60 / 5.0

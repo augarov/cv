@@ -102,9 +102,14 @@
 \runsubsection{ {{- edu.institution | escape_latex -}} } \\
 \descript{ {{- edu.degree | escape_latex -}} }
 \location{ {{- edu.period | escape_latex }} | {{ edu.location | escape_latex }}}
-{% if edu.description %}{{ edu.description | markdown_latex }}{% endif %}
-{% if edu.gpa %}\textbf{Cum. GPA}: \textit{ {{- edu.gpa.cumulative | escape_latex -}} } \\
-\textbf{Major GPA}: \textit{ {{- edu.gpa.major | escape_latex -}} }{% endif %}
+{% if edu.description %}
+{{ edu.description | markdown_latex }}
+{% endif %}
+{% if edu.gpa %}
+
+\textbf{Cum. GPA}: \textit{ {{- edu.gpa.cumulative | escape_latex -}} } \\
+\textbf{Major GPA}: \textit{ {{- edu.gpa.major | escape_latex -}} }
+{% endif %}
 {% endfor %}
 
 \sectionspace

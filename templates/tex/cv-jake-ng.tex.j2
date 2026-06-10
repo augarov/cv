@@ -74,6 +74,7 @@
       \resumeSubsectionText{ {{- edu.description | markdown_latex -}} }
 {% endif %}
 {% if edu.gpa %}
+
       \resumeSubsectionText{\textbf{GPA}: \textit{ {{- edu.gpa.cumulative | escape_latex -}} } (cumulative), \textit{ {{- edu.gpa.major | escape_latex -}} } (major)}
 {% endif %}
 {% endfor %}
