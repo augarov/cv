@@ -191,8 +191,8 @@ class Education(BaseModel):
     degree: StrippedStr = Field(..., min_length=1, max_length=50)
     period: StrippedStr = Field(..., min_length=1, max_length=200)
     location: StrippedStr = Field(..., min_length=1, max_length=50)
-    description: MarkdownText = Field(
-        ..., description="Education description with markdown support"
+    description: Optional[MarkdownText] = Field(
+        None, description="Education description with markdown support"
     )
     gpa: Optional[GPA] = Field(None, description="GPA information")
 

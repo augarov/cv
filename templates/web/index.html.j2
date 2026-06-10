@@ -232,7 +232,7 @@
                         </div>
                     </header>
                     <div class="educationContent">
-                        <div class="educationDescription">{{ edu.description | markdown_plain }}</div>
+                        {% if edu.description %}<div class="educationDescription">{{ edu.description | markdown_plain }}</div>{% endif %}
                         {% if edu.gpa %}
                         <div class="gpaInfo">
                             <span class="gpaItem">
