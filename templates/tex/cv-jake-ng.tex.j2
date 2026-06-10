@@ -17,6 +17,7 @@
 \begin{center}
     {\huge \scshape \textbf{ {{- personal.name.first | escape_latex }} {{ personal.name.last | escape_latex -}} , {{ personal.title | escape_latex -}} }} \\ \vspace{1pt}
     \small
+    {{ personal.location | escape_latex }} $|$
 {% if personal.contact.phone %}
     {{ personal.contact.phone | format_phone | escape_latex }} $|$
 {% endif %}
