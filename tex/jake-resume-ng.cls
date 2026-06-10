@@ -6,7 +6,8 @@
 
 \usepackage{latexsym}
 \usepackage[empty]{fullpage}
-\usepackage{titlesec}
+\usepackage[nobottomtitles*]{titlesec}
+\renewcommand{\bottomtitlespace}{4\baselineskip}
 \usepackage{marvosym}
 \usepackage[usenames,dvipsnames]{color}
 \usepackage{verbatim}
@@ -17,6 +18,7 @@
 \usepackage{tabularx}
 \usepackage{multicol}
 \setlength{\multicolsep}{0pt}
+\usepackage{needspace}
 \input{glyphtounicode}
 
 %----------FONT OPTIONS----------
@@ -72,10 +74,11 @@
 
 \newcommand{\resumeSubheading}[4]{
   \item
+  \needspace{4\baselineskip}
     \begin{tabular*}{0.97\textwidth}[t]{l@{\extracolsep{\fill}}r}
       \textbf{#1} & #2 \\
       \textit{\small#3} & \textit{\small #4} \\
-    \end{tabular*}
+    \end{tabular*}\nopagebreak[3]
 }
 
 \newcommand{\resumeSubSubheading}[2]{
@@ -87,9 +90,10 @@
 
 \newcommand{\resumeProjectHeading}[2]{
   \item
+  \needspace{3\baselineskip}
     \begin{tabular*}{0.97\textwidth}{l@{\extracolsep{\fill}}r}
       #1 & #2 \\
-    \end{tabular*}
+    \end{tabular*}\nopagebreak[3]
 }
 
 \newcommand{\resumeSubItem}[1]{\resumeItem{#1}}
