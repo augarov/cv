@@ -295,11 +295,11 @@ class Publication(BaseModel):
 class SkillCategory(BaseModel):
     """Model for a skill category with its associated skills."""
 
-    category: StrippedStr = Field(
-        ...,
+    category: Optional[StrippedStr] = Field(
+        None,
         min_length=1,
         max_length=50,
-        description="Category of skills",
+        description="Category of skills (None = uncategorized)",
     )
     skills: List[StrippedStr] = Field(
         ...,
@@ -334,6 +334,20 @@ class CVData(BaseModel):
         min_length=1,
         description="List of skill categories",
     )
+
+    @field_validator("skills")
+    @classmethod
+    def validate_skills_categories(cls, v: List[SkillCategory]) -> List[SkillCategory]:
+        """Validate that an unnamed category is the only category."""
+        unnamed = [c for c in v if c.category is None]
+        if unnamed and len(v) > 1:
+            raise ValueError(
+                "An uncategorized skill category (no name) must be the only "
+                "category; remove category names from all entries or add one "
+                "to the unnamed entry."
+            )
+        return v
+
     languages: List[Language] = Field(
         ...,
         min_length=1,

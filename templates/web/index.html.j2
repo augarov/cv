@@ -206,7 +206,7 @@
             <div class="skillsList">
                 {% for skill_category in skills %}
                 <div class="skillCategory">
-                    <h3 class="skillCategoryName">{{ skill_category.category }}</h3>
+                    {% if skill_category.category %}<h3 class="skillCategoryName">{{ skill_category.category }}</h3>{% endif %}
                     <div class="skillItems">
                         <span class="skillList">{{ skill_category.skills | join(", ") }}</span>
                     </div>

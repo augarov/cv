@@ -70,8 +70,8 @@
 \section{Skills}
 {% for skill_category in skills %}
 
-\textbf{ {{- skill_category.category | escape_latex -}} :}
-\begin{skillitemize}
+{% if skill_category.category %}\textbf{ {{- skill_category.category | escape_latex -}} :}
+{% endif %}\begin{skillitemize}
 {%- for skill in skill_category.skills %}
     \skillitem {{ skill | escape_latex }}
 {%- endfor %}

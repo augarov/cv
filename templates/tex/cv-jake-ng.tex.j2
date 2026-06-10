@@ -84,7 +84,11 @@
 \section{Skills}
   \resumeSubHeadingListStart
 {% for skill_category in skills %}
+{% if skill_category.category %}
     \resumeSkillCategoryHeading{ {{- skill_category.category | escape_latex -}} }
+{% else %}
+    \item
+{% endif %}
     \resumeMulticolItemListStart{3}
 {% for skill in skill_category.skills %}
       \resumeItem{ {{- skill | escape_latex -}} }
