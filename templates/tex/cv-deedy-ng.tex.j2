@@ -47,9 +47,15 @@
 {% if personal.contact.phone %}
     \raisebox{-1pt}{\faPhone} & {\bf {{ personal.contact.phone | format_phone | escape_latex }}} \\
 {% endif %}
+{% if personal.contact.linkedin %}
     \raisebox{-1pt}{\faLinkedin} & \href{ {{ personal.contact.linkedin.url }} }{\bf {{ personal.contact.linkedin.display_name | escape_latex }}} \\
+{% endif %}
+{% if personal.contact.telegram %}
     \raisebox{-1pt}{\faTelegramPlane} & \href{ {{ personal.contact.telegram.url }} }{\bf {{ personal.contact.telegram.display_name | escape_latex }}} \\
+{% endif %}
+{% if personal.contact.github %}
     \raisebox{-1pt}{\faGithub} & \href{ {{ personal.contact.github.url }} }{\bf {{ personal.contact.github.display_name | escape_latex }}} \\
+{% endif %}
 \end{supertabular}
 }
 
