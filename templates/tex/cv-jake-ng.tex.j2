@@ -129,11 +129,14 @@
 
 %-----------LANGUAGES-----------
 \section{Languages}
-  \resumeMulticolItemListStart{3}
+  \resumeSubHeadingListStart
+    \item
+    \resumeMulticolItemListStart{3}
 {% for lang in languages %}
-    \resumeItem{\textbf{ {{- lang.language | escape_latex -}} }{: \textit{ {{- lang.level | escape_latex -}} }}}
+      \resumeItem{\textbf{ {{- lang.language | escape_latex -}} }{: \textit{ {{- lang.level | escape_latex -}} }}}
 {% endfor %}
-  \resumeMulticolItemListEnd
+    \resumeMulticolItemListEnd
+  \resumeSubHeadingListEnd
 {% endif %}
 
 
