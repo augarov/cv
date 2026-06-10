@@ -45,7 +45,7 @@
     \raisebox{-1pt}{\faHome} & {{ personal.location | escape_latex }} \\
     \raisebox{-1pt}{\small\faEnvelope} & \href{mailto:{{ personal.contact.email }}}{\bf {{ personal.contact.email | escape_latex }}} \\
 {% if personal.contact.phone %}
-    \raisebox{-1pt}{\faPhone} & {\bf {{ personal.contact.phone | format_phone | escape_latex }}} \\
+    \raisebox{-1pt}{\faPhone} & \href{tel:{{ personal.contact.phone }}}{\bf {{ personal.contact.phone | format_phone | escape_latex }}} \\
 {% endif %}
 {% if personal.contact.linkedin %}
     \raisebox{-1pt}{\faLinkedin} & \href{ {{ personal.contact.linkedin.url }} }{\bf {{ personal.contact.linkedin.display_name | escape_latex }}} \\

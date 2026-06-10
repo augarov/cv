@@ -19,7 +19,7 @@
     \small
     {{ personal.location | escape_latex }} $|$
 {% if personal.contact.phone %}
-    {{ personal.contact.phone | format_phone | escape_latex }} $|$
+    \href{tel:{{ personal.contact.phone }}}{\underline{ {{- personal.contact.phone | format_phone | escape_latex -}} }} $|$
 {% endif %}
     \href{mailto:{{ personal.contact.email }}}{\underline{ {{- personal.contact.email | escape_latex -}} }}
 {% if personal.contact.linkedin %}
