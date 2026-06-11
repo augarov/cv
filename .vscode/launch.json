@@ -12,9 +12,9 @@
         "--data",
         "cv_data.yaml",
         "--input",
-        "templates/tex/cv-deedy.tex.j2",
+        "templates/tex/cv-deedy-ng.tex.j2",
         "--output",
-        "build/debug/cv-deedy.tex",
+        "build/debug/cv-deedy-ng.tex",
         "--force"
       ]
     },
