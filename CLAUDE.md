@@ -8,7 +8,7 @@ A CV/résumé generation system that reads structured data from `cv_data.yaml` a
 
 ## Build commands
 
-All orchestration goes through `make`. Python deps require Poetry inside a venv; Node deps use pnpm inside `gh-pages/`.
+All orchestration goes through `make`. Prefer `make` targets over direct `poetry run`, `pnpm`, `latexmk`, or `pre-commit` invocations. Python deps require Poetry inside a venv; Node deps use pnpm inside `gh-pages/`.
 
 Prefer `make all` for full builds rather than running individual render/build targets. Use `make clear-cv` to clear the LaTeX build directory before a clean rebuild. Use `make test-renderer` to run Python tests rather than invoking `poetry run pytest` directly.
 
@@ -64,7 +64,7 @@ Jinja2 filters available in templates: `escape_latex`, `escape_html`, `markdown_
 
 ### Jinja2 templates (`templates/`)
 
-- `tex/cv-deedy.tex.j2` — LaTeX template using the deedy-resume class (`tex/deedy-resume.cls`).
+- `tex/cv-deedy-ng.tex.j2` — LaTeX template using the deedy-resume-ng class (`tex/deedy-resume-ng.cls`).
 - `web/index.html.j2` — Main HTML template.
 - `web/sitemap.xml.j2`, `web/template_params.js.j2`, `web/site.webmanifest.json.j2` — Supporting web files.
 
