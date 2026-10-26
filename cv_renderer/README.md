@@ -1,48 +1,31 @@
 # CV Renderer
 
-Generate CV/Resume from YAML data using Jinja2 templates.
+Render a [rendercv](https://docs.rendercv.com/) CV to Typst, PDF and website files. rendercv validates the YAML and renders the Typst source; the website templates are rendered with our own Jinja2 environment from the same model.
 
-## Quick Start
-
-```bash
-poetry install
-poetry run python -m cv_renderer
-```
+In this repo, run it through `make` (see the top-level `README.md`). The commands below are for running it by hand from `cv_renderer/` inside the project venv.
 
 ## Usage
 
 ```bash
-poetry run python -m cv_renderer --data DATA [--input INPUT [INPUT ...]] [--output OUTPUT] [--force] [--log-level {DEBUG,INFO,WARNING,ERROR}] [--silent]
+poetry run python -m cv_renderer [--log-level {DEBUG,INFO,WARNING,ERROR}] [--silent] SUBCOMMAND ...
 ```
+
+| Subcommand | Reads                                                         | Writes                                               |
+| ---------- | ------------------------------------------------------------- | ---------------------------------------------------- |
+| `typst`    | `--cv` and optionally `--design`, `--locale`, `--settings`    | `--output`: the Typst source (theme from the design) |
+| `pdf`      | `--input`: a `.typ` file                                      | `--output`: the PDF                                  |
+| `web`      | the same inputs as `typst`, plus `--website` and `--template` | `--output`: the rendered template                    |
 
 ```bash
-poetry run python -m cv_renderer --data cv_data.yaml --input templates/cv.html.j2
-poetry run python -m cv_renderer -d cv_data.yaml -i templates/cv.tex.j2 -o cv.tex
+poetry run python -m cv_renderer typst --cv ../cv/cv.yaml --design ../cv/design.yaml --output ../build/pdf/cv.typ
+poetry run python -m cv_renderer pdf --input ../build/pdf/cv.typ --output ../build/pdf/cv.pdf
+poetry run python -m cv_renderer web --cv ../cv/cv.yaml --website ../cv/website.yaml \
+    --template ../templates/web/index.html.j2 --output ../build/web/index.html
 ```
 
-## Data Format
+The build date is `settings.current_date` if that is an explicit date, otherwise `SOURCE_DATE_EPOCH`, otherwise today. Errors are printed as one line naming the file and exit with status 1.
 
-Edit `cv_data.yaml` with your information:
-
-```yaml
-personal:
-  name: { first: "Your", last: "Name" }
-  title: "Your Title"
-  contact:
-    email: your.email@example.com
-
-skills:
-  - category: Programming
-    skills:
-      - Python
-
-experience:
-  - company: "Company Name"
-    position: "Your Position"
-    achievements: ["Achievement 1", "Achievement 2"]
-```
-
-### Run Tests
+## Run tests
 
 ```bash
 poetry run pytest

@@ -2,37 +2,64 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "cv_renderer - latex - debug",
+      "name": "cv_renderer - typst - debug",
       "type": "debugpy",
       "request": "launch",
       "module": "cv_renderer",
       "args": [
         "--log-level",
         "DEBUG",
-        "--data",
-        "cv_data.yaml",
-        "--input",
-        "templates/tex/cv-deedy-ng.tex.j2",
+        "typst",
+        "--cv",
+        "cv/cv.yaml",
+        "--design",
+        "cv/design.yaml",
+        "--locale",
+        "cv/locale.yaml",
+        "--settings",
+        "cv/settings.yaml",
         "--output",
-        "build/debug/cv-deedy-ng.tex",
-        "--force"
+        "build/debug/cv.typ"
       ]
     },
     {
-      "name": "cv_renderer - html - debug",
+      "name": "cv_renderer - pdf - debug",
       "type": "debugpy",
       "request": "launch",
       "module": "cv_renderer",
       "args": [
         "--log-level",
         "DEBUG",
-        "--data",
-        "cv_data.yaml",
+        "pdf",
         "--input",
+        "build/debug/cv.typ",
+        "--output",
+        "build/debug/cv.pdf"
+      ]
+    },
+    {
+      "name": "cv_renderer - web - debug",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "cv_renderer",
+      "args": [
+        "--log-level",
+        "DEBUG",
+        "web",
+        "--cv",
+        "cv/cv.yaml",
+        "--design",
+        "cv/design.yaml",
+        "--locale",
+        "cv/locale.yaml",
+        "--settings",
+        "cv/settings.yaml",
+        "--website",
+        "cv/website.yaml",
+        "--template",
         "templates/web/index.html.j2",
         "--output",
-        "build/debug/index.html",
-        "--force"
+        "build/debug/index.html"
       ]
     }
   ]

@@ -1,0 +1,8 @@
+cv:
+  name: Jane Doe
+design:
+  theme: sb2nov
+locale:
+  language: french
+settings:
+  pdf_title: Inline title

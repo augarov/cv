@@ -1,0 +1,71 @@
+cv:
+  name: Jane Doe
+  headline: Software Engineer
+  location: Zürich, Switzerland
+  email: jane.doe@example.org
+  phone: "+41441234567"
+  social_networks:
+    - network: LinkedIn
+      username: jane-doe
+    - network: GitHub
+      username: janedoe
+    - network: Telegram
+      username: jane_doe
+  sections:
+    summary:
+      - Engineer with **10 years** of experience in R&D.
+    experience:
+      - company: ACME Corp
+        position: Senior Engineer
+        start_date: 2021-03
+        end_date: present
+        location: Zürich, Switzerland
+        summary: Built *fast* things.
+        highlights:
+          - Cut latency by **40%**.
+          - "**Stack:** *C++20 / Python / Docker*"
+      - company: Initech
+        position: Engineer
+        start_date: 2018-01
+        end_date: 2021-02
+        location: Berlin, Germany
+        highlights:
+          - Shipped the `report` service.
+    education:
+      - institution: Example University
+        degree: MS
+        area: Computer Science
+        start_date: 2016-09
+        end_date: 2018-06
+        location: Berlin
+        highlights:
+          - Graduated with honours.
+    publications:
+      - title: A Paper About Things
+        authors:
+          - "*Jane Doe*"
+          - John Smith
+        url: https://example.org/paper.pdf
+        journal: Example Conference 2020
+        date: 2020
+      - title: A Paper With a DOI
+        authors:
+          - "*Jane Doe*"
+        doi: 10.1000/xyz123
+        url: https://example.org/ignored.pdf
+        date: 2022
+    competitions:
+      - name: Example Challenge
+        date: Feb 2024
+        highlights:
+          - "[**Winner**](https://example.org/challenge): built the best model."
+    skills:
+      - label: Programming
+        details: C++, Python, Go
+      - label: Tools
+        details: CMake, Docker, Git
+    languages:
+      - label: English
+        details: C1
+      - label: German
+        details: B2

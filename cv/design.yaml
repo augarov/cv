@@ -1,0 +1,6 @@
+design:
+  theme: classic
+  sections:
+    # No "2 years 3 months" spans: for an ongoing job the span is counted up to
+    # the build date, so a static PDF would go stale. The dates show the duration.
+    show_time_spans_in: []

@@ -1,0 +1,130 @@
+/*
+ * Customizations of the stock pdf.js viewer. viewer.html only links this file
+ * and custom.js, so upgrading pdf.js means replacing web/ with a new release
+ * (see the pdfjs-customization skill). Hide stock elements here instead of
+ * deleting them: viewer.mjs looks them up by id.
+ */
+
+/* Pages as white sheets on a tinted background, so a page break reads as two
+   sheets of paper instead of a gap in a white canvas. Spacing goes through
+   pdf.js's own variables; forced-colors mode keeps pdf.js's values, and
+   presentation mode its black background and plain pages. Colors use
+   light-dark(), as viewer.css does, so they follow the theme custom.js sets
+   through color-scheme, not only the system one. */
+:root {
+  --cv-canvas-color: light-dark(rgb(236 239 243), rgb(35 37 41));
+  --cv-page-shadow:
+    0 1px 2px light-dark(rgb(20 30 45 / 8%), rgb(0 0 0 / 50%)),
+    0 6px 18px light-dark(rgb(20 30 45 / 10%), rgb(0 0 0 / 45%));
+}
+
+@media not (forced-colors: active) {
+  :root {
+    --page-margin: 24px auto 0;
+    --page-border: 0 solid transparent;
+    --pdfViewer-padding-bottom: 24px;
+  }
+
+  /* pdf.js's smallest breakpoint: the page fills more of a phone screen */
+  @media (max-width: 560px) {
+    :root {
+      --page-margin: 8px auto 0;
+      --pdfViewer-padding-bottom: 8px;
+    }
+  }
+
+  html,
+  body,
+  #outerContainer,
+  #mainContainer,
+  #viewerContainer:not(.pdfPresentationMode),
+  #viewer,
+  .pdfViewer {
+    background-color: var(--cv-canvas-color) !important;
+  }
+
+  #viewerContainer:not(.pdfPresentationMode) .page {
+    box-shadow: var(--cv-page-shadow);
+  }
+}
+
+.pdfViewer .page {
+  --page-bg-color: white;
+}
+
+/* No views manager (sidebar): the toggle is hidden, and the pages never move
+   aside for it */
+#viewsManagerToggleButton,
+#viewsManager,
+#viewsManagerResizer {
+  display: none !important;
+}
+
+#viewerContainer {
+  inset-inline-start: 0 !important;
+}
+
+/* No editing tools */
+#editorModeButtons,
+#editorModeSeparator {
+  display: none !important;
+}
+
+/* Secondary menu: only print (narrow screens), presentation mode, view source,
+   document properties and accessibility mode stay */
+#secondaryOpenFile,
+#secondaryDownload,
+#viewBookmark,
+#viewBookmarkSeparator,
+#firstPage,
+#lastPage,
+#pageRotateCw,
+#pageRotateCcw,
+#cursorToolButtons,
+#scrollModeButtons,
+#spreadModeButtons,
+#imageAltTextSettingsSeparator,
+#imageAltTextSettings {
+  display: none !important;
+}
+
+/* The separator after presentation mode goes with it (pdf.js hides the button
+   where full screen isn't available) */
+#presentationMode:is(.hidden, [hidden]) + #presentationSeparator {
+  display: none !important;
+}
+
+/* Icons of the links added by custom.js, the way viewer.css does its icons */
+:root {
+  --viewSource-icon: url("images/github-mark-white.svg");
+  --accessibilityMode-icon: url("images/accessibility-icon.svg");
+  --themeSystem-icon: url("images/theme-system.svg");
+  --themeLight-icon: url("images/theme-light.svg");
+  --themeDark-icon: url("images/theme-dark.svg");
+}
+
+:is(#secondaryToolbar #secondaryToolbarButtonContainer) #themeSystem::before {
+  -webkit-mask-image: var(--themeSystem-icon);
+  mask-image: var(--themeSystem-icon);
+}
+
+:is(#secondaryToolbar #secondaryToolbarButtonContainer) #themeLight::before {
+  -webkit-mask-image: var(--themeLight-icon);
+  mask-image: var(--themeLight-icon);
+}
+
+:is(#secondaryToolbar #secondaryToolbarButtonContainer) #themeDark::before {
+  -webkit-mask-image: var(--themeDark-icon);
+  mask-image: var(--themeDark-icon);
+}
+
+:is(#secondaryToolbar #secondaryToolbarButtonContainer) #viewSource::before {
+  -webkit-mask-image: var(--viewSource-icon);
+  mask-image: var(--viewSource-icon);
+}
+
+:is(#secondaryToolbar #secondaryToolbarButtonContainer)
+  #accessibilityMode::before {
+  -webkit-mask-image: var(--accessibilityMode-icon);
+  mask-image: var(--accessibilityMode-icon);
+}

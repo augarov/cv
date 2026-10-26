@@ -1,9 +1,1 @@
-"""
-CV Renderer package.
-
-A template-based CV generator.
-"""
-
-from .renderer import CVRenderer
-
-__all__ = ["CVRenderer"]
+"""CV Renderer package: rendercv-based CV, PDF and website renderer."""

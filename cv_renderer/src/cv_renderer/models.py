@@ -1,385 +1,52 @@
-"""
-Pydantic models for CV data validation.
+"""Website configuration model."""
 
-This module defines validation models
-for different field types and the complete CV data structure.
-"""
+from typing import Any
+from urllib.parse import urljoin, urlparse
 
-import re
-from typing import Any, Dict, List, Optional
-
-import mistune
-from pydantic import (
-    BaseModel,
-    BeforeValidator,
-    EmailStr,
-    Field,
-    HttpUrl,
-    field_validator,
-    model_validator,
-)
-from typing_extensions import Annotated
-
-from cv_renderer.plugins.underlined import underlined as underlined_plugin
+from pydantic import BaseModel, ConfigDict, HttpUrl, ValidationInfo, model_validator
+from rendercv.schema.models.cv.cv import Cv
 
 
-def _make_markdown_parser() -> mistune.Markdown:
-    """Create a mistune AST parser with all supported plugins enabled."""
-    return mistune.create_markdown(renderer="ast", plugins=[underlined_plugin])
+class Website(BaseModel):
+    """Website-specific metadata not covered by the rendercv schema.
 
+    Only ``url`` is required. The other fields default to values derived from
+    ``url`` and from the CV, which is passed in the validation context:
+    ``Website.model_validate(data, context={"cv": cv})``.
+    """
 
-def strip_str(v: str) -> str:
-    """Strip whitespace from string values."""
-    return v.strip()
+    model_config = ConfigDict(frozen=True, extra="forbid")
 
-
-# Type alias for string fields that need stripping and validation
-StrippedStr = Annotated[str, BeforeValidator(strip_str)]
-
-
-class MarkdownText(BaseModel):
-    """Model for markdown text with AST validation."""
-
-    text: StrippedStr = Field(..., min_length=1, description="Raw markdown text")
-    ast: List[Dict[str, Any]] = Field(
-        default_factory=list, description="Parsed AST representation"
-    )
-
-    def __init__(self, **data: Any) -> None:
-        """Initialize MarkdownText with AST parsing."""
-        # If only text is provided, parse it into AST
-        if "text" in data and "ast" not in data:
-            text = data["text"]
-            if isinstance(text, str) and text.strip():
-                # Create markdown parser with AST renderer
-                markdown_parser = _make_markdown_parser()
-                data["ast"] = markdown_parser(text.strip())
-            else:
-                data["ast"] = []
-
-        super().__init__(**data)
-
-    @field_validator("ast")
-    @classmethod
-    def validate_supported_markup(cls, v: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-        """Validate that AST only contains supported markdown markup."""
-        if not v:
-            return v
-
-        # Define supported token types based on what our renderers can handle
-        supported_token_types = {
-            "paragraph",
-            "text",
-            "strong",
-            "emphasis",
-            "underlined",
-            "link",
-            "linebreak",
-            "softbreak",
-        }
-
-        def check_tokens(tokens: List[Dict[str, Any]], path: str = "root") -> None:
-            """Recursively check all tokens for unsupported types."""
-            for i, token in enumerate(tokens):
-                if isinstance(token, dict):
-                    token_type: str = token.get("type", "")
-                    if token_type and token_type not in supported_token_types:
-                        raise ValueError(
-                            f"Unsupported markdown markup '{token_type}' found at "
-                            f"{path}[{i}]. Supported markup: "
-                            f"{', '.join(sorted(supported_token_types))}"
-                        )
-
-                    # Recursively check children
-                    if "children" in token and isinstance(token["children"], list):
-                        check_tokens(token["children"], f"{path}[{i}].children")
-
-        check_tokens(v)
-        return v
+    url: HttpUrl
+    pdf_url: HttpUrl
+    source_url: HttpUrl | None = None
+    title: str
+    author: str
+    app_name: str
+    keywords: str | None = None
+    locale: str | None = None
+    pdf_filename: str | None = None
 
     @model_validator(mode="before")
     @classmethod
-    def convert_string_to_markdown_text(cls, data: Any) -> Any:
-        """Convert string inputs to MarkdownText objects automatically."""
-        if isinstance(data, str):
-            # Convert string input to expected dictionary format
-            text = data.strip()
-            if text:
-                # Create markdown parser with AST renderer
-                markdown_parser = _make_markdown_parser()
-                ast = markdown_parser(text)
-                return {"text": text, "ast": ast}
-            else:
-                return {"text": text, "ast": []}
+    def fill_defaults(cls, data: Any, info: ValidationInfo) -> Any:
+        """Normalize ``url`` and fill the fields left out of the file."""
+        if not isinstance(data, dict):
+            return data
+        data = dict(data)
+
+        url = data.get("url")
+        if isinstance(url, str) and urlparse(url).netloc:
+            if not url.endswith("/"):
+                url += "/"
+            data["url"] = url
+            data.setdefault("pdf_url", urljoin(url, "cv.pdf"))
+
+        cv = (info.context or {}).get("cv")
+        if isinstance(cv, Cv) and cv.name:
+            title = f"{cv.name} – {cv.headline}" if cv.headline else cv.name
+            data.setdefault("title", title)
+            data.setdefault("author", cv.name)
+            data.setdefault("app_name", cv.name)
+
         return data
-
-
-class Name(BaseModel):
-    """Model for person's name."""
-
-    first: StrippedStr = Field(..., min_length=1, max_length=50)
-    last: StrippedStr = Field(..., min_length=1, max_length=50)
-
-
-class Link(BaseModel):
-    """Model for a URL link with optional display name."""
-
-    url: HttpUrl = Field(..., description="Full URL starting with http:// or https://")
-    display_name: Optional[StrippedStr] = Field(
-        None, description="Display name for the link"
-    )
-
-    def __init__(self, **data: Any) -> None:
-        """Initialize Link with auto-generated display_name if not provided."""
-        super().__init__(**data)
-        if self.display_name is None:
-            url_str = str(self.url)
-            # Remove https:// or http:// prefix
-            if url_str.startswith("https://"):
-                self.display_name = url_str[8:]  # Remove 'https://'
-            elif url_str.startswith("http://"):
-                self.display_name = url_str[7:]  # Remove 'http://'
-            else:
-                self.display_name = url_str
-
-
-class Contact(BaseModel):
-    """Model for contact information."""
-
-    email: EmailStr
-    phone: Optional[StrippedStr] = Field(
-        None, description="Phone number in E.164 format"
-    )
-    linkedin: Optional[Link] = Field(None, description="LinkedIn profile URL")
-    telegram: Optional[Link] = Field(None, description="Telegram profile URL")
-    github: Optional[Link] = Field(None, description="GitHub profile URL")
-
-    @field_validator("phone")
-    @classmethod
-    def validate_phone(cls, v: Optional[str]) -> Optional[str]:
-        """Validate phone number is in E.164 format (+<country code><number>)."""
-        if v is None:
-            return v
-        if not re.fullmatch(r"\+[1-9]\d{6,14}", v):
-            raise ValueError(
-                "Phone must be in E.164 format: '+' followed by 7–15 digits "
-                "(e.g. +12025551234)"
-            )
-        return v
-
-
-class Personal(BaseModel):
-    """Model for personal information."""
-
-    name: Name
-    title: StrippedStr = Field(..., min_length=1, max_length=50)
-    summary: MarkdownText = Field(
-        ..., description="Personal summary with markdown support"
-    )
-    location: StrippedStr = Field(..., min_length=1, max_length=50)
-    contact: Contact
-
-
-class Language(BaseModel):
-    """Model for language proficiency."""
-
-    language: StrippedStr = Field(..., min_length=1, max_length=50)
-    level: StrippedStr = Field(..., min_length=1, max_length=50)
-
-
-class GPA(BaseModel):
-    """Model for GPA information."""
-
-    cumulative: StrippedStr = Field(..., min_length=1, max_length=20)
-    major: StrippedStr = Field(..., min_length=1, max_length=20)
-
-
-class Education(BaseModel):
-    """Model for education entry."""
-
-    institution: StrippedStr = Field(..., min_length=1, max_length=50)
-    degree: StrippedStr = Field(..., min_length=1, max_length=50)
-    period: StrippedStr = Field(..., min_length=1, max_length=200)
-    location: StrippedStr = Field(..., min_length=1, max_length=50)
-    description: Optional[MarkdownText] = Field(
-        None, description="Education description with markdown support"
-    )
-    gpa: Optional[GPA] = Field(None, description="GPA information")
-
-
-class Experience(BaseModel):
-    """Model for work experience entry."""
-
-    company: StrippedStr = Field(..., min_length=1, max_length=50)
-    position: StrippedStr = Field(..., min_length=1, max_length=50)
-    period: StrippedStr = Field(..., min_length=1, max_length=50)
-    location: StrippedStr = Field(..., min_length=1, max_length=50)
-    description: Optional[MarkdownText] = Field(
-        None, description="Job description with markdown support"
-    )
-    achievements: List[MarkdownText] = Field(
-        default_factory=list,
-        description="List of achievements with markdown support",
-    )
-    stack: Optional[StrippedStr] = Field(None, max_length=200)
-
-
-class Metadata(BaseModel):
-    """Model for PDF metadata."""
-
-    pdf_title: StrippedStr = Field(
-        ...,
-        min_length=1,
-        max_length=50,
-        description="Title of the CV PDF",
-    )
-    pdf_author: StrippedStr = Field(
-        ...,
-        min_length=1,
-        max_length=50,
-        description="Author of the CV PDF",
-    )
-    pdf_subject: StrippedStr = Field(
-        ...,
-        min_length=1,
-        max_length=50,
-        description="Subject of the CV PDF",
-    )
-    pdf_keywords: StrippedStr = Field(
-        ...,
-        min_length=1,
-        max_length=100,
-        description="Keywords of the CV PDF",
-    )
-    pdf_filename: StrippedStr = Field(
-        ...,
-        min_length=1,
-        max_length=50,
-        description="Filename of the CV PDF",
-    )
-    url: HttpUrl = Field(
-        ...,
-        description="URL of the CV website",
-    )
-    pdf_url: HttpUrl = Field(
-        ...,
-        description="URL of the CV PDF",
-    )
-    app_name: StrippedStr = Field(
-        ...,
-        min_length=1,
-        max_length=20,
-        description="Name of the CV app",
-    )
-    source_url: Optional[HttpUrl] = Field(
-        None,
-        description="URL of the CV source code",
-    )
-    locale: Optional[StrippedStr] = Field(
-        None,
-        description="Locale of the CV",
-    )
-
-
-class Competition(BaseModel):
-    """Model for a competition entry."""
-
-    date: StrippedStr = Field(
-        ..., min_length=1, max_length=50, description="Date of the competition"
-    )
-    title: StrippedStr = Field(
-        ..., min_length=1, max_length=100, description="Title of the competition"
-    )
-    description: MarkdownText = Field(
-        ..., description="Competition description with markdown support"
-    )
-
-
-class Publication(BaseModel):
-    """Model for a publication entry."""
-
-    link: Link = Field(..., description="Link to the publication")
-    year: int = Field(..., ge=1900, le=2100, description="Year of publication")
-
-
-class SkillCategory(BaseModel):
-    """Model for a skill category with its associated skills."""
-
-    category: Optional[StrippedStr] = Field(
-        None,
-        min_length=1,
-        max_length=50,
-        description="Category of skills (None = uncategorized)",
-    )
-    skills: List[StrippedStr] = Field(
-        ...,
-        min_length=1,
-        description="List of skills",
-    )
-
-    @field_validator("skills")
-    @classmethod
-    def validate_skills(cls, v: List[str]) -> List[str]:
-        """Validate skills list."""
-        if not v:
-            raise ValueError("Skills list cannot be empty")
-
-        # Additional validation to ensure no empty skills after stripping
-        for skill in v:
-            if not skill:  # This will catch empty strings after stripping
-                raise ValueError("Individual skill cannot be empty")
-
-        return v
-
-
-class CVData(BaseModel):
-    """Root model for complete CV data validation."""
-
-    personal: Personal = Field(
-        ...,
-        description="Personal information",
-    )
-    skills: List[SkillCategory] = Field(
-        ...,
-        min_length=1,
-        description="List of skill categories",
-    )
-
-    @field_validator("skills")
-    @classmethod
-    def validate_skills_categories(cls, v: List[SkillCategory]) -> List[SkillCategory]:
-        """Validate that an unnamed category is the only category."""
-        unnamed = [c for c in v if c.category is None]
-        if unnamed and len(v) > 1:
-            raise ValueError(
-                "An uncategorized skill category (no name) must be the only "
-                "category; remove category names from all entries or add one "
-                "to the unnamed entry."
-            )
-        return v
-
-    languages: List[Language] = Field(
-        ...,
-        min_length=1,
-        description="List of languages",
-    )
-    education: List[Education] = Field(
-        ...,
-        min_length=1,
-        description="List of education entries",
-    )
-    experience: List[Experience] = Field(
-        ...,
-        min_length=1,
-        description="List of work experiences",
-    )
-    competitions: List[Competition] = Field(
-        default_factory=list, description="List of competitions"
-    )
-    publications: List[Publication] = Field(
-        default_factory=list, description="List of publications"
-    )
-    metadata: Metadata = Field(
-        ...,
-        description="PDF metadata",
-    )
