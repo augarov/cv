@@ -4,27 +4,25 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this project is
 
-A CV/résumé generation system that reads structured data from `cv_data.yaml` and renders it into multiple output formats (PDF via LaTeX, HTML website, sitemap, JS params, webmanifest) using Jinja2 templates. The rendered HTML site is deployed to GitHub Pages; the PDF is published as a release artifact.
+A CV/résumé build. The CV data is in [rendercv](https://github.com/rendercv/rendercv)'s YAML schema in `cv/`. rendercv, used as a Python library, validates it and renders the PDF through Typst. The same validated model feeds our own Jinja2 templates for the GitHub Pages website (HTML, sitemap, JS params, webmanifest). The website is deployed to GitHub Pages; the PDF and the website bundle are published as a release.
 
 ## Build commands
 
-All orchestration goes through `make`. Prefer `make` targets over direct `poetry run`, `pnpm`, `latexmk`, or `pre-commit` invocations. Python deps require Poetry inside a venv; Node deps use pnpm inside `gh-pages/`.
+All orchestration goes through `make`. Prefer `make` targets over direct `poetry run`, `pnpm`, or `pre-commit` invocations. Python deps require Poetry inside a venv (`.venv`); Node deps use pnpm inside `gh-pages/`.
 
-Prefer `make all` for full builds rather than running individual render/build targets. Use `make clear-cv` to clear the LaTeX build directory before a clean rebuild. Use `make test-renderer` to run Python tests rather than invoking `poetry run pytest` directly.
+Prefer `make all` for full builds rather than running individual targets. Use `make clear-cv` to remove the build outputs before a clean rebuild. Use `make test-renderer` to run Python tests rather than invoking `poetry run pytest` directly.
 
 ```bash
 make install-deps-python      # set up .venv and install Poetry deps
 make install-deps-node        # install pnpm deps for gh-pages
 
-make render-tex               # render cv.tex from cv_data.yaml + template
-make render-html              # render index.html
-make render-sitemap           # render sitemap.xml
-make render-js                # render template_params.js
-make render-webmanifest       # render site.webmanifest
-
-make build-cv                 # compile cv.tex → cv.pdf (requires xelatex/latexmk)
-make build-website            # build Vite bundle in gh-pages/dist/
-make build-release            # build everything and package release artifacts
+make render-typst             # build/pdf/cv.typ
+make build-pdf                # build/pdf/cv.pdf (alias: build-cv)
+make render-web               # the website files in build/web/
+make build-website            # copy build/web/ into gh-pages/, build gh-pages/dist/
+make build-release            # build/release/: cv.pdf + gh-pages-bundle.tar.gz
+make all                      # all of the above
+make clear-cv                 # remove build/ and the copies in gh-pages/
 
 make preview-website-dev      # start Vite dev server
 make preview-website-prod     # preview the built site
@@ -32,6 +30,10 @@ make preview-website-prod     # preview the built site
 make test-renderer            # run Python tests
 make validate-pre-commit      # run pre-commit on all files
 ```
+
+- `make all CV_DIR=local/<name>` builds the CV in another folder (default `cv`). `local/` is ignored by git: CVs there never go into the repo.
+- `SOURCE_DATE_EPOCH` sets the build date of the PDF and the website (an explicit `settings.current_date` wins). The Makefile sets it to the last commit that changed `CV_DIR`, or leaves it empty (today) while `CV_DIR` has uncommitted changes. The same inputs and date give byte-identical `build/pdf/` and `build/web/` files (not the release tarball, whose gzip header and file times differ).
+- `make help` lists all targets.
 
 Run a single Python test:
 
@@ -41,46 +43,67 @@ Run a single Python test:
 
 ## Architecture
 
-### Data flow
+### Inputs (`cv/`)
+
+| File            | Required?                       | Content                                                                                        |
+| --------------- | ------------------------------- | ---------------------------------------------------------------------------------------------- |
+| `cv.yaml`       | yes                             | rendercv's `cv:` section; custom themes resolve relative to this file (no `photo` support yet) |
+| `design.yaml`   | no (rendercv's `classic` theme) | rendercv's `design:` section                                                                   |
+| `locale.yaml`   | no (English)                    | rendercv's `locale:` section                                                                   |
+| `settings.yaml` | no (rendercv's defaults)        | rendercv's `settings:` section                                                                 |
+| `website.yaml`  | only for the website            | `Website` model (`models.py`); only `url` is required, the rest defaults from `url` and the CV |
+
+A separate `design.yaml` / `locale.yaml` / `settings.yaml` replaces the section of the same name inside `cv.yaml` (no merge); the renderer warns when both exist.
+
+### Data flow: two stages
 
 ```
-cv_data.yaml  →  cv_renderer (Python)  →  Jinja2 templates  →  output files
-                 (validates + renders)      templates/tex/        tex/cv.tex
-                                            templates/web/        gh-pages/index.html
-                                                                  gh-pages/public/sitemap.xml
-                                                                  gh-pages/src/template_params.js
-                                                                  gh-pages/public/img/favicon/site.webmanifest
+Stage 1 (Python, cv_renderer)                       Stage 2 (Node, gh-pages/)
+cv/*.yaml → rendercv model ─┬→ typst → build/pdf/cv.typ → pdf → build/pdf/cv.pdf
+                            └→ web + templates/web/*.j2 → build/web/  ──copy──→ gh-pages/ → Vite → gh-pages/dist/
+build/release/ = cv.pdf + gh-pages-bundle.tar.gz (tar of build/web/), the hand-off between the stages
 ```
+
+`build/web/` has the layout of `gh-pages/` (`index.html`, `src/template_params.js`, `public/sitemap.xml`, `public/img/favicon/site.webmanifest`, `public/cv.pdf`). CI uses the same split: `build_cv.yaml` runs stage 1 and uploads the release, `deploy_pages.yaml` downloads the bundle by tag (`make build-website-from-bundle`) and deploys. Keep the workflow `paths` in sync with the stage inputs in the Makefile.
 
 ### Python renderer (`cv_renderer/`)
 
-- `models.py` — Pydantic v2 models that validate `cv_data.yaml`. `MarkdownText` parses markdown fields into a mistune AST at load time; only `paragraph`, `text`, `strong`, `linebreak`, `softbreak` AST nodes are supported.
-- `renderer.py` — `CVRenderer`: loads/validates data, builds Jinja2 `Environment` with custom filters and globals, renders templates.
-- `ast/` — Three concrete `ASTRenderer` subclasses (`html_renderer`, `latex_renderer`, `plain_renderer`) that walk the mistune AST and emit format-specific output. The abstract base is `ast/base.py`.
-- `template_type.py` — Detects output format from file extension (`.html` → HTML, `.tex`/`.latex` → LaTeX, `.xml` → XML, `.txt` → plain). Template type controls which AST renderer filters are used inside templates.
-- `template_utils.py` — Helper functions exposed as Jinja2 globals: `format_current_time`, `normalize_url`, `url_path`, `dquoted`.
+CLI (`python -m cv_renderer`), one subcommand per kind of processing:
 
-Jinja2 filters available in templates: `escape_latex`, `escape_html`, `markdown_latex`, `markdown_html`, `markdown_plain`.
+```
+cv_renderer typst --cv cv/cv.yaml [--design …] [--locale …] [--settings …] --output build/pdf/cv.typ
+cv_renderer pdf   --input build/pdf/cv.typ --output build/pdf/cv.pdf
+cv_renderer web   --cv cv/cv.yaml [--design …] [--locale …] [--settings …] --website cv/website.yaml \
+                  --template templates/web/index.html.j2 --output build/web/index.html
+```
 
-### Jinja2 templates (`templates/`)
+- `app.py` / `app_params.py` — argument parsing and dispatch; errors are logged as one line and exit with status 1.
+- `inputs.py` — `load_cv` (rendercv's YAML files → `RenderCVModel`) and `load_website`. Every input problem becomes an `InputError` whose message names the file (and line/column where rendercv knows it).
+- `build_date.py` — the build date from `SOURCE_DATE_EPOCH` / `settings.current_date`, the same for the PDF and the website.
+- `typst_renderer.py` — the Typst source via rendercv's `render_full_template`.
+- `pdf_builder.py` — compiles `.typ` to PDF with `typst-py`, rendercv's Typst package and `rendercv_fonts`.
+- `web_renderer.py` — our own Jinja environment for `templates/web/`: autoescape for `.html.j2` / `.xml.j2`, `StrictUndefined`, `tojson` for JS/JSON templates. Templates get `cv`, `design`, `locale` (the raw rendercv model), `website` and `build_date`.
+- `template_utils.py` — the template filters: `markdown` (inline HTML via `markdown-it-py`, raw HTML escaped), `markdown_plain`, `date_range` / `single_date` (rendercv's date functions, same formats as the PDF), `phone_display`, `as_list`; global `url_path`.
+- `models.py` — the `Website` model.
 
-- `tex/cv-deedy-ng.tex.j2` — LaTeX template using the deedy-resume-ng class (`tex/deedy-resume-ng.cls`).
-- `web/index.html.j2` — Main HTML template.
-- `web/sitemap.xml.j2`, `web/template_params.js.j2`, `web/site.webmanifest.json.j2` — Supporting web files.
+The website renders the raw, validated model, not rendercv's processed one, and converts markdown and dates in filters at render time, so each output (HTML body, `<meta>`, JSON) gets its own conversion and escaping. With `StrictUndefined`, check fields that only some entry types have with `is defined`. `index.html.j2` has one macro per section key it knows (`section_macros`) and renders them in `cv.yaml`'s order, like the PDF; other keys are left out.
 
-Template variables come from `CVData.model_dump()` merged with injected context (`context`, `static` dicts containing disclaimer comments and metadata).
+### rendercv as a dependency
+
+rendercv has no documented Python API, so every import from it is internal. It's pinned to `>=2.8,<2.9` (patch updates only); an upgrade is a deliberate step. Imports are limited to: `build_rendercv_dictionary` / `build_rendercv_model_from_commented_map` and `rendercv.exception` (`inputs.py`), `render_full_template` (`typst_renderer.py`), `get_package_path` (`pdf_builder.py`), `format_date_range` / `format_single_date` (`template_utils.py`), and the schema models for type hints. `tests/test_rendercv_contract.py` checks each of these, plus the model attributes the templates rely on (`SocialNetwork.url`, `cv.phone` as a `tel:` URI, `PublicationEntry.doi_url`). Add any new import or relied-on attribute there.
 
 ### Website (`gh-pages/`)
 
-Vite-based static site. Receives the rendered `index.html`, PDF, sitemap, JS params, and webmanifest as inputs before the Vite build runs.
+Vite-based static site. Receives the rendered files from `build/web/` before the Vite build runs. The PDF is shown with a customized pdf.js viewer (`gh-pages/public/pdfjs/`).
 
 ## Code style (Python)
 
 - Black (88-char line length), isort with black profile, flake8 with docstrings, mypy strict, bandit security scan — all enforced via pre-commit.
+- The mypy hook runs `.venv/bin/mypy` from the project venv (so installed packages bring their own type hints), checking `src/` and `tests/`. Run `make install-deps-python` first, also in a new worktree; otherwise the hook fails with "executable not found".
 - Full type annotations required; mypy is configured strictly (`disallow_untyped_defs`, `warn_return_any`, etc.).
 
-## Adding a new markdown node type
+## Adding a website filter
 
-1. Add the type string to `supported_token_types` in `models.py:MarkdownText.validate_supported_markup`.
-2. Add a `case` branch in `ast/base.py:ASTRenderer._render_token` and a corresponding abstract method.
-3. Implement the method in all three concrete renderers (`html_renderer.py`, `latex_renderer.py`, `plain_renderer.py`).
+1. Add the function to `template_utils.py`, with tests in `tests/test_template_utils.py`.
+2. Register it in `web_renderer.py:make_web_environment`.
+3. Mark HTML output as safe (`Markup`) only after escaping its input.

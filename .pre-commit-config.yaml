@@ -3,7 +3,7 @@
 repos:
   # General pre-commit hooks
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.6.0
+    rev: v6.0.0
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
@@ -17,7 +17,7 @@ repos:
 
   # Python formatting with black
   - repo: https://github.com/psf/black
-    rev: 24.8.0
+    rev: 26.10.1
     hooks:
       - id: black
         files: ^cv_renderer/
@@ -25,7 +25,7 @@ repos:
 
   # Import sorting with isort
   - repo: https://github.com/pycqa/isort
-    rev: 5.13.2
+    rev: 9.0.2
     hooks:
       - id: isort
         files: ^cv_renderer/
@@ -33,28 +33,28 @@ repos:
 
   # Linting with flake8
   - repo: https://github.com/pycqa/flake8
-    rev: 7.1.1
+    rev: 7.4.1
     hooks:
       - id: flake8
         files: ^cv_renderer/
         additional_dependencies: [flake8-docstrings]
         args: ["--config", "cv_renderer/.flake8"]
 
-  # Type checking with mypy
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.11.2
+  # Type checking with mypy from the project venv, so installed packages
+  # bring their own type hints (needs `make install-deps-python` first)
+  - repo: local
     hooks:
       - id: mypy
-        files: ^cv_renderer/src
-        additional_dependencies:
-          - types-PyYAML
-          - pydantic >= 2.0.0
-          - pydantic[email]
-        args: [--config-file=cv_renderer/pyproject.toml]
+        name: mypy (project venv)
+        entry: .venv/bin/mypy --config-file=cv_renderer/pyproject.toml cv_renderer/src cv_renderer/tests
+        language: system
+        pass_filenames: false
+        files: ^cv_renderer/
+        types: [python]
 
   # Python security linting
   - repo: https://github.com/PyCQA/bandit
-    rev: 1.7.10
+    rev: 1.9.4
     hooks:
       - id: bandit
         files: ^cv_renderer/src
@@ -99,19 +99,20 @@ repos:
         language: system
         pass_filenames: true
         files: \.(js|mjs|cjs|jsx|ts|tsx|css|scss|html|json|md|yml|yaml)$
+        # Written by pnpm in its own format
+        exclude: (^|/)pnpm-lock\.yaml$
 
 # Global exclusions
 exclude: |
   (?x)^(
-    gh-pages/public/pdfjs/.*|
+    gh-pages/public/pdfjs/(?!web/custom\.(js|css)$).*|
     gh-pages/dist/.*|
     gh-pages/node_modules/.*|
     build/.*|
-    tex/.*\.(aux|fdb_latexmk|fls|log|out|synctex\.gz|xdv)$|
     \.git/.*|
     .*\.min\.(js|css)$|
     .*\.bundle\.(js|css)$|
-    \.venv/.*
+    \.venv/.*|
     \.mypy_cache/.*
   )$
 

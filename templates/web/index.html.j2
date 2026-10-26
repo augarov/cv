@@ -1,7 +1,191 @@
-{{ static.disclaimer }}
+{#- Dates as in the PDF: a range, or a single date for entries with `date` -#}
+{% macro entry_date(entry) -%}
+{% if entry.start_date is defined and entry.start_date %}{{ entry.start_date | date_range(entry.end_date, locale, design) }}{% elif entry.date is defined and entry.date %}{{ entry.date | single_date(locale, design) }}{% endif %}
+{%- endmacro %}
 
+{% macro summary_section(entries) -%}
+        <section class="cvSection cvSummary" aria-labelledby="summaryHeading">
+            <h2 id="summaryHeading" class="cvSectionTitle">Summary</h2>
+            <div class="summaryContent">
+                {% for text in entries %}
+                <p class="summaryText">{{ text | markdown }}</p>
+                {% endfor %}
+            </div>
+        </section>
+{%- endmacro %}
+
+{% macro experience_section(entries) -%}
+        <section class="cvSection cvExperience" aria-labelledby="experienceHeading">
+            <h2 id="experienceHeading" class="cvSectionTitle">Experience</h2>
+            <div class="experienceList">
+                {% for job in entries %}
+                <article class="experienceItem">
+                    <header class="experienceHeader">
+                        <h3 class="companyName">{{ job.company | markdown }}</h3>
+                        <div class="jobMeta">
+                            {% set separator = joiner(" / ") %}
+                            {% if job.position %}
+                            {{ separator() }}<b><span class="jobPosition">{{ job.position | markdown }}</span></b>
+                            {% endif %}
+                            {% if job.start_date or job.date %}
+                            {{ separator() }}<span class="jobPeriod">{{ entry_date(job) }}</span>
+                            {% endif %}
+                            {% if job.location %}
+                            {{ separator() }}<span class="jobLocation">{{ job.location | markdown }}</span>
+                            {% endif %}
+                        </div>
+                    </header>
+                    <div class="experienceContent">
+                        {% if job.summary %}
+                        <p class="jobDescription">{{ job.summary | markdown }}</p>
+                        {% endif %}
+                        {% if job.highlights %}
+                        <ul class="achievementsList">
+                            {% for highlight in job.highlights %}
+                            <li class="achievementItem">{{ highlight | markdown }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+        </section>
+{%- endmacro %}
+
+{% macro competitions_section(entries) -%}
+        <section class="cvSection cvCompetitions" aria-labelledby="competitionsHeading">
+            <h2 id="competitionsHeading" class="cvSectionTitle">Competitions</h2>
+            <div class="competitionsList">
+                {% for comp in entries %}
+                <article class="competitionItem">
+                    <header class="competitionHeader">
+                        <h3 class="competitionTitle">{{ comp.name | markdown }}</h3>
+                        <span class="competitionDate">{{ entry_date(comp) }}</span>
+                    </header>
+                    {% if comp.summary %}
+                    <div class="competitionDescription">{{ comp.summary | markdown }}</div>
+                    {% endif %}
+                    {% for highlight in comp.highlights or [] %}
+                    <div class="competitionDescription">{{ highlight | markdown }}</div>
+                    {% endfor %}
+                </article>
+                {% endfor %}
+            </div>
+        </section>
+{%- endmacro %}
+
+{% macro skills_section(entries) -%}
+        <section class="cvSection cvSkills" aria-labelledby="skillsHeading">
+            <h2 id="skillsHeading" class="cvSectionTitle">Skills</h2>
+            <div class="skillsList">
+                {% for skill_entry in entries %}
+                <div class="skillCategory">
+                    {% if skill_entry.label %}
+                    <h3 class="skillCategoryName">{{ skill_entry.label | markdown }}</h3>
+                    {% endif %}
+                    <div class="skillItems">
+                        <span class="skillList">{{ skill_entry.details | markdown }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+{%- endmacro %}
+
+{% macro education_section(entries) -%}
+        <section class="cvSection cvEducation" aria-labelledby="educationHeading">
+            <h2 id="educationHeading" class="cvSectionTitle">Education</h2>
+            <div class="educationList">
+                {% for edu in entries %}
+                <article class="educationItem">
+                    <header class="educationHeader">
+                        <h3 class="institutionName">{{ edu.institution | markdown }}</h3>
+                        <div class="educationMeta">
+                            {% set separator = joiner(" / ") %}
+                            {% if edu.degree or edu.area %}
+                            {{ separator() }}<span class="degreeName">{% if edu.degree %}{{ edu.degree | markdown }}{% endif %}{% if edu.degree and edu.area %} in {% endif %}{% if edu.area %}{{ edu.area | markdown }}{% endif %}</span>
+                            {% endif %}
+                            {% if edu.start_date or edu.date %}
+                            {{ separator() }}<span class="educationPeriod">{{ entry_date(edu) }}</span>
+                            {% endif %}
+                            {% if edu.location %}
+                            {{ separator() }}<span class="educationLocation">{{ edu.location | markdown }}</span>
+                            {% endif %}
+                        </div>
+                    </header>
+                    <div class="educationContent">
+                        {% if edu.summary %}
+                        <div class="educationDescription">{{ edu.summary | markdown }}</div>
+                        {% endif %}
+                        {% if edu.highlights %}
+                        <ul class="educationHighlights">
+                            {% for highlight in edu.highlights %}
+                            <li>{{ highlight | markdown }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+        </section>
+{%- endmacro %}
+
+{% macro publications_section(entries) -%}
+        <section class="cvSection cvPublications" aria-labelledby="publicationsHeading">
+            <h2 id="publicationsHeading" class="cvSectionTitle">Publications</h2>
+            <ul class="publicationsList">
+                {% for pub in entries %}
+                {#- rendercv drops url when there's a doi, as the PDF links the DOI -#}
+                {% set pub_url = pub.doi_url or pub.url %}
+                <li class="publicationItem">
+                    {% if pub_url %}
+                    <a href="{{ pub_url }}" class="publicationLink" target="_blank" rel="noopener">{{ pub.title | markdown }}</a>
+                    {% else %}
+                    <span class="publicationTitle">{{ pub.title | markdown }}</span>
+                    {% endif %}
+                    {% if pub.journal %}
+                    <em class="publicationJournal">— {{ pub.journal | markdown }}</em>
+                    {% endif %}
+                    {% if pub.date %}
+                    <span class="publicationYear">({{ entry_date(pub) }})</span>
+                    {% endif %}
+                </li>
+                {% endfor %}
+            </ul>
+        </section>
+{%- endmacro %}
+
+{% macro languages_section(entries) -%}
+        <section class="cvSection cvLanguages" aria-labelledby="languagesHeading">
+            <h2 id="languagesHeading" class="cvSectionTitle">Languages</h2>
+            <div class="languagesList">
+                {% for lang in entries %}
+                <div class="languageItem">
+                    <span class="languageName">{{ lang.label | markdown }}</span>
+                    /
+                    <span class="languageLevel">{{ lang.details | markdown }}</span>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+{%- endmacro %}
+
+{#- One macro per section the website knows; the loop below renders them in
+    the order of cv.yaml, like the PDF. Other sections are left out. -#}
+{% set section_macros = {
+    "summary": summary_section,
+    "experience": experience_section,
+    "competitions": competitions_section,
+    "skills": skills_section,
+    "education": education_section,
+    "publications": publications_section,
+    "languages": languages_section,
+} %}
+{% set language = website.locale or "en" %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ language }}">
 
 <head>
 
@@ -9,18 +193,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- Primary Meta Tags -->
-    <title>{{ metadata.pdf_title }}</title>
-    <meta name="title" content="{{ metadata.pdf_title }}">
-    <meta name="author" content="{{ metadata.pdf_author }}">
-    <meta name="description" content="{{ personal.summary | markdown_plain }}">
-    <meta name="keywords" content="{{ metadata.pdf_keywords }}">
+    <title>{{ website.title }}</title>
+    <meta name="title" content="{{ website.title }}">
+    <meta name="author" content="{{ website.author }}">
+    <meta name="description" content="{% if cv.sections and cv.sections.get('summary') %}{{ cv.sections['summary'][0] | markdown_plain }}{% endif %}">
+    {% if website.keywords %}
+    <meta name="keywords" content="{{ website.keywords }}">
+    {% endif %}
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <meta name="google" content="notranslate">
     <meta name="robots" content="index, follow">
-    <meta name="language" content="English">
+    <meta name="language" content="{{ language }}">
 
     <!-- Canonical URL -->
-    <link rel="canonical" href="{{ metadata.url }}">
+    <link rel="canonical" href="{{ website.url }}">
 
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="/img/favicon.png">
@@ -28,15 +214,11 @@
     <link rel="icon" type="image/svg+xml" href="/img/favicon/favicon.svg" />
     <link rel="shortcut icon" href="/img/favicon/favicon.ico" />
     <link rel="apple-touch-icon" sizes="180x180" href="/img/favicon/apple-touch-icon.png" />
-    <meta name="apple-mobile-web-app-title" content="{{ metadata.app_name }}" />
+    <meta name="apple-mobile-web-app-title" content="{{ website.app_name }}" />
     <link rel="manifest" href="/img/favicon/site.webmanifest" />
 
     <!-- Stylesheets -->
     <link rel="stylesheet" href="/src/styles.css">
-
-    <!-- Preload critical resources -->
-    <link rel="preload" href="/cv.pdf" as="document">
-    <link rel="preload" href="/src/pdfjs/web/viewer.html" as="document">
 
     <!-- DNS prefetch for external resources -->
     <link rel="dns-prefetch" href="//github.com">
@@ -52,15 +234,19 @@
         </iframe>
     </div>
 
+    {% set sections = cv.sections or {} %}
     <!-- Fallback interface (visible by default) -->
     <main id="accessibleContainer" class="cvContainer">
         <!-- Header Section -->
         <header class="cvHeader">
             <h1 class="cvName">
-                <span class="firstName">{{ personal.name.first }}</span>
-                <span class="lastName">{{ personal.name.last }}</span>
+                {% set name_parts = (cv.name | markdown_plain).split() if cv.name else [] %}
+                <span class="firstName">{{ name_parts[:1] | join(' ') }}</span>
+                <span class="lastName">{{ name_parts[1:] | join(' ') }}</span>
+                {% if cv.headline %}
                 <br>
-                <span class="jobTitle">{{ personal.title }}</span>
+                <span class="jobTitle">{{ cv.headline | markdown }}</span>
+                {% endif %}
             </h1>
         </header>
 
@@ -69,38 +255,34 @@
         <!-- Contact Information Section -->
         <section class="cvSection cvContact" aria-labelledby="contactHeading">
             <div class="contactInfoGrid">
+                {% for email in cv.email | as_list %}
                 <div class="contactItem contactEmail">
                     <span class="contactLabel">Email:</span>
-                    <a href="mailto:{{ personal.contact.email }}" class="contactLink">
-                        {{ personal.contact.email }}
-                    </a>
+                    <a href="mailto:{{ email }}" class="contactLink">{{ email }}</a>
                 </div>
-                {% if personal.contact.phone %}
+                {% endfor %}
+                {% for phone in cv.phone | as_list %}
                 <div class="contactItem contactPhone">
                     <span class="contactLabel">Phone:</span>
-                    <a href="tel:{{ personal.contact.phone }}" class="contactLink">
-                        {{ personal.contact.phone | format_phone }}
-                    </a>
+                    <a href="{{ phone }}" class="contactLink">{{ phone | phone_display(design) }}</a>
                 </div>
-                {% endif %}
-                <div class="contactItem contactLinkedin">
-                    <span class="contactLabel">LinkedIn:</span>
-                    <a href="{{ personal.contact.linkedin.url }}" class="contactLink" target="_blank" rel="noopener">
-                        {{ personal.contact.linkedin.display_name }}
-                    </a>
+                {% endfor %}
+                {% for site in cv.website | as_list %}
+                <div class="contactItem contactWebsite">
+                    <span class="contactLabel">Website:</span>
+                    <a href="{{ site }}" class="contactLink" target="_blank" rel="noopener">{{ site }}</a>
                 </div>
-                <div class="contactItem contactTelegram">
-                    <span class="contactLabel">Telegram:</span>
-                    <a href="{{ personal.contact.telegram.url }}" class="contactLink" target="_blank" rel="noopener">
-                        {{ personal.contact.telegram.display_name }}
-                    </a>
+                {% endfor %}
+                {% for sn in cv.social_networks or [] %}
+                <div class="contactItem contactSocialNetwork">
+                    <span class="contactLabel">{{ sn.network }}:</span>
+                    {% if sn.url %}
+                    <a href="{{ sn.url }}" class="contactLink" target="_blank" rel="noopener">{{ sn.username }}</a>
+                    {% else %}
+                    <span class="contactLink">{{ sn.username }}</span>
+                    {% endif %}
                 </div>
-                <div class="contactItem contactGithub">
-                    <span class="contactLabel">GitHub:</span>
-                    <a href="{{ personal.contact.github.url }}" class="contactLink" target="_blank" rel="noopener">
-                        {{ personal.contact.github.display_name }}
-                    </a>
-                </div>
+                {% endfor %}
             </div>
         </section>
 
@@ -112,11 +294,11 @@
                 <p class="downloadDescription">Download or view the CV:</p>
                 <ul class="downloadOptions">
                     <li class="downloadOption">
-                        <a id="cvDownloadButton" download="{{ metadata.pdf_filename }}"
+                        <a id="cvDownloadButton"{% if website.pdf_filename %} download="{{ website.pdf_filename }}"{% endif %}
                             class="downloadLink downloadPdf">Download CV as PDF</a>
                     </li>
                     <li class="downloadOption">
-                        <a id="cvOpenInNewTabButton" href="{{ metadata.pdf_url }}" target="_blank"
+                        <a id="cvOpenInNewTabButton" href="{{ website.pdf_url }}" target="_blank"
                             class="downloadLink openNewTab">Open in New Tab</a>
                     </li>
                     <li class="downloadOption">
@@ -129,163 +311,13 @@
 
         <hr>
 
-        <!-- Summary Section -->
-        <section class="cvSection cvSummary" aria-labelledby="summaryHeading">
-            <h2 id="summaryHeading" class="cvSectionTitle">Summary</h2>
-            <div class="summaryContent">
-                <p class="summaryText">{{ personal.summary | markdown_plain }}</p>
-            </div>
-        </section>
+        {% for name, entries in sections.items() if name in section_macros and entries %}
+        {{ section_macros[name](entries) }}
+        {% if not loop.last %}
 
         <hr>
-
-        <!-- Experience Section -->
-        <section class="cvSection cvExperience" aria-labelledby="experienceHeading">
-            <h2 id="experienceHeading" class="cvSectionTitle">Experience</h2>
-            <div class="experienceList">
-                {% for job in experience %}
-                <article class="experienceItem">
-                    <header class="experienceHeader">
-                        <h3 class="companyName">{{ job.company }}</h3>
-                        <div class="jobMeta">
-                            <b><span class="jobPosition">{{ job.position }}</span></b>
-                            /
-                            <span class="jobPeriod">{{ job.period }}</span>
-                            /
-                            <span class="jobLocation">{{ job.location }}</span>
-                        </div>
-                    </header>
-                    <div class="experienceContent">
-                        {% if job.description %}
-                        <p class="jobDescription">{{ job.description | markdown_plain }}</p>
-                        {% endif %}
-                        {% if job.achievements %}
-                        <ul class="achievementsList">
-                            {% for achievement in job.achievements %}
-                            <li class="achievementItem">{{ achievement | markdown_plain }}</li>
-                            {% endfor %}
-                        </ul>
-                        {% endif %}
-                        {% if job.stack %}
-                        <div class="techStack">
-                            <b><span class="techStackLabel">Tech Stack:</span></b>
-                            <i><span class="techStackList">{{ job.stack }}</span></i>
-                        </div>
-                        {% endif %}
-                    </div>
-                </article>
-                {% endfor %}
-            </div>
-        </section>
-
-        {% if competitions %}
-        <hr>
-
-        <!-- Competitions Section -->
-        <section class="cvSection cvCompetitions" aria-labelledby="competitionsHeading">
-            <h2 id="competitionsHeading" class="cvSectionTitle">Competitions</h2>
-            <div class="competitionsList">
-                {% for comp in competitions %}
-                <article class="competitionItem">
-                    <header class="competitionHeader">
-                        <h3 class="competitionTitle">{{ comp.title }}</h3>
-                        <span class="competitionDate">{{ comp.date }}</span>
-                    </header>
-                    <div class="competitionDescription">{{ comp.description | markdown_plain }}</div>
-                </article>
-                {% endfor %}
-            </div>
-        </section>
         {% endif %}
-
-        <hr>
-
-        <!-- Skills Section -->
-        <section class="cvSection cvSkills" aria-labelledby="skillsHeading">
-            <h2 id="skillsHeading" class="cvSectionTitle">Skills</h2>
-            <div class="skillsList">
-                {% for skill_category in skills %}
-                <div class="skillCategory">
-                    {% if skill_category.category %}<h3 class="skillCategoryName">{{ skill_category.category }}</h3>{% endif %}
-                    <div class="skillItems">
-                        <span class="skillList">{{ skill_category.skills | join(", ") }}</span>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-        </section>
-
-        <hr>
-
-        <!-- Education Section -->
-        <section class="cvSection cvEducation" aria-labelledby="educationHeading">
-            <h2 id="educationHeading" class="cvSectionTitle">Education</h2>
-            <div class="educationList">
-                {% for edu in education %}
-                <article class="educationItem">
-                    <header class="educationHeader">
-                        <h3 class="institutionName">{{ edu.institution }}</h3>
-                        <div class="educationMeta">
-                            <span class="degreeName">{{ edu.degree }}</span>
-                            <span class="educationPeriod">{{ edu.period }}</span>
-                            <span class="educationLocation">{{ edu.location }}</span>
-                        </div>
-                    </header>
-                    <div class="educationContent">
-                        {% if edu.description %}<div class="educationDescription">{{ edu.description | markdown_plain }}</div>{% endif %}
-                        {% if edu.gpa %}
-                        <div class="gpaInfo">
-                            <span class="gpaItem">
-                                <b><span class="gpaLabel">Cum. GPA:</span></b>
-                                <span class="gpaValue">{{ edu.gpa.cumulative }}</span>
-                            </span>
-                            <br>
-                            <span class="gpaItem">
-                                <b><span class="gpaLabel">Major GPA:</span></b>
-                                <span class="gpaValue">{{ edu.gpa.major }}</span>
-                            </span>
-                        </div>
-                        {% endif %}
-                    </div>
-                </article>
-                {% endfor %}
-            </div>
-        </section>
-
-        {% if publications %}
-        <hr>
-
-        <!-- Publications Section -->
-        <section class="cvSection cvPublications" aria-labelledby="publicationsHeading">
-            <h2 id="publicationsHeading" class="cvSectionTitle">Publications</h2>
-            <ul class="publicationsList">
-                {% for pub in publications %}
-                <li class="publicationItem">
-                    <a href="{{ pub.link.url }}" class="publicationLink" target="_blank" rel="noopener">
-                        {{ pub.link.display_name }}
-                    </a>
-                    <span class="publicationYear">({{ pub.year }})</span>
-                </li>
-                {% endfor %}
-            </ul>
-        </section>
-        {% endif %}
-
-        <hr>
-
-        <!-- Languages Section -->
-        <section class="cvSection cvLanguages" aria-labelledby="languagesHeading">
-            <h2 id="languagesHeading" class="cvSectionTitle">Languages</h2>
-            <div class="languagesList">
-                {% for lang in languages %}
-                <div class="languageItem">
-                    <span class="languageName">{{ lang.language }}</span>
-                    /
-                    <span class="languageLevel">{{ lang.level }}</span>
-                </div>
-                {% endfor %}
-            </div>
-        </section>
+        {% endfor %}
 
     </main>
 </body>

@@ -1,29 +1,45 @@
 name: Build CV
 
+# Stage 1 (Python): the PDF and the website files, published as a release.
+# Keep the paths in sync with the stage 1 inputs in the Makefile.
 on:
   push:
     branches:
       - main
     paths:
       - ".github/workflows/build_cv.yaml"
-      - "cv_data.yaml"
+      - "cv/**"
       - "templates/**"
       - "cv_renderer/**"
-      - "tex/**"
       - "Makefile"
 
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: "Release to upload to (use a test tag, such as cv-test, for trial runs)"
+        type: string
+        default: cv-latest
+      deploy:
+        description: "Deploy the website to GitHub Pages"
+        type: boolean
+        default: true
+
 jobs:
-  build_latex:
-    name: Build LaTeX document
+  build:
+    name: Build PDF and website files
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # Required to upload to the release.
     steps:
       - name: 🛎️ Checkout 🛎️
         uses: actions/checkout@v4
         with:
           lfs: true
+          # Full history: the build date is the last commit that changed cv/
+          fetch-depth: 0
 
       - name: 🐍 Set up Python 🐍
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
@@ -31,22 +47,7 @@ jobs:
         run: |
           make install-deps-python
 
-      - name: 🔄 Generate PDF using cv_renderer 🔄
-        run: |
-          make render-tex
-
-      - name: 📕 Compile LaTeX document 📕
-        uses: xu-cheng/latex-action@v2
-        with:
-          root_file: cv.tex
-          latexmk_use_xelatex: true
-          working_directory: tex
-
-      - name: 🔄 Generate HTML using cv_renderer 🔄
-        run: |
-          make render-html
-
-      - name: Prepare release files
+      - name: 🔄 Build PDF and website files 🔄
         run: |
           make build-release
 
@@ -56,13 +57,20 @@ jobs:
           file: build/release/*
           file_glob: true
           overwrite: true
-          release_name: cv-latest
+          tag: ${{ inputs.release_tag || 'cv-latest' }}
+          release_name: ${{ inputs.release_tag || 'cv-latest' }}
+          # Test releases must not become the repository's latest release
+          prerelease: ${{ (inputs.release_tag || 'cv-latest') != 'cv-latest' }}
           body: "Latest build"
 
   run_deploy_pages:
     name: Deploy GH Pages
-    needs: build_latex
+    needs: build
     permissions:
       pages: write # Required to deploy to GitHub Pages.
       id-token: write # Required to verify that the deployment originates from this workflow.
     uses: ./.github/workflows/deploy_pages.yaml
+    with:
+      release_tag: ${{ inputs.release_tag || 'cv-latest' }}
+      # On push the inputs are empty: deploy
+      deploy: ${{ github.event_name == 'push' || inputs.deploy }}

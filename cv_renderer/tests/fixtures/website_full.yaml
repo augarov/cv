@@ -1,0 +1,9 @@
+url: https://example.org/cv/
+pdf_url: https://cdn.example.org/jane.pdf
+source_url: https://github.com/janedoe/cv
+title: Jane Doe – CV
+author: J. Doe
+app_name: janedoe
+keywords: software, engineer
+locale: en-GB
+pdf_filename: Jane_Doe_CV.pdf
