@@ -64,7 +64,7 @@ cv/*.yaml → rendercv model ─┬→ typst → build/pdf/cv.typ → pdf → bu
 build/release/ = cv.pdf + gh-pages-bundle.tar.gz (tar of build/web/), the hand-off between the stages
 ```
 
-`build/web/` has the layout of `gh-pages/` (`index.html`, `src/template_params.js`, `public/sitemap.xml`, `public/img/favicon/site.webmanifest`, `public/cv.pdf`). CI uses the same split: `build_cv.yaml` runs stage 1 and uploads the release, `deploy_pages.yaml` downloads the bundle by tag (`make build-website-from-bundle`) and deploys. Keep the workflow `paths` in sync with the stage inputs in the Makefile.
+`build/web/` has the layout of `gh-pages/` (`index.html`, `src/template_params.js`, `public/sitemap.xml`, `public/img/favicon/site.webmanifest`, `public/cv.pdf`). CI uses the same split: `build_cv.yaml` runs stage 1 and uploads the release, `deploy_pages.yaml` downloads the bundle by tag (`make build-website-from-bundle`) and deploys. On a pull request (stage 1 or stage 2 inputs), `build_cv.yaml` uploads `build/release/` as the workflow artifact `cv-build` instead of releasing, and `deploy_pages.yaml` builds the website from that artifact without deploying. Keep the workflow `paths` in sync with the stage inputs in the Makefile.
 
 ### Python renderer (`cv_renderer/`)
 
