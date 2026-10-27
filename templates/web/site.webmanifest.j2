@@ -1,21 +1,27 @@
+{#- The site's path, e.g. "/cv/" ("/" for a site at the domain root) -#}
+{% set base = url_path(website.url | string) ~ "/" %}
+{% set icons = base ~ "img/favicon/web-app-manifest-" %}
+{#- theme_color: the same value as index.html.j2 -#}
 {
+    "id": {{ base | tojson }},
     "name": {{ website.title | tojson }},
     "short_name": {{ website.app_name | tojson }},
-    "icons": [
-        {
-            "src": {{ (url_path(website.url | string) ~ "/img/favicon/web-app-manifest-192x192.png") | tojson }},
-            "sizes": "192x192",
-            "type": "image/png",
-            "purpose": "maskable"
-        },
-        {
-            "src": {{ (url_path(website.url | string) ~ "/img/favicon/web-app-manifest-512x512.png") | tojson }},
-            "sizes": "512x512",
-            "type": "image/png",
-            "purpose": "maskable"
-        }
-    ],
+    "description": {{ website.description | markdown_plain | tojson }},
+    "lang": {{ (website.locale or "en") | tojson }},
+    "start_url": {{ base | tojson }},
+    "scope": {{ base | tojson }},
+    "display": "standalone",
     "theme_color": "#ffffff",
     "background_color": "#ffffff",
-    "display": "standalone"
+    "icons": [
+        {% for size, purpose in [("192x192", "any"), ("192x192", "maskable"),
+                                 ("512x512", "any"), ("512x512", "maskable")] %}
+        {
+            "src": {{ (icons ~ size ~ ".png") | tojson }},
+            "sizes": "{{ size }}",
+            "type": "image/png",
+            "purpose": "{{ purpose }}"
+        }{{ "," if not loop.last }}
+        {% endfor %}
+    ]
 }

@@ -184,6 +184,9 @@
     "languages": languages_section,
 } %}
 {% set language = website.locale or "en" %}
+{#- Same values as site.webmanifest.j2 -#}
+{% set theme_color = "#ffffff" %}
+{% set preview_image = "img/favicon/web-app-manifest-512x512.png" %}
 <!DOCTYPE html>
 <html lang="{{ language }}">
 
@@ -196,23 +199,37 @@
     <title>{{ website.title }}</title>
     <meta name="title" content="{{ website.title }}">
     <meta name="author" content="{{ website.author }}">
-    <meta name="description" content="{% if cv.sections and cv.sections.get('summary') %}{{ cv.sections['summary'][0] | markdown_plain }}{% endif %}">
+    <meta name="description" content="{{ website.description | markdown_plain }}">
     {% if website.keywords %}
     <meta name="keywords" content="{{ website.keywords }}">
     {% endif %}
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <meta name="google" content="notranslate">
     <meta name="robots" content="index, follow">
     <meta name="language" content="{{ language }}">
+    <meta name="theme-color" content="{{ theme_color }}">
 
     <!-- Canonical URL -->
     <link rel="canonical" href="{{ website.url }}">
 
+    <!-- Link previews (Open Graph, Twitter / X) -->
+    <meta property="og:type" content="profile">
+    <meta property="og:url" content="{{ website.url }}">
+    <meta property="og:title" content="{{ website.title }}">
+    <meta property="og:description" content="{{ website.description | markdown_plain }}">
+    <meta property="og:site_name" content="{{ website.app_name }}">
+    {% if website.locale %}
+    <meta property="og:locale" content="{{ website.locale | replace('-', '_') }}">
+    {% endif %}
+    <meta property="og:image" content="{{ website.url }}{{ preview_image }}">
+    <meta property="og:image:width" content="512">
+    <meta property="og:image:height" content="512">
+    <meta property="og:image:alt" content="{{ website.title }}">
+    <meta name="twitter:card" content="summary">
+
     <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="/img/favicon.png">
     <link rel="icon" type="image/png" href="/img/favicon/favicon-96x96.png" sizes="96x96" />
     <link rel="icon" type="image/svg+xml" href="/img/favicon/favicon.svg" />
-    <link rel="shortcut icon" href="/img/favicon/favicon.ico" />
+    <link rel="icon" href="/img/favicon/favicon.ico" sizes="32x32" />
     <link rel="apple-touch-icon" sizes="180x180" href="/img/favicon/apple-touch-icon.png" />
     <meta name="apple-mobile-web-app-title" content="{{ website.app_name }}" />
     <link rel="manifest" href="/img/favicon/site.webmanifest" />

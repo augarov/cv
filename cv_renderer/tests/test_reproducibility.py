@@ -36,7 +36,7 @@ def _build(folder: Path) -> None:
         assert run(["-s", "web", *cv_inputs, *web]) == 0
 
 
-@pytest.mark.slow
+@pytest.mark.integration
 def test_same_source_date_gives_identical_outputs(tmp_path, monkeypatch):
     """Test that two builds in different folders are byte-identical."""
     monkeypatch.setenv("SOURCE_DATE_EPOCH", SOURCE_DATE_EPOCH)

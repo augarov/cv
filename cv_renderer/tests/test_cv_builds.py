@@ -14,7 +14,7 @@ CV_DIRS = [ROOT / "cv"] + sorted(
 )
 
 
-@pytest.mark.slow
+@pytest.mark.integration
 @pytest.mark.parametrize("cv_dir", CV_DIRS, ids=lambda d: str(d.relative_to(ROOT)))
 def test_cv_builds(cv_dir, tmp_path):
     """Test that the Typst source, the PDF and all web templates render."""

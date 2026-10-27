@@ -3,11 +3,14 @@
 import json
 import re
 from datetime import date
+from html.parser import HTMLParser
 from pathlib import Path
+from urllib.parse import urlparse
 from xml.etree import ElementTree
 
 import jinja2
 import pytest
+from PIL import Image
 
 from cv_renderer.inputs import InputError, load_cv, load_website
 from cv_renderer.web_renderer import make_web_environment, render_web
@@ -142,6 +145,10 @@ class TestTemplateErrorLine:
 
 
 TEMPLATES = Path(__file__).parents[2] / "templates" / "web"
+SITE = Path(__file__).parents[2] / "gh-pages"
+# Website files rendered by stage 1 rather than kept in gh-pages/ (the
+# Makefile's WEB_FILES), relative to the site root
+RENDERED_SITE_FILES = {"img/favicon/site.webmanifest", "cv.pdf", "sitemap.xml"}
 
 
 def _render(tmp_path, template, cv="cv_full.yaml", website="website_full.yaml"):
@@ -153,6 +160,63 @@ def _render(tmp_path, template, cv="cv_full.yaml", website="website_full.yaml"):
         model, load_website(website_path, model.cv), TEMPLATES / template, output
     )
     return output.read_text(encoding="utf-8")
+
+
+class _HeadParser(HTMLParser):
+    """Collect the tags of <head> in order, with their attributes."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.tags: list[tuple[str, dict[str, str]]] = []
+        self.title: list[str] = []
+        self._in_head = False
+        self._in_title = False
+
+    def handle_starttag(self, tag, attrs):
+        if tag == "head":
+            self._in_head = True
+        elif self._in_head:
+            self.tags.append((tag, {k: v or "" for k, v in attrs}))
+            self._in_title = tag == "title"
+
+    def handle_endtag(self, tag):
+        if tag == "head":
+            self._in_head = False
+        self._in_title = False
+
+    def handle_data(self, data):
+        if self._in_title:
+            self.title.append(data)
+
+
+def _head(html):
+    """Return the parsed <head> of a page."""
+    parser = _HeadParser()
+    parser.feed(html)
+    return parser
+
+
+def _meta(head, key, value):
+    """Return the content of every <meta key=value> in the head."""
+    return [
+        a.get("content") for t, a in head.tags if t == "meta" and a.get(key) == value
+    ]
+
+
+def _site_file(path):
+    """Return whether a root-relative site path is a file of the website."""
+    relative = path.lstrip("/")
+    return (
+        relative in RENDERED_SITE_FILES
+        or (SITE / relative).is_file()
+        or (SITE / "public" / relative).is_file()
+    )
+
+
+def _image_size(path):
+    """Return the width and height of an image file."""
+    with Image.open(path) as image:
+        return image.size
 
 
 class TestIndexHtml:
@@ -280,6 +344,293 @@ class TestIndexHtml:
 
         assert 'name="keywords"' not in html
         assert '<html lang="en">' in html
+
+
+class TestIndexHead:
+    """Test cases for the metadata in index.html's <head>."""
+
+    @pytest.fixture
+    def head(self, tmp_path):
+        """Return the parsed <head> rendered from the full fixtures."""
+        return _head(_render(tmp_path, "index.html.j2"))
+
+    @pytest.fixture
+    def minimal_head(self, tmp_path):
+        """Return the parsed <head> of a CV with only a name and a bare website."""
+        return _head(
+            _render(
+                tmp_path,
+                "index.html.j2",
+                cv="cv_minimal.yaml",
+                website="website_minimal.yaml",
+            )
+        )
+
+    def test_charset_first(self, head):
+        """Test that <meta charset> is the first tag (within the first 1024 bytes)."""
+        assert head.tags[0] == ("meta", {"charset": "UTF-8"})
+
+    def test_one_title(self, head):
+        """Test that there is exactly one <title>, the website title."""
+        assert [t for t, _ in head.tags].count("title") == 1
+        assert "".join(head.title) == "Jane Doe – CV"
+
+    def test_viewport_allows_zoom(self, head):
+        """Test that there is one viewport and it doesn't block zooming."""
+        viewports = _meta(head, "name", "viewport")
+        assert viewports == ["width=device-width, initial-scale=1.0"]
+
+    def test_description(self, head):
+        """Test that the description is the summary as plain text."""
+        assert _meta(head, "name", "description") == [
+            "Engineer with 10 years of experience in R&D."
+        ]
+        assert _meta(head, "property", "og:description") == [
+            "Engineer with 10 years of experience in R&D."
+        ]
+
+    def test_canonical_and_robots(self, head):
+        """Test the canonical URL and that the page may be indexed."""
+        canonical = [a["href"] for t, a in head.tags if a.get("rel") == "canonical"]
+        assert canonical == ["https://example.org/cv/"]
+        assert _meta(head, "name", "robots") == ["index, follow"]
+
+    def test_theme_color_matches_manifest(self, head, tmp_path):
+        """Test that theme-color is the manifest's theme_color."""
+        manifest = json.loads(_render(tmp_path, "site.webmanifest.j2"))
+
+        assert _meta(head, "name", "theme-color") == [manifest["theme_color"]]
+
+    def test_link_previews(self, head):
+        """Test the Open Graph and Twitter tags, with absolute URLs."""
+        assert _meta(head, "property", "og:type") == ["profile"]
+        assert _meta(head, "property", "og:url") == ["https://example.org/cv/"]
+        assert _meta(head, "property", "og:title") == ["Jane Doe – CV"]
+        assert _meta(head, "property", "og:site_name") == ["janedoe"]
+        assert _meta(head, "property", "og:locale") == ["en_GB"]
+        assert _meta(head, "property", "og:image") == [
+            "https://example.org/cv/img/favicon/web-app-manifest-512x512.png"
+        ]
+        assert _meta(head, "name", "twitter:card") == ["summary"]
+
+    def test_preview_image_size(self, head):
+        """Test that og:image's width and height match the image."""
+        path = urlparse(_meta(head, "property", "og:image")[0]).path
+        image = SITE / "public" / path.removeprefix("/cv/")
+
+        assert _image_size(image) == (
+            int(_meta(head, "property", "og:image:width")[0]),
+            int(_meta(head, "property", "og:image:height")[0]),
+        )
+
+    def test_local_links_exist(self, head):
+        """Test that every root-relative href / src is a file of the website."""
+        paths = [
+            a.get("href") or a.get("src")
+            for t, a in head.tags
+            if t in ("link", "script")
+            and (a.get("href") or a.get("src", "")).startswith("/")
+            and not (a.get("href") or "").startswith("//")
+        ]
+
+        assert paths  # icons, manifest, stylesheet, script
+        assert [p for p in paths if not _site_file(p)] == []
+
+    def test_icons(self, head):
+        """Test the favicon, apple-touch-icon and manifest links."""
+        links = {(a.get("rel"), a.get("href")) for t, a in head.tags if t == "link"}
+
+        assert ("icon", "/img/favicon/favicon.svg") in links
+        assert ("icon", "/img/favicon/favicon.ico") in links
+        assert ("apple-touch-icon", "/img/favicon/apple-touch-icon.png") in links
+        assert ("manifest", "/img/favicon/site.webmanifest") in links
+        assert _image_size(SITE / "public/img/favicon/apple-touch-icon.png") == (
+            180,
+            180,
+        )
+
+    def test_no_obsolete_shortcut_icon(self, head):
+        """Test that no link uses rel="shortcut icon" (rel="icon" since HTML5)."""
+        assert [a for t, a in head.tags if "shortcut" in a.get("rel", "")] == []
+
+    def test_ico_sizes_attribute(self, head):
+        """Test that the .ico link has sizes, and the .ico holds that size.
+
+        Without sizes, Chrome may pick the .ico over the SVG.
+        """
+        sizes = [
+            a.get("sizes")
+            for t, a in head.tags
+            if t == "link" and a.get("href", "").endswith(".ico")
+        ]
+        assert sizes == ["32x32"]
+        with Image.open(SITE / "public/img/favicon/favicon.ico") as ico:
+            assert (32, 32) in ico.info["sizes"]
+
+    def test_minimal_has_every_required_tag(self, minimal_head):
+        """Test that a bare website.yaml still gives the tags with defaults."""
+        assert "".join(minimal_head.title) == "Jane Doe"
+        assert _meta(minimal_head, "name", "description") == ["Jane Doe"]
+        assert _meta(minimal_head, "property", "og:url") == ["https://example.org/cv/"]
+        assert _meta(minimal_head, "property", "og:locale") == []
+        assert _meta(minimal_head, "name", "theme-color") == ["#ffffff"]
+
+    def test_markdown_in_description_is_plain(self, tmp_path):
+        """Test that markdown in a description from website.yaml is removed."""
+        website = tmp_path / "website.yaml"
+        website.write_text(
+            "url: https://example.org/cv\ndescription: '**Fast** & <safe>'\n",
+            encoding="utf-8",
+        )
+
+        html = _render(tmp_path, "index.html.j2", website=website)
+        manifest = json.loads(_render(tmp_path, "site.webmanifest.j2", website=website))
+
+        assert _meta(_head(html), "name", "description") == ["Fast & <safe>"]
+        assert 'content="Fast &amp; &lt;safe&gt;"' in html
+        assert manifest["description"] == "Fast & <safe>"
+
+
+ICONS = SITE / "public" / "img" / "favicon"
+
+
+class TestIconFiles:
+    """Test cases for the icon files the page and the manifest link to."""
+
+    def test_svg_has_viewbox(self):
+        """Test that favicon.svg has a viewBox matching its size, so it scales."""
+        root = ElementTree.parse(ICONS / "favicon.svg").getroot()
+
+        assert root.get("viewBox") == f"0 0 {root.get('width')} {root.get('height')}"
+
+    def test_ico_has_small_sizes(self):
+        """Test that favicon.ico holds 16, 32 and 48 px for tabs and HiDPI tabs."""
+        with Image.open(ICONS / "favicon.ico") as ico:
+            assert {(16, 16), (32, 32), (48, 48)} <= ico.info["sizes"]
+
+    @pytest.mark.parametrize(
+        "name", sorted(p.name for p in ICONS.glob("*.png")), ids=str
+    )
+    def test_png_icons_are_opaque(self, name):
+        """Test that no icon has transparent pixels.
+
+        iOS shows transparent pixels of the apple-touch-icon as black, and a
+        maskable icon must fill its whole square.
+        """
+        with Image.open(ICONS / name) as image:
+            alpha = image.convert("RGBA").getchannel("A")
+            assert alpha.getextrema() == (255, 255)
+
+
+class TestWebmanifest:
+    """Test cases for site.webmanifest: what browsers need to install the site."""
+
+    @pytest.fixture
+    def manifest(self, tmp_path):
+        """Return the manifest rendered from the full fixtures."""
+        return json.loads(_render(tmp_path, "site.webmanifest.j2"))
+
+    def test_required_fields(self, manifest):
+        """Test the fields that browsers read to install the site."""
+        assert manifest["name"] == "Jane Doe – CV"
+        assert manifest["short_name"] == "janedoe"
+        assert manifest["description"] == "Engineer with 10 years of experience in R&D."
+        assert manifest["lang"] == "en-GB"
+        assert manifest["display"] == "standalone"
+        assert manifest["theme_color"] == manifest["background_color"] == "#ffffff"
+
+    @pytest.mark.parametrize(
+        "url", ["https://example.org/cv", "https://example.org/cv/"]
+    )
+    def test_id_start_url_scope(self, tmp_path, url):
+        """Test that id, start_url and scope are the site's path."""
+        website = tmp_path / "website.yaml"
+        website.write_text(f"url: {url}\n", encoding="utf-8")
+
+        manifest = json.loads(_render(tmp_path, "site.webmanifest.j2", website=website))
+
+        assert manifest["id"] == manifest["start_url"] == manifest["scope"] == "/cv/"
+
+    def test_site_at_domain_root(self, tmp_path):
+        """Test a site at the domain root (a user's github.io site)."""
+        website = tmp_path / "website.yaml"
+        website.write_text("url: https://janedoe.github.io\n", encoding="utf-8")
+
+        manifest = json.loads(_render(tmp_path, "site.webmanifest.j2", website=website))
+
+        assert manifest["start_url"] == manifest["scope"] == "/"
+        assert manifest["icons"][0]["src"] == (
+            "/img/favicon/web-app-manifest-192x192.png"
+        )
+
+    def test_icons(self, manifest):
+        """Test a 192 and a 512 icon for both purposes, matching the files."""
+        icons = {(i["sizes"], i["purpose"]) for i in manifest["icons"]}
+
+        assert icons == {
+            ("192x192", "any"),
+            ("192x192", "maskable"),
+            ("512x512", "any"),
+            ("512x512", "maskable"),
+        }
+        for icon in manifest["icons"]:
+            assert icon["type"] == "image/png"
+            assert icon["src"].startswith(manifest["scope"])
+            path = SITE / "public" / icon["src"].removeprefix(manifest["scope"])
+            width, height = _image_size(path)
+            assert f"{width}x{height}" == icon["sizes"]
+
+    def test_non_ascii_title(self, tmp_path):
+        """Test that a non-ASCII title stays valid JSON with the same text."""
+        website = tmp_path / "website.yaml"
+        website.write_text(
+            "url: https://example.org/cv\ntitle: Žofie Dvořák – Инженер\n",
+            encoding="utf-8",
+        )
+
+        manifest = json.loads(_render(tmp_path, "site.webmanifest.j2", website=website))
+
+        assert manifest["name"] == "Žofie Dvořák – Инженер"
+
+
+class TestSitemap:
+    """Test cases for sitemap.xml beyond the build date."""
+
+    NS = {"s": "http://www.sitemaps.org/schemas/sitemap/0.9"}
+
+    def test_urls_absolute_under_site(self, tmp_path):
+        """Test that every <loc> is an absolute http(s) URL."""
+        root = ElementTree.fromstring(
+            _render(tmp_path, "sitemap.xml.j2", website="website_minimal.yaml")
+        )
+        locs = [e.text or "" for e in root.findall("s:url/s:loc", self.NS)]
+
+        assert locs == ["https://example.org/cv/", "https://example.org/cv/cv.pdf"]
+        assert root.tag == "{http://www.sitemaps.org/schemas/sitemap/0.9}urlset"
+
+    def test_lastmod_is_a_w3c_date(self, tmp_path):
+        """Test that lastmod uses the W3C date format the protocol asks for."""
+        root = ElementTree.fromstring(_render(tmp_path, "sitemap.xml.j2"))
+
+        for lastmod in root.findall("s:url/s:lastmod", self.NS):
+            assert re.fullmatch(r"\d{4}-\d{2}-\d{2}", lastmod.text or "")
+
+    def test_ampersand_in_url_is_escaped(self, tmp_path):
+        """Test that a URL with & still gives well-formed XML."""
+        website = tmp_path / "website.yaml"
+        website.write_text(
+            "url: https://example.org/cv/\n"
+            "pdf_url: https://example.org/cv.pdf?a=1&b=2\n",
+            encoding="utf-8",
+        )
+
+        xml = _render(tmp_path, "sitemap.xml.j2", website=website)
+        root = ElementTree.fromstring(xml)
+
+        assert "a=1&amp;b=2" in xml
+        assert root.findall("s:url/s:loc", self.NS)[1].text == (
+            "https://example.org/cv.pdf?a=1&b=2"
+        )
 
 
 class TestOtherTemplates:

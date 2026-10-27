@@ -288,6 +288,42 @@ class TestLoadWebsite:
 
         assert website.title == "Jane Doe"
 
+    def test_description_from_summary(self, cv):
+        """Test that the default description is the first summary paragraph."""
+        website = load_website(FIXTURES / "website_minimal.yaml", cv)
+
+        assert website.description == (
+            "Engineer with **10 years** of experience in R&D."
+        )
+
+    @pytest.mark.parametrize(
+        ("cv_yaml", "expected"),
+        [
+            (
+                "cv:\n  name: A B\n  headline: '**Lead** Engineer'\n",
+                "**Lead** Engineer",
+            ),
+            ("cv:\n  name: A *B*\n", "A *B*"),
+        ],
+    )
+    def test_description_without_summary(self, tmp_path, cv_yaml, expected):
+        """Test that without a summary the headline, else the title, is used."""
+        path = tmp_path / "cv.yaml"
+        path.write_text(cv_yaml, encoding="utf-8")
+
+        website = load_website(FIXTURES / "website_minimal.yaml", load_cv(path).cv)
+
+        assert website.description == expected
+
+    def test_explicit_description_wins(self, cv, tmp_path):
+        """Test that a description in website.yaml replaces the summary."""
+        path = tmp_path / "website.yaml"
+        path.write_text(
+            "url: https://example.org/cv\ndescription: Short.\n", encoding="utf-8"
+        )
+
+        assert load_website(path, cv).description == "Short."
+
     def test_explicit_values_win(self, cv):
         """Test that values in the file override the defaults."""
         website = load_website(FIXTURES / "website_full.yaml", cv)

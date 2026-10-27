@@ -23,6 +23,7 @@ class Website(BaseModel):
     title: str
     author: str
     app_name: str
+    description: str
     keywords: str | None = None
     locale: str | None = None
     pdf_filename: str | None = None
@@ -48,5 +49,17 @@ class Website(BaseModel):
             data.setdefault("title", title)
             data.setdefault("author", cv.name)
             data.setdefault("app_name", cv.name)
+            data.setdefault("description", _default_description(cv, str(data["title"])))
 
         return data
+
+
+def _default_description(cv: Cv, title: str) -> str:
+    """Return the first summary paragraph, else the headline or the title.
+
+    Markdown stays as it is; templates convert it with ``markdown_plain``.
+    """
+    summary = (cv.sections or {}).get("summary") or []
+    if summary and isinstance(summary[0], str):
+        return summary[0]
+    return cv.headline or title
