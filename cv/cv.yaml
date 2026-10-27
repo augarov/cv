@@ -21,7 +21,7 @@ cv:
       - company: CeTu
         position: Software Engineering Team Lead
         start_date: 2024-04
-        end_date: present
+        end_date: 2026-02
         location: Zürich, Switzerland
         summary: >-
           Developing a **high-load C++20 backend** for real-time telemetry and event aggregation,
@@ -102,11 +102,11 @@ cv:
         area: Computer Science
         start_date: 2015
         end_date: 2019
-        location: St. Petersburg
+        location: St. Petersburg, Russia
         highlights:
           - "Program: Computer Systems Engineering and Informatics"
           - "Specialization: Computer Aided Design Systems"
-          - "GPA: 4.57 / 5.0 (major: 4.60 / 5.0)"
+          - "GPA: 4.6 / 5.0"
 
     skills:
       - label: Programming
@@ -129,5 +129,3 @@ cv:
         details: C1
       - label: Russian
         details: native
-      - label: German
-        details: A1 (learning)
