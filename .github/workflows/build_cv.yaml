@@ -1,30 +1,34 @@
 name: Build CV
 
-# Stage 1 (Python): the PDF and the website files, published as a release.
-# Keep the paths in sync with the stage 1 inputs in the Makefile.
+# Stage 1 (Python): the PDF and the website files, published as a release;
+# then stage 2 (deploy_pages.yaml) builds and deploys the website from them.
+# The only workflow that runs on push, so a push never starts two deploys: the
+# paths are the stage 1 and stage 2 inputs in the Makefile, the same for push
+# and pull_request.
 on:
   push:
     branches:
       - main
     paths:
       - ".github/workflows/build_cv.yaml"
+      - ".github/workflows/deploy_pages.yaml"
       - "cv/**"
       - "templates/**"
       - "cv_renderer/**"
+      - "gh-pages/**"
       - "Makefile"
 
   # Builds both stages without releasing or deploying; the PDF and the bundle
-  # are a workflow artifact. Stage 2 inputs too, so a website-only change is
-  # built against its own bundle.
+  # are a workflow artifact
   pull_request:
     paths:
       - ".github/workflows/build_cv.yaml"
+      - ".github/workflows/deploy_pages.yaml"
       - "cv/**"
       - "templates/**"
       - "cv_renderer/**"
-      - "Makefile"
-      - ".github/workflows/deploy_pages.yaml"
       - "gh-pages/**"
+      - "Makefile"
 
   workflow_dispatch:
     inputs:
@@ -45,14 +49,14 @@ jobs:
       contents: write # Required to upload to the release.
     steps:
       - name: 🛎️ Checkout 🛎️
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           lfs: true
           # Full history: the build date is the last commit that changed cv/
           fetch-depth: 0
 
       - name: 🐍 Set up Python 🐍
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: "3.12"
 
@@ -79,10 +83,20 @@ jobs:
 
       - name: Upload files as workflow artifact
         if: github.event_name == 'pull_request'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: cv-build
           path: build/release/
+          retention-days: 7
+
+      # The PDF once more, unzipped, to open from the run page; the artifact
+      # takes the file's name (cv.pdf)
+      - name: Upload PDF as workflow artifact
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v7
+        with:
+          path: build/release/cv.pdf
+          archive: false
           retention-days: 7
 
   run_deploy_pages:
