@@ -15,6 +15,13 @@ repos:
       - id: check-toml
       - id: detect-private-key
 
+  # GitHub Actions workflows: actionlint's release binary from PyPI (no Go
+  # toolchain); runs only when a workflow changes
+  - repo: https://github.com/Mateusz-Grzelinski/actionlint-py
+    rev: v1.7.12.25
+    hooks:
+      - id: actionlint
+
   # Python formatting with black
   - repo: https://github.com/psf/black
     rev: 26.10.1
@@ -68,7 +75,7 @@ repos:
         entry: bash -c 'realpath "$@" | xargs pnpm -C gh-pages exec eslint --fix --max-warnings=0' --
         language: system
         pass_filenames: true
-        files: ^gh-pages/src/.*\.(js|mjs|cjs|jsx|css)$
+        files: ^gh-pages/(src|tests)/.*\.(js|mjs|cjs|jsx|css)$
 
   # CSS linting with local Stylelint setup
   - repo: local
