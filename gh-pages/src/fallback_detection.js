@@ -5,15 +5,16 @@
  */
 
 /**
- * Minimum versions for the viewer, as [major, minor]: pdf.js's own targets
- * (Chrome 118, Safari 16.4) raised to native light-dark() support, which
- * custom.css and the viewer's theme switch use (Chrome 123, Firefox 120,
- * Safari 17.5). Older browsers get the accessible page.
+ * Minimum versions for the viewer, as [major, minor]: the targets of the
+ * pdf.js legacy build (6.4: Chrome 125, Safari 18, and the Firefox ESR at its
+ * build time, 153). They also cover native light-dark(), which custom.css and
+ * the viewer's theme switch use. Raise them with each pdf.js upgrade. Older
+ * browsers get the accessible page.
  */
 const MIN_VERSIONS = {
-  chromium: [123, 0], // Chrome, Edge, Opera, Samsung Internet, Android webviews
-  firefox: [120, 0],
-  webkit: [17, 5], // Safari version on macOS, iOS version on iPhone / iPad
+  chromium: [125, 0], // Chrome, Edge, Opera, Samsung Internet, Android webviews
+  firefox: [153, 0],
+  webkit: [18, 0], // Safari version on macOS, iOS version on iPhone / iPad
 };
 
 function parseVersion(major, minor) {
