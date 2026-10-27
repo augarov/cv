@@ -27,6 +27,7 @@ dev = [
     "pre-commit>=4.7,<5",
     "bandit>=1.9,<2",
     "types-PyYAML>=6.0.12,<7",
+    "pillow>=12.3,<13",
 ]
 
 [tool.poetry]
@@ -109,8 +110,7 @@ addopts = [
 ]
 pythonpath = ["src"]
 markers = [
-    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
-    "integration: marks tests as integration tests",
+    "integration: builds whole CVs end to end (deselect with '-m \"not integration\"')",
 ]
 
 [tool.coverage.run]

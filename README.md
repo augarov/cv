@@ -31,6 +31,6 @@ The minimal inputs:
   url: https://example.github.io/cv/
   ```
 
-  The title, author and PDF link default from the CV and the URL; `source_url`, `keywords` and `locale` are optional.
+  The title, author, description (the first summary paragraph) and PDF link default from the CV and the URL; `source_url`, `keywords` and `locale` are optional.
 
 `make help` lists all targets.
