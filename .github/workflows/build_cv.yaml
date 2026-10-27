@@ -13,6 +13,19 @@ on:
       - "cv_renderer/**"
       - "Makefile"
 
+  # Builds both stages without releasing or deploying; the PDF and the bundle
+  # are a workflow artifact. Stage 2 inputs too, so a website-only change is
+  # built against its own bundle.
+  pull_request:
+    paths:
+      - ".github/workflows/build_cv.yaml"
+      - "cv/**"
+      - "templates/**"
+      - "cv_renderer/**"
+      - "Makefile"
+      - ".github/workflows/deploy_pages.yaml"
+      - "gh-pages/**"
+
   workflow_dispatch:
     inputs:
       release_tag:
@@ -52,6 +65,7 @@ jobs:
           make build-release
 
       - name: Upload files to release
+        if: github.event_name != 'pull_request'
         uses: svenstaro/upload-release-action@v2
         with:
           file: build/release/*
@@ -63,6 +77,14 @@ jobs:
           prerelease: ${{ (inputs.release_tag || 'cv-latest') != 'cv-latest' }}
           body: "Latest build"
 
+      - name: Upload files as workflow artifact
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: cv-build
+          path: build/release/
+          retention-days: 7
+
   run_deploy_pages:
     name: Deploy GH Pages
     needs: build
@@ -72,5 +94,7 @@ jobs:
     uses: ./.github/workflows/deploy_pages.yaml
     with:
       release_tag: ${{ inputs.release_tag || 'cv-latest' }}
-      # On push the inputs are empty: deploy
-      deploy: ${{ github.event_name == 'push' || inputs.deploy }}
+      bundle_artifact: ${{ github.event_name == 'pull_request' && 'cv-build' || '' }}
+      # On push the inputs are empty: deploy. On pull_request they're empty
+      # too, and a bare `inputs.deploy` would pass '' to the boolean input
+      deploy: ${{ github.event_name == 'push' || inputs.deploy == true }}

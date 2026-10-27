@@ -18,6 +18,10 @@ on:
         description: "Release to download the website bundle from"
         type: string
         default: cv-latest
+      bundle_artifact:
+        description: "Workflow artifact of the calling run to take the bundle from instead of the release (pull requests)"
+        type: string
+        default: ""
       deploy:
         description: "Deploy the website to GitHub Pages"
         type: boolean
@@ -64,6 +68,7 @@ jobs:
       # By tag, not the newest release: that may be a test release, or not yet
       # have the upload of the calling workflow
       - name: Download release
+        if: ${{ !inputs.bundle_artifact }}
         uses: robinraju/release-downloader@v1.9
         with:
           tag: ${{ inputs.release_tag || 'cv-latest' }}
@@ -71,6 +76,13 @@ jobs:
           out-file-path: downloads
           tarBall: false
           zipBall: false
+
+      - name: Download bundle artifact
+        if: ${{ inputs.bundle_artifact }}
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.bundle_artifact }}
+          path: downloads
 
       - name: Build website
         run: |
@@ -84,6 +96,7 @@ jobs:
           done
 
       - name: Upload Pages artifact
+        if: ${{ github.event_name == 'push' || inputs.deploy }}
         uses: actions/upload-pages-artifact@v3
         with:
           path: gh-pages/dist
