@@ -33,7 +33,7 @@ preview-website-dev
 - **Outputs depend on the tool.** Stage 1 outputs depend on `$(RENDERER_STAMP)`, which depends on the renderer sources and the Python dependencies.
 - **Values are inputs too.** Stage 1 outputs depend on `$(BUILD_PARAMS_STAMP)`, which holds `CV_PATH` and the build date and is removed at parse time when they change. Add any other variable that changes the output to `BUILD_PARAMS`.
 - Optional inputs are prerequisites and flags only when they exist (`$(wildcard …)`).
-- Stage 1 (Python) writes `build/pdf/` and `build/web/`; stage 2 (Node) builds `gh-pages/dist/` from `build/web/`. Keep `.github/workflows/build_cv.yaml` (stage 1) and `deploy_pages.yaml` (stage 2) `paths` in sync with the stage inputs. The exception is the `Makefile`: it's only in `build_cv.yaml`, which deploys too, so a Makefile change doesn't start two deploys.
+- Stage 1 (Python) writes `build/pdf/` and `build/web/`; stage 2 (Node) builds `gh-pages/dist/` from `build/web/`. Keep the `paths` of `.github/workflows/build_cv.yaml` (push and pull_request) in sync with the inputs of both stages. It's the only workflow that runs on push and calls `deploy_pages.yaml` (stage 2), which has no push trigger, so a push never starts two deploys.
 
 ### .PHONY declaration
 
