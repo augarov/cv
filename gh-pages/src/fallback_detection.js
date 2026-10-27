@@ -1,104 +1,117 @@
 /**
- * Enhanced PDF.js Capability Detection
- * Checks for basic APIs, browser versions, and known compatibility issues
+ * PDF.js Capability Detection
+ * Decides between the pdf.js viewer and the accessible page: basic APIs, the
+ * browser version, bots, and a working Web Worker.
  */
-function detectPDFjsCapabilities() {
-  // Basic feature detection (from original)
-  if (
-    !window.Worker ||
-    !window.ArrayBuffer ||
-    !window.Uint8Array ||
-    !window.Promise ||
-    !window.fetch ||
-    !window.URL
-  ) {
-    return false;
-  }
 
-  // Enhanced browser and version detection
-  const browserInfo = getBrowserInfo();
+/**
+ * Minimum versions for the viewer, as [major, minor]: pdf.js's own targets
+ * (Chrome 118, Safari 16.4) raised to native light-dark() support, which
+ * custom.css and the viewer's theme switch use (Chrome 123, Firefox 120,
+ * Safari 17.5). Older browsers get the accessible page.
+ */
+const MIN_VERSIONS = {
+  chromium: [123, 0], // Chrome, Edge, Opera, Samsung Internet, Android webviews
+  firefox: [120, 0],
+  webkit: [17, 5], // Safari version on macOS, iOS version on iPhone / iPad
+};
 
-  // Check against known minimum requirements
-  if (!isVersionSupported(browserInfo)) {
-    return false;
-  }
-
-  // Test Web Workers functionality (more reliable than just existence check)
-  if (!testWebWorkerCapability()) {
-    return false;
-  }
-
-  return true;
+function parseVersion(major, minor) {
+  return [parseInt(major, 10), parseInt(minor || "0", 10)];
 }
 
 /**
- * Get browser information with version detection
- * Simplified to detect the three main rendering engines
+ * Get the rendering engine and its version from a user agent string
+ * @param {string} ua
+ * @returns {{name: string, version: number[]}}
  */
-function getBrowserInfo() {
-  const ua = navigator.userAgent;
-  const browser = {
-    name: "unknown",
-    version: 0,
-  };
+function getBrowserInfo(ua) {
+  // Every browser on iPhone / iPad (Safari, Chrome "CriOS", Firefox "FxiOS",
+  // in-app webviews) is WebKit of the iOS version. iPadOS's default desktop
+  // UA has no iPad token and is matched as Safari below.
+  const iosMatch = ua.match(/\b(?:iPhone|iPad|iPod)\b.*? OS (\d+)(?:_(\d+))?/);
+  if (iosMatch) {
+    return { name: "webkit", version: parseVersion(iosMatch[1], iosMatch[2]) };
+  }
 
-  // Firefox detection (Gecko engine)
-  const firefoxMatch = ua.match(/Firefox\/(\d+)/);
+  const firefoxMatch = ua.match(/\bFirefox\/(\d+)(?:\.(\d+))?/);
   if (firefoxMatch) {
-    browser.name = "firefox";
-    browser.version = parseInt(firefoxMatch[1]);
-    return browser;
+    return {
+      name: "firefox",
+      version: parseVersion(firefoxMatch[1], firefoxMatch[2]),
+    };
   }
 
-  // Safari detection (WebKit engine, but not Chromium-based)
-  const safariMatch = ua.match(/Version\/(\d+).*Safari/);
-  if (safariMatch && !ua.includes("Chrome")) {
-    browser.name = "safari";
-    browser.version = parseInt(safariMatch[1]);
-    return browser;
-  }
-
-  // Chromium-based browsers (Chrome, Edge, Opera, Brave, etc.)
-  // This catches Chrome, modern Edge, Opera, and other Chromium-based browsers
-  const chromeMatch = ua.match(/Chrome\/(\d+)/);
+  // Chromium-based browsers (Chrome, Edge, Opera, Brave, Samsung Internet,
+  // Android webviews) all carry the Chromium version as Chrome/<version>
+  const chromeMatch = ua.match(/\bChrome\/(\d+)(?:\.(\d+))?/);
   if (chromeMatch) {
-    browser.name = "chromium";
-    browser.version = parseInt(chromeMatch[1]);
-    return browser;
+    return {
+      name: "chromium",
+      version: parseVersion(chromeMatch[1], chromeMatch[2]),
+    };
   }
 
-  return browser;
+  // Safari on macOS (and iPadOS's desktop UA): Version/<x.y> ... Safari
+  const safariMatch = ua.match(/\bVersion\/(\d+)(?:\.(\d+))?.*\bSafari\//);
+  if (safariMatch) {
+    return {
+      name: "webkit",
+      version: parseVersion(safariMatch[1], safariMatch[2]),
+    };
+  }
+
+  return { name: "unknown", version: [0, 0] };
+}
+
+// Search engine crawlers and link preview fetchers: the accessible page shows
+// them the CV as text instead of a PDF inside an iframe (the same content, so
+// it isn't cloaking). Named bots, plus the "<name>bot/<version>" convention;
+// not a bare "bot", which phone names such as "CUBOT" contain.
+const BOT_PATTERN =
+  /googlebot|google-inspectiontool|bingbot|yandex(?:bot|images)|baiduspider|duckduckbot|slurp|applebot|petalbot|facebookexternalhit|linkedinbot|twitterbot|telegrambot|slackbot|discordbot|whatsapp|skypeuripreview|[a-z](?:bot|crawler|spider)\/\d/i;
+
+/**
+ * Check if a user agent is a known crawler or link preview bot
+ * @param {string} ua
+ * @returns {boolean}
+ */
+function isBot(ua) {
+  return BOT_PATTERN.test(ua);
 }
 
 /**
- * Check if browser version meets minimum requirements
- * Based on official PDF.js compatibility requirements
+ * Check if a browser meets the minimum version for the viewer
+ * @param {{name: string, version: number[]}} browser
+ * @returns {boolean}
  */
 function isVersionSupported(browser) {
-  const minVersions = {
-    // Based on PDF.js official documentation (legacy build requirements)
-    chromium: 110, // Chrome 110+ covers Chrome, Edge, Opera, and other Chromium-based browsers
-    firefox: 78, // Firefox ESR+
-    safari: 16, // Safari 16.4+ (using 16 as safe minimum)
-  };
-
-  const minVersion = minVersions[browser.name] || 999;
-  return browser.version >= minVersion;
+  const minVersion = MIN_VERSIONS[browser.name];
+  if (!minVersion) {
+    return false;
+  }
+  const [major, minor] = browser.version;
+  return (
+    major > minVersion[0] || (major === minVersion[0] && minor >= minVersion[1])
+  );
 }
 
 /**
- * Test Web Worker capability more thoroughly
+ * Test that a Web Worker can actually be created (more reliable than just
+ * checking that the constructor exists)
+ * @param {Window} env
+ * @returns {boolean}
  */
-function testWebWorkerCapability() {
+function testWebWorkerCapability(env) {
   try {
-    // Test if we can create a simple web worker
     const testScript = 'self.postMessage("test");';
-    const blob = new Blob([testScript], { type: "application/javascript" });
-    const worker = new Worker(URL.createObjectURL(blob));
+    const blob = new env.Blob([testScript], { type: "application/javascript" });
+    const url = env.URL.createObjectURL(blob);
+    const worker = new env.Worker(url);
 
     // Clean up immediately
     worker.terminate();
-    URL.revokeObjectURL(worker);
+    env.URL.revokeObjectURL(url);
 
     return true;
   } catch {
@@ -106,4 +119,36 @@ function testWebWorkerCapability() {
   }
 }
 
-export { detectPDFjsCapabilities };
+/**
+ * Check whether this browser can run the pdf.js viewer
+ * @param {Window} env the window (a stand-in in tests)
+ * @returns {boolean}
+ */
+function detectPDFjsCapabilities(env = window) {
+  if (
+    !env.Worker ||
+    !env.ArrayBuffer ||
+    !env.Uint8Array ||
+    !env.Promise ||
+    !env.fetch ||
+    !env.URL ||
+    !env.Blob
+  ) {
+    return false;
+  }
+
+  const ua = env.navigator?.userAgent ?? "";
+  if (isBot(ua) || !isVersionSupported(getBrowserInfo(ua))) {
+    return false;
+  }
+
+  return testWebWorkerCapability(env);
+}
+
+export {
+  MIN_VERSIONS,
+  detectPDFjsCapabilities,
+  getBrowserInfo,
+  isBot,
+  isVersionSupported,
+};
