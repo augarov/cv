@@ -136,7 +136,7 @@ RENDERER = $(ENTER_RENDERER_DIR) && \
 .PHONY: all help \
         render-typst render-web \
         build-cv build-pdf build-website build-website-from-bundle build-release \
-        test-renderer \
+        test-renderer test-website-unit \
         install-deps-node install-deps-python install-deps-node-frozen \
         preview-website-prod preview-website-dev \
         clear-cv clear-deps-node clear-deps-python clear-all \
@@ -161,6 +161,7 @@ help :
 	$(PRINT_TARGET_HELP)   "build-website-from-bundle"   "build website from release bundle"
 	$(PRINT_TARGET_HELP)   "build-release"               "build the PDF and the website bundle"
 	$(PRINT_TARGET_HELP)   "test-renderer"               "run tests for renderer"
+	$(PRINT_TARGET_HELP)   "test-website-unit"           "run unit tests of the website scripts"
 	$(PRINT_TARGET_HELP)   "install-deps-node"           "install Node.js dependencies"
 	$(PRINT_TARGET_HELP)   "install-deps-node-frozen"    "install Node.js dependencies (frozen)"
 	$(PRINT_TARGET_HELP)   "install-deps-python"         "install Python dependencies with Poetry"
@@ -192,6 +193,9 @@ validate-pre-commit : $(PYTHON_DEPS_MARKER) $(MODULES_MARKER)
 
 test-renderer : $(PYTHON_DEPS_MARKER)
 	$(ENTER_RENDERER_DIR) && poetry run pytest
+
+test-website-unit : $(MODULES_MARKER)
+	$(ENTER_WEBSITE_DIR) && pnpm run test:unit
 
 install-deps-node : $(MODULES_MARKER)
 

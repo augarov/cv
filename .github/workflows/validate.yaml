@@ -52,3 +52,7 @@ jobs:
       - name: ✅ Run tests ✅
         run: |
           make test-renderer
+
+      - name: ✅ Run website unit tests ✅
+        run: |
+          make test-website-unit
