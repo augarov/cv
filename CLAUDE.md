@@ -32,7 +32,7 @@ make validate-pre-commit      # run pre-commit on all files
 ```
 
 - `make all CV_DIR=local/<name>` builds the CV in another folder (default `cv`). `local/` is ignored by git: CVs there never go into the repo.
-- `SOURCE_DATE_EPOCH` sets the build date of the PDF and the website (an explicit `settings.current_date` wins). The Makefile sets it to the last commit that changed `CV_DIR`, or leaves it empty (today) while `CV_DIR` has uncommitted changes. The same inputs and date give byte-identical `build/pdf/` and `build/web/` files (not the release tarball, whose gzip header and file times differ).
+- `SOURCE_DATE_EPOCH` sets the build date of the PDF and the website (an explicit `settings.current_date` wins). The Makefile sets it to the last commit that changed `CV_DIR`, or leaves it empty (today) while `CV_DIR` has uncommitted changes. Before stage 1 renders, make prints which date it uses and why (a `::notice` annotation in GitHub Actions). The same inputs and date give byte-identical `build/pdf/` and `build/web/` files (not the release tarball, whose gzip header and file times differ).
 - `make help` lists all targets.
 
 Run a single Python test:

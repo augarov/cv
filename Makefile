@@ -54,6 +54,19 @@ unexport SOURCE_DATE_EPOCH
 # stage 1 rebuilds; the rule below writes it again.
 BUILD_PARAMS := $(CV_PATH) $(or $(SOURCE_DATE_EPOCH),$(shell date +%Y-%m-%d))
 
+# The build date, shown once per run before stage 1 renders; a notice in GitHub
+# Actions. `date -d` is GNU, `date -r` BSD (macOS).
+comma := ,
+EPOCH_DATE = $(shell date -u -d @$(SOURCE_DATE_EPOCH) +%F 2>/dev/null || \
+	date -u -r $(SOURCE_DATE_EPOCH) +%F)
+BUILD_DATE_MESSAGE = $(if $(SOURCE_DATE_EPOCH), \
+	SOURCE_DATE_EPOCH=$(SOURCE_DATE_EPOCH) ($(EPOCH_DATE) UTC$(comma) \
+	$(if $(filter file,$(origin SOURCE_DATE_EPOCH)),last commit to $(CV_DIR),set explicitly)), \
+	SOURCE_DATE_EPOCH not set: the build date is today \
+	($(if $(CV_DIRTY),$(CV_DIR) has uncommitted changes,no commit has changed $(CV_DIR))))
+show_build_date = $(if $(BUILD_DATE_SHOWN),,$(eval BUILD_DATE_SHOWN := 1)$(info \
+	$(if $(GITHUB_ACTIONS),::notice title=Build date::)$(strip $(BUILD_DATE_MESSAGE))))
+
 # Source files from git (tracked and untracked, not ignored), so a change to the
 # renderer or the site rebuilds what depends on it. Deleted files are dropped.
 git_files = $(wildcard $(shell git ls-files --cached --others --exclude-standard -- $(1)))
@@ -232,7 +245,7 @@ $(BUILD_PARAMS_STAMP) :
 # ── Stage 1: PDF ──────────────────────────────────────────────────────────
 
 $(OUT_TYP) : $(CV_INPUTS) $(RENDERER_STAMP) $(BUILD_PARAMS_STAMP)
-	$(RENDERER) typst $(CV_INPUT_FLAGS) --output $@
+	$(show_build_date)$(RENDERER) typst $(CV_INPUT_FLAGS) --output $@
 
 $(OUT_PDF) : $(OUT_TYP) $(RENDERER_STAMP)
 	$(RENDERER) pdf --input $< --output $@
@@ -242,7 +255,7 @@ $(OUT_PDF) : $(OUT_TYP) $(RENDERER_STAMP)
 # $(1) = template, $(2) = output
 define WEB_RULE
 $(2) : $(1) $(CV_INPUTS) $(WEBSITE_YAML) $(RENDERER_STAMP) $(BUILD_PARAMS_STAMP)
-	$$(RENDERER) web $$(CV_INPUT_FLAGS) --website $$(WEBSITE_YAML) --template $$< --output $$@
+	$$(show_build_date)$$(RENDERER) web $$(CV_INPUT_FLAGS) --website $$(WEBSITE_YAML) --template $$< --output $$@
 endef
 $(eval $(call WEB_RULE,$(WEB_TEMPLATES_DIR)/index.html.j2,$(WEB_OUT_DIR)/index.html))
 $(eval $(call WEB_RULE,$(WEB_TEMPLATES_DIR)/sitemap.xml.j2,$(WEB_OUT_DIR)/public/sitemap.xml))
