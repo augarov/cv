@@ -62,17 +62,17 @@ const USER_AGENTS = [
     true,
   ],
   [
-    "Chrome 123 (minimum)",
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.6312.58 Safari/537.36",
+    "Chrome 125 (minimum)",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.6422.60 Safari/537.36",
     "chromium",
-    [123, 0],
+    [125, 0],
     true,
   ],
   [
-    "Chrome 122 (below)",
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.6261.112 Safari/537.36",
+    "Chrome 124 (below)",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.6367.91 Safari/537.36",
     "chromium",
-    [122, 0],
+    [124, 0],
     false,
   ],
   [
@@ -92,30 +92,30 @@ const USER_AGENTS = [
   // Firefox
   [
     "Firefox, Windows",
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:144.0) Gecko/20100101 Firefox/144.0",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:156.0) Gecko/20100101 Firefox/156.0",
     "firefox",
-    [144, 0],
+    [156, 0],
     true,
   ],
   [
     "Firefox, Android",
-    "Mozilla/5.0 (Android 14; Mobile; rv:144.0) Gecko/144.0 Firefox/144.0",
+    "Mozilla/5.0 (Android 14; Mobile; rv:156.0) Gecko/156.0 Firefox/156.0",
     "firefox",
-    [144, 0],
+    [156, 0],
     true,
   ],
   [
-    "Firefox 120 (minimum)",
-    "Mozilla/5.0 (X11; Linux x86_64; rv:120.0) Gecko/20100101 Firefox/120.0",
+    "Firefox ESR 153 (minimum)",
+    "Mozilla/5.0 (X11; Linux x86_64; rv:153.0) Gecko/20100101 Firefox/153.0",
     "firefox",
-    [120, 0],
+    [153, 0],
     true,
   ],
   [
-    "Firefox ESR 115 (below)",
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:115.0) Gecko/20100101 Firefox/115.0",
+    "Firefox ESR 140 (below)",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:140.0) Gecko/20100101 Firefox/140.0",
     "firefox",
-    [115, 0],
+    [140, 0],
     false,
   ],
   // WebKit
@@ -127,17 +127,17 @@ const USER_AGENTS = [
     true,
   ],
   [
-    "Safari 17.5 (minimum)",
-    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Safari/605.1.15",
+    "Safari 18.0 (minimum)",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Safari/605.1.15",
     "webkit",
-    [17, 5],
+    [18, 0],
     true,
   ],
   [
-    "Safari 17.4 (below, minor version counts)",
-    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4.1 Safari/605.1.15",
+    "Safari 17.6 (below)",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.6 Safari/605.1.15",
     "webkit",
-    [17, 4],
+    [17, 6],
     false,
   ],
   [
@@ -155,10 +155,10 @@ const USER_AGENTS = [
     true,
   ],
   [
-    "iPhone iOS 17.4 (below)",
-    "Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Mobile/15E148 Safari/604.1",
+    "iPhone iOS 17.7 (below)",
+    "Mozilla/5.0 (iPhone; CPU iPhone OS 17_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.7 Mobile/15E148 Safari/604.1",
     "webkit",
-    [17, 4],
+    [17, 7],
     false,
   ],
   [
@@ -191,9 +191,9 @@ const USER_AGENTS = [
   ],
   [
     "Edge, iPad (EdgiOS)",
-    "Mozilla/5.0 (iPad; CPU OS 17_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 EdgiOS/141.0.3537.71 Mobile/15E148 Safari/605.1.15",
+    "Mozilla/5.0 (iPad; CPU OS 18_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 EdgiOS/141.0.3537.71 Mobile/15E148 Safari/605.1.15",
     "webkit",
-    [17, 6],
+    [18, 6],
     true,
   ],
   [
@@ -282,17 +282,24 @@ describe("isBot", () => {
 });
 
 describe("MIN_VERSIONS", () => {
-  it("covers native light-dark() support (custom.css, the theme switch)", () => {
+  it("the targets of the pdf.js 6.4 legacy build", () => {
     assert.deepEqual(MIN_VERSIONS, {
-      chromium: [123, 0],
-      firefox: [120, 0],
-      webkit: [17, 5],
+      chromium: [125, 0],
+      firefox: [153, 0],
+      webkit: [18, 0],
     });
   });
 
-  it("a newer major with a smaller minor is supported", () => {
+  it("an older major with a larger minor is below", () => {
     assert.equal(
-      isVersionSupported({ name: "webkit", version: [18, 0] }),
+      isVersionSupported({ name: "webkit", version: [17, 9] }),
+      false,
+    );
+  });
+
+  it("a newer minor of the minimum major is supported", () => {
+    assert.equal(
+      isVersionSupported({ name: "webkit", version: [18, 1] }),
       true,
     );
   });
@@ -321,7 +328,7 @@ function fakeWindow(overrides = {}) {
     },
     navigator: {
       userAgent:
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:144.0) Gecko/20100101 Firefox/144.0",
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:156.0) Gecko/20100101 Firefox/156.0",
     },
     ...overrides,
   };

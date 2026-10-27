@@ -51,7 +51,10 @@
     // options below
     setOption(options, "disablePreferences", true);
     setOption(options, "workerSrc", "../build/pdf.worker.min.mjs");
-    setOption(options, "sandboxBundleSrc", "../build/pdf.sandbox.min.mjs");
+    // No JavaScript from PDFs: the CV has none, and it closes CVE-2026-16633
+    // (GHSA-hq66-cqwq-w95j, a malicious PDF runs script on this origin; fixed
+    // in pdf.js 6.2.108). Without scripting the sandbox is never loaded.
+    setOption(options, "enableScripting", false);
     // The views manager (sidebar) is hidden: never open it for a PDF's page mode
     setOption(options, "sidebarViewOnLoad", 0); // SidebarView.NONE
     const locale = params.get("locale");
