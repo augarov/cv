@@ -10,7 +10,7 @@ A CV/résumé build. The CV data is in [rendercv](https://github.com/rendercv/re
 
 All orchestration goes through `make`. Prefer `make` targets over direct `poetry run`, `pnpm`, or `pre-commit` invocations. Python deps require Poetry inside a venv (`.venv`); Node deps use pnpm inside `gh-pages/`.
 
-Prefer `make all` for full builds rather than running individual targets. Use `make clear-cv` to remove the build outputs before a clean rebuild. Use `make test-renderer` (unit tests) and `make test-renderer-integration` to run Python tests rather than invoking `poetry run pytest` directly.
+Prefer `make all` for full builds rather than running individual targets. Use `make clear-cv` to remove the build outputs before a clean rebuild. Use `make test-renderer` (all), `make test-renderer-unit` or `make test-renderer-integration` to run Python tests rather than invoking `poetry run pytest` directly.
 
 ```bash
 make install-deps-python      # set up .venv and install Poetry deps
@@ -27,7 +27,8 @@ make clear-cv                 # remove build/ and the copies in gh-pages/
 make preview-website-dev      # start Vite dev server
 make preview-website-prod     # preview the built site
 
-make test-renderer            # run Python unit tests (tests/unit/, on the fixtures)
+make test-renderer            # run all Python tests: unit, then integration
+make test-renderer-unit       # Python unit tests (tests/unit/, on the fixtures)
 make test-renderer-integration # whole builds through the CLI (tests/integration/): cv/, local/*/, reproducibility
 make validate-pre-commit      # run pre-commit on all files
 ```
