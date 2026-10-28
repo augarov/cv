@@ -160,6 +160,8 @@ __pycache__/
 build/
 develop-eggs/
 dist/
+# Tests of the built website, not a build
+!/gh-pages/tests/dist/
 downloads/
 eggs/
 .eggs/

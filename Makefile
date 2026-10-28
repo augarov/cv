@@ -136,7 +136,7 @@ RENDERER = $(ENTER_RENDERER_DIR) && \
 .PHONY: all help \
         render-typst render-web \
         build-cv build-pdf build-website build-website-from-bundle build-release \
-        test-renderer test-renderer-integration test-website-unit \
+        test-renderer test-renderer-integration test-website-unit test-website-dist test-website-dist-from-bundle \
         install-deps-node install-deps-python install-deps-node-frozen \
         preview-website-prod preview-website-dev \
         clear-cv clear-deps-node clear-deps-python clear-all \
@@ -163,6 +163,8 @@ help :
 	$(PRINT_TARGET_HELP)   "test-renderer"               "run unit tests of the renderer (fixtures)"
 	$(PRINT_TARGET_HELP)   "test-renderer-integration"   "build cv/, local/*/ and the fixtures end to end"
 	$(PRINT_TARGET_HELP)   "test-website-unit"           "run unit tests of the website scripts"
+	$(PRINT_TARGET_HELP)   "test-website-dist"           "check the built website files in gh-pages/dist"
+	$(PRINT_TARGET_HELP)   "test-website-dist-from-bundle" "check the website built from the release bundle"
 	$(PRINT_TARGET_HELP)   "install-deps-node"           "install Node.js dependencies"
 	$(PRINT_TARGET_HELP)   "install-deps-node-frozen"    "install Node.js dependencies (frozen)"
 	$(PRINT_TARGET_HELP)   "install-deps-python"         "install Python dependencies with Poetry"
@@ -201,6 +203,14 @@ test-renderer-integration : $(PYTHON_DEPS_MARKER)
 
 test-website-unit : $(MODULES_MARKER)
 	$(ENTER_WEBSITE_DIR) && pnpm run test:unit
+
+# Checks the files in gh-pages/dist/ (no server, no browser)
+test-website-dist : $(WEBSITE_BUILD_MARKER) $(MODULES_MARKER)
+	$(ENTER_WEBSITE_DIR) && pnpm run test:dist
+
+# CI: the same checks on the website built from the release bundle
+test-website-dist-from-bundle : $(WEBSITE_BUILD_FROM_BUNDLE_MARKER) $(MODULES_FROZEN_MARKER)
+	$(ENTER_WEBSITE_DIR) && pnpm run test:dist
 
 install-deps-node : $(MODULES_MARKER)
 

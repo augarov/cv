@@ -12,7 +12,9 @@
     "eslint": "^9.39.5",
     "globals": "^16.5.0",
     "html-minifier-terser": "^7.2.0",
+    "html-validate": "^11.17.0",
     "htmlhint": "^1.9.2",
+    "pngjs": "^7.0.0",
     "prettier": "^3.9.10",
     "stylelint": "^16.26.1",
     "stylelint-config-standard": "^39.0.1",
@@ -25,6 +27,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "test:unit": "node --test \"tests/unit/*.test.js\"",
+    "test:dist": "node --test \"tests/dist/*.test.js\"",
     "clean": "rm -rf dist"
   }
 }
