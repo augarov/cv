@@ -167,13 +167,16 @@ class TestPhoneDisplay:
     @pytest.mark.parametrize(
         "number_format, expected",
         [
-            ("national", "044 123 45 67"),
-            ("international", "+41 44 123 45 67"),
+            ("national", "044\u00a0123\u00a045\u00a067"),
+            ("international", "+41\u00a044\u00a0123\u00a045\u00a067"),
             ("E164", "+41441234567"),
         ],
     )
     def test_follows_design(self, tmp_path, number_format, expected):
-        """Test that the number shows like in the PDF header, without tel:."""
+        """Test that the number shows like in the PDF header, without tel:.
+
+        Spaces are non-breaking, so the number doesn't wrap.
+        """
         design = tmp_path / "design.yaml"
         design.write_text(
             "design:\n  theme: classic\n  header:\n    connections:\n"
