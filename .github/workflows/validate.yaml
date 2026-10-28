@@ -28,8 +28,15 @@ jobs:
         uses: actions/setup-node@v7
         with:
           node-version: "22"
-          cache: "pnpm"
-          cache-dependency-path: gh-pages/pnpm-lock.yaml
+
+      # The store itself, not setup-node's pnpm cache: setup-node asks pnpm for
+      # the store from the repo root, where storeDir in gh-pages/ doesn't apply
+      - name: Cache pnpm store
+        uses: actions/cache@v6
+        with:
+          path: .pnpm-store
+          key: pnpm-store-${{ runner.os }}-${{ hashFiles('gh-pages/pnpm-lock.yaml') }}
+          restore-keys: pnpm-store-${{ runner.os }}-
 
       - name: 🐍 Set up Python 🐍
         uses: actions/setup-python@v7
