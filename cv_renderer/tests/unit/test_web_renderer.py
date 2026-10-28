@@ -5,12 +5,10 @@ import re
 from datetime import date
 from html.parser import HTMLParser
 from pathlib import Path
-from urllib.parse import urlparse
 from xml.etree import ElementTree
 
 import jinja2
 import pytest
-from PIL import Image
 
 from cv_renderer.inputs import InputError, load_cv, load_website
 from cv_renderer.web_renderer import make_web_environment, render_web
@@ -145,10 +143,6 @@ class TestTemplateErrorLine:
 
 
 TEMPLATES = Path(__file__).parents[3] / "templates" / "web"
-SITE = Path(__file__).parents[3] / "gh-pages"
-# Website files rendered by stage 1 rather than kept in gh-pages/ (the
-# Makefile's WEB_FILES), relative to the site root
-RENDERED_SITE_FILES = {"img/favicon/site.webmanifest", "cv.pdf", "sitemap.xml"}
 
 
 def _render(tmp_path, template, cv="cv_full.yaml", website="website_full.yaml"):
@@ -201,22 +195,6 @@ def _meta(head, key, value):
     return [
         a.get("content") for t, a in head.tags if t == "meta" and a.get(key) == value
     ]
-
-
-def _site_file(path):
-    """Return whether a root-relative site path is a file of the website."""
-    relative = path.lstrip("/")
-    return (
-        relative in RENDERED_SITE_FILES
-        or (SITE / relative).is_file()
-        or (SITE / "public" / relative).is_file()
-    )
-
-
-def _image_size(path):
-    """Return the width and height of an image file."""
-    with Image.open(path) as image:
-        return image.size
 
 
 class TestIndexHtml:
@@ -433,27 +411,24 @@ class TestIndexHead:
         assert _meta(head, "name", "twitter:card") == ["summary"]
 
     def test_preview_image_size(self, head):
-        """Test that og:image's width and height match the image."""
-        path = urlparse(_meta(head, "property", "og:image")[0]).path
-        image = SITE / "public" / path.removeprefix("/cv/")
+        """Test that og:image has a width and a height (layer 3a checks the file)."""
+        assert _meta(head, "property", "og:image:width") == ["512"]
+        assert _meta(head, "property", "og:image:height") == ["512"]
 
-        assert _image_size(image) == (
-            int(_meta(head, "property", "og:image:width")[0]),
-            int(_meta(head, "property", "og:image:height")[0]),
-        )
+    def test_local_links_are_root_relative(self, head):
+        """Test that local hrefs / srcs start with /, so Vite adds the base.
 
-    def test_local_links_exist(self, head):
-        """Test that every root-relative href / src is a file of the website."""
+        That they are files of the site is checked on the build (layer 3a).
+        """
         paths = [
-            a.get("href") or a.get("src")
+            a.get("href") or a.get("src", "")
             for t, a in head.tags
             if t in ("link", "script")
-            and (a.get("href") or a.get("src", "")).startswith("/")
-            and not (a.get("href") or "").startswith("//")
+            and not re.match(r"[a-z]+:|//", a.get("href") or a.get("src", ""))
         ]
 
         assert paths  # icons, manifest, stylesheet, script
-        assert [p for p in paths if not _site_file(p)] == []
+        assert [p for p in paths if not p.startswith("/")] == []
 
     def test_icons(self, head):
         """Test the favicon, apple-touch-icon and manifest links."""
@@ -463,17 +438,13 @@ class TestIndexHead:
         assert ("icon", "/img/favicon/favicon.ico") in links
         assert ("apple-touch-icon", "/img/favicon/apple-touch-icon.png") in links
         assert ("manifest", "/img/favicon/site.webmanifest") in links
-        assert _image_size(SITE / "public/img/favicon/apple-touch-icon.png") == (
-            180,
-            180,
-        )
 
     def test_no_obsolete_shortcut_icon(self, head):
         """Test that no link uses rel="shortcut icon" (rel="icon" since HTML5)."""
         assert [a for t, a in head.tags if "shortcut" in a.get("rel", "")] == []
 
     def test_ico_sizes_attribute(self, head):
-        """Test that the .ico link has sizes, and the .ico holds that size.
+        """Test that the .ico link has sizes.
 
         Without sizes, Chrome may pick the .ico over the SVG.
         """
@@ -483,8 +454,6 @@ class TestIndexHead:
             if t == "link" and a.get("href", "").endswith(".ico")
         ]
         assert sizes == ["32x32"]
-        with Image.open(SITE / "public/img/favicon/favicon.ico") as ico:
-            assert (32, 32) in ico.info["sizes"]
 
     def test_minimal_has_every_required_tag(self, minimal_head):
         """Test that a bare website.yaml still gives the tags with defaults."""
@@ -508,37 +477,6 @@ class TestIndexHead:
         assert _meta(_head(html), "name", "description") == ["Fast & <safe>"]
         assert 'content="Fast &amp; &lt;safe&gt;"' in html
         assert manifest["description"] == "Fast & <safe>"
-
-
-ICONS = SITE / "public" / "img" / "favicon"
-
-
-class TestIconFiles:
-    """Test cases for the icon files the page and the manifest link to."""
-
-    def test_svg_has_viewbox(self):
-        """Test that favicon.svg has a viewBox matching its size, so it scales."""
-        root = ElementTree.parse(ICONS / "favicon.svg").getroot()
-
-        assert root.get("viewBox") == f"0 0 {root.get('width')} {root.get('height')}"
-
-    def test_ico_has_small_sizes(self):
-        """Test that favicon.ico holds 16, 32 and 48 px for tabs and HiDPI tabs."""
-        with Image.open(ICONS / "favicon.ico") as ico:
-            assert {(16, 16), (32, 32), (48, 48)} <= ico.info["sizes"]
-
-    @pytest.mark.parametrize(
-        "name", sorted(p.name for p in ICONS.glob("*.png")), ids=str
-    )
-    def test_png_icons_are_opaque(self, name):
-        """Test that no icon has transparent pixels.
-
-        iOS shows transparent pixels of the apple-touch-icon as black, and a
-        maskable icon must fill its whole square.
-        """
-        with Image.open(ICONS / name) as image:
-            alpha = image.convert("RGBA").getchannel("A")
-            assert alpha.getextrema() == (255, 255)
 
 
 class TestWebmanifest:
@@ -583,7 +521,7 @@ class TestWebmanifest:
         )
 
     def test_icons(self, manifest):
-        """Test a 192 and a 512 icon for both purposes, matching the files."""
+        """Test a 192 and a 512 icon for both purposes (layer 3a checks the files)."""
         icons = {(i["sizes"], i["purpose"]) for i in manifest["icons"]}
 
         assert icons == {
@@ -595,9 +533,6 @@ class TestWebmanifest:
         for icon in manifest["icons"]:
             assert icon["type"] == "image/png"
             assert icon["src"].startswith(manifest["scope"])
-            path = SITE / "public" / icon["src"].removeprefix(manifest["scope"])
-            width, height = _image_size(path)
-            assert f"{width}x{height}" == icon["sizes"]
 
     def test_non_ascii_title(self, tmp_path):
         """Test that a non-ASCII title stays valid JSON with the same text."""
