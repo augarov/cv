@@ -68,6 +68,16 @@ jobs:
         run: |
           make build-release
 
+      # The release action only creates a missing tag and never moves one, so
+      # the release's commit and source archives would stay at its first run
+      - name: Point the release tag at this commit
+        if: github.event_name != 'pull_request'
+        env:
+          RELEASE_TAG: ${{ inputs.release_tag || 'cv-latest' }}
+        run: |
+          git tag --force "${RELEASE_TAG}"
+          git push --force origin "refs/tags/${RELEASE_TAG}"
+
       - name: Upload files to release
         if: github.event_name != 'pull_request'
         uses: svenstaro/upload-release-action@v2
