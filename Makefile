@@ -136,7 +136,7 @@ RENDERER = $(ENTER_RENDERER_DIR) && \
 .PHONY: all help \
         render-typst render-web \
         build-cv build-pdf build-website build-website-from-bundle build-release \
-        test-renderer test-renderer-integration test-website-unit test-website-dist test-website-dist-from-bundle \
+        test-renderer test-renderer-unit test-renderer-integration test-website-unit test-website-dist test-website-dist-from-bundle \
         install-deps-node install-deps-python install-deps-node-frozen \
         preview-website-prod preview-website-dev \
         clear-cv clear-deps-node clear-deps-python clear-all \
@@ -160,7 +160,8 @@ help :
 	$(PRINT_TARGET_HELP)   "build-website"               "build website"
 	$(PRINT_TARGET_HELP)   "build-website-from-bundle"   "build website from release bundle"
 	$(PRINT_TARGET_HELP)   "build-release"               "build the PDF and the website bundle"
-	$(PRINT_TARGET_HELP)   "test-renderer"               "run unit tests of the renderer (fixtures)"
+	$(PRINT_TARGET_HELP)   "test-renderer"               "run all tests of the renderer (unit and integration)"
+	$(PRINT_TARGET_HELP)   "test-renderer-unit"          "run unit tests of the renderer (fixtures)"
 	$(PRINT_TARGET_HELP)   "test-renderer-integration"   "build cv/, local/*/ and the fixtures end to end"
 	$(PRINT_TARGET_HELP)   "test-website-unit"           "run unit tests of the website scripts"
 	$(PRINT_TARGET_HELP)   "test-website-dist"           "check the built website files in gh-pages/dist"
@@ -194,7 +195,10 @@ build-release : $(RELEASE_OUTPUTS)
 validate-pre-commit : $(PYTHON_DEPS_MARKER) $(MODULES_MARKER)
 	$(ACTIVATE_VENV) && pre-commit run --all-files
 
-test-renderer : $(PYTHON_DEPS_MARKER)
+test-renderer : test-renderer-unit test-renderer-integration
+
+# One module at a time, on the fixtures
+test-renderer-unit : $(PYTHON_DEPS_MARKER)
 	$(ENTER_RENDERER_DIR) && poetry run pytest tests/unit
 
 # Whole builds through the CLI: every real CV (cv/, local/*/) and reproducibility

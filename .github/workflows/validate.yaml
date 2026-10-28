@@ -49,9 +49,9 @@ jobs:
         run: |
           make validate-pre-commit
 
-      - name: ✅ Run tests ✅
+      - name: ✅ Run unit tests ✅
         run: |
-          make test-renderer
+          make test-renderer-unit
 
       - name: ✅ Run integration tests ✅
         run: |
