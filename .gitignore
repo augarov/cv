@@ -49,6 +49,8 @@ build/Release
 
 # Dependency directories
 node_modules/
+# pnpm's store for this repo (gh-pages/pnpm-workspace.yaml)
+/.pnpm-store/
 jspm_packages/
 
 # Snowpack dependency directory (https://snowpack.dev/)
