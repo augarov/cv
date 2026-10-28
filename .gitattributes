@@ -8,8 +8,6 @@
 *.woff filter=lfs diff=lfs merge=lfs -text
 *.woff2 filter=lfs diff=lfs merge=lfs -text
 *.pfb filter=lfs diff=lfs merge=lfs -text
-# Templates
-*.ftl filter=lfs diff=lfs merge=lfs -text
 # WebAssembly
 *.wasm filter=lfs diff=lfs merge=lfs -text
 # ICC Profiles
