@@ -80,13 +80,14 @@ def phone_display(phone: str, design: Design) -> str:
     """Format a ``tel:`` phone the way the PDF header does.
 
     rendercv stores phones as RFC 3966 ``tel:`` URIs and formats them with
-    ``design.header.connections.phone_number_format``.
+    ``design.header.connections.phone_number_format``. Spaces are non-breaking,
+    so the number never wraps.
     """
     number_format = design.header.connections.phone_number_format.upper()
     return phonenumbers.format_number(
         phonenumbers.parse(phone, None),
         getattr(phonenumbers.PhoneNumberFormat, number_format),
-    )
+    ).replace(" ", "\u00a0")
 
 
 def as_list(value: T | list[T] | None) -> list[T]:

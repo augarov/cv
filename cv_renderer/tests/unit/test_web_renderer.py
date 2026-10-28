@@ -308,9 +308,9 @@ class TestIndexHtml:
         assert 'href="tel:+41-44-123-45-67"' in html
         assert "tel:tel:" not in html
         assert (
-            '<a href="tel:+41-44-123-45-67" class="contactLink">044 123 45 67</a>'
-            in (html)
-        )
+            '<a href="tel:+41-44-123-45-67" class="contactLink">'
+            "044\u00a0123\u00a045\u00a067</a>"
+        ) in html
 
     def test_social_links(self, html):
         """Test that social links use rendercv's URL for each network."""
@@ -337,6 +337,25 @@ class TestIndexHtml:
         """Test that every skill label is shown."""
         assert '<h3 class="skillCategoryName">Programming</h3>' in html
         assert '<h3 class="skillCategoryName">Tools</h3>' in html
+
+    def test_pdf_links_work_without_javascript(self, html):
+        """Test that the download links have the PDF's URL before main.js runs."""
+        assert re.search(
+            r'<a id="cvDownloadButton" href="https://cdn\.example\.org/jane\.pdf"', html
+        )
+        assert re.search(
+            r'<a id="cvOpenInNewTabButton" href="https://cdn\.example\.org/jane\.pdf"',
+            html,
+        )
+
+    def test_viewer_iframe(self, html):
+        """Test that the iframe has a title and no presentational attributes."""
+        iframe = re.search(r"<iframe[^>]*>", html)
+
+        assert iframe
+        assert 'title="' in iframe.group()
+        for attribute in ("width=", "height=", "frameborder="):
+            assert attribute not in iframe.group()
 
     def test_no_keywords_without_keywords(self, tmp_path):
         """Test that the keywords tag is left out when not set."""

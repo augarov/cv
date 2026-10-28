@@ -247,8 +247,7 @@
 <body>
     <!-- PDF Viewer (hidden by default) -->
     <div id="pdfViewerContainer" style="display: none;">
-        <iframe id="pdfViewerIframe" width="100%" height="100%" frameborder="0">
-        </iframe>
+        <iframe id="pdfViewerIframe" title="CV in a PDF viewer"></iframe>
     </div>
 
     {% set sections = cv.sections or {} %}
@@ -311,7 +310,7 @@
                 <p class="downloadDescription">Download or view the CV:</p>
                 <ul class="downloadOptions">
                     <li class="downloadOption">
-                        <a id="cvDownloadButton"{% if website.pdf_filename %} download="{{ website.pdf_filename }}"{% endif %}
+                        <a id="cvDownloadButton" href="{{ website.pdf_url }}"{% if website.pdf_filename %} download="{{ website.pdf_filename }}"{% endif %}
                             class="downloadLink downloadPdf">Download CV as PDF</a>
                     </li>
                     <li class="downloadOption">
