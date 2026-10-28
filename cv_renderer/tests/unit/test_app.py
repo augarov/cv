@@ -7,7 +7,7 @@ import pytest
 from cv_renderer.app import run
 from cv_renderer.app_params import make_parser
 
-FIXTURES = Path(__file__).parent / "fixtures"
+FIXTURES = Path(__file__).parents[1] / "fixtures"
 CV = str(FIXTURES / "cv_full.yaml")
 WEBSITE = str(FIXTURES / "website_full.yaml")
 

@@ -16,7 +16,7 @@ from cv_renderer.template_utils import (
     url_path,
 )
 
-FIXTURES = Path(__file__).parent / "fixtures"
+FIXTURES = Path(__file__).parents[1] / "fixtures"
 
 
 class TestUrlPath:

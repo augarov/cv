@@ -8,7 +8,7 @@ import pytest
 from cv_renderer.build_date import build_date, date_from_source_date_epoch
 from cv_renderer.inputs import load_cv
 
-FIXTURES = Path(__file__).parent / "fixtures"
+FIXTURES = Path(__file__).parents[1] / "fixtures"
 
 
 class TestDateFromSourceDateEpoch:

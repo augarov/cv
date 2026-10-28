@@ -6,7 +6,7 @@ import pytest
 
 from cv_renderer.app import run
 
-ROOT = Path(__file__).parents[2]
+ROOT = Path(__file__).parents[3]
 TEMPLATES = ROOT / "templates" / "web"
 OPTIONAL_INPUTS = ["design", "locale", "settings"]
 CV_DIRS = [ROOT / "cv"] + sorted(
@@ -14,7 +14,6 @@ CV_DIRS = [ROOT / "cv"] + sorted(
 )
 
 
-@pytest.mark.integration
 @pytest.mark.parametrize("cv_dir", CV_DIRS, ids=lambda d: str(d.relative_to(ROOT)))
 def test_cv_builds(cv_dir, tmp_path):
     """Test that the Typst source, the PDF and all web templates render."""
