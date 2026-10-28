@@ -82,6 +82,11 @@ jobs:
           ls -la downloads
           make build-website-from-bundle
 
+      # Before the upload: a failing check stops the deploy (and fails a PR)
+      - name: Test built website
+        run: |
+          make test-website-dist-from-bundle
+
       - name: Fix permissions
         run: |
           chmod -c -R +rX "gh-pages/dist" | while read -r line; do
