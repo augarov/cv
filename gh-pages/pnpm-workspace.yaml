@@ -1,2 +1,7 @@
 allowBuilds:
   esbuild: false
+
+# A store for this repo only, at the repo root (ignored by git), instead of the
+# shared one in the home folder: pnpm hard-links store files into
+# node_modules, so a shared store links every project on the machine
+storeDir: ../.pnpm-store
