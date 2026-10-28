@@ -25,7 +25,7 @@ from rendercv.schema.rendercv_model_builder import (
 
 from cv_renderer.inputs import load_cv
 
-FIXTURES = Path(__file__).parent / "fixtures"
+FIXTURES = Path(__file__).parents[1] / "fixtures"
 
 
 def _parameters(function):

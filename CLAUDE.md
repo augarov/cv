@@ -10,7 +10,7 @@ A CV/résumé build. The CV data is in [rendercv](https://github.com/rendercv/re
 
 All orchestration goes through `make`. Prefer `make` targets over direct `poetry run`, `pnpm`, or `pre-commit` invocations. Python deps require Poetry inside a venv (`.venv`); Node deps use pnpm inside `gh-pages/`.
 
-Prefer `make all` for full builds rather than running individual targets. Use `make clear-cv` to remove the build outputs before a clean rebuild. Use `make test-renderer` to run Python tests rather than invoking `poetry run pytest` directly.
+Prefer `make all` for full builds rather than running individual targets. Use `make clear-cv` to remove the build outputs before a clean rebuild. Use `make test-renderer` (unit tests) and `make test-renderer-integration` to run Python tests rather than invoking `poetry run pytest` directly.
 
 ```bash
 make install-deps-python      # set up .venv and install Poetry deps
@@ -27,7 +27,8 @@ make clear-cv                 # remove build/ and the copies in gh-pages/
 make preview-website-dev      # start Vite dev server
 make preview-website-prod     # preview the built site
 
-make test-renderer            # run Python tests
+make test-renderer            # run Python unit tests (tests/unit/, on the fixtures)
+make test-renderer-integration # whole builds through the CLI (tests/integration/): cv/, local/*/, reproducibility
 make validate-pre-commit      # run pre-commit on all files
 ```
 
@@ -38,7 +39,7 @@ make validate-pre-commit      # run pre-commit on all files
 Run a single Python test:
 
 ```bash
-. .venv/bin/activate && cd cv_renderer && poetry run pytest tests/test_template_utils.py::test_name -v
+. .venv/bin/activate && cd cv_renderer && poetry run pytest tests/unit/test_template_utils.py::test_name -v
 ```
 
 ## Architecture
@@ -90,7 +91,7 @@ The website renders the raw, validated model, not rendercv's processed one, and 
 
 ### rendercv as a dependency
 
-rendercv has no documented Python API, so every import from it is internal. It's pinned to `>=2.8,<2.9` (patch updates only); an upgrade is a deliberate step. Imports are limited to: `build_rendercv_dictionary` / `build_rendercv_model_from_commented_map` and `rendercv.exception` (`inputs.py`), `render_full_template` (`typst_renderer.py`), `get_package_path` (`pdf_builder.py`), `format_date_range` / `format_single_date` (`template_utils.py`), and the schema models for type hints. `tests/test_rendercv_contract.py` checks each of these, plus the model attributes the templates rely on (`SocialNetwork.url`, `cv.phone` as a `tel:` URI, `PublicationEntry.doi_url`). Add any new import or relied-on attribute there.
+rendercv has no documented Python API, so every import from it is internal. It's pinned to `>=2.8,<2.9` (patch updates only); an upgrade is a deliberate step. Imports are limited to: `build_rendercv_dictionary` / `build_rendercv_model_from_commented_map` and `rendercv.exception` (`inputs.py`), `render_full_template` (`typst_renderer.py`), `get_package_path` (`pdf_builder.py`), `format_date_range` / `format_single_date` (`template_utils.py`), and the schema models for type hints. `tests/unit/test_rendercv_contract.py` checks each of these, plus the model attributes the templates rely on (`SocialNetwork.url`, `cv.phone` as a `tel:` URI, `PublicationEntry.doi_url`). Add any new import or relied-on attribute there.
 
 ### Website (`gh-pages/`)
 
@@ -104,6 +105,6 @@ Vite-based static site. Receives the rendered files from `build/web/` before the
 
 ## Adding a website filter
 
-1. Add the function to `template_utils.py`, with tests in `tests/test_template_utils.py`.
+1. Add the function to `template_utils.py`, with tests in `tests/unit/test_template_utils.py`.
 2. Register it in `web_renderer.py:make_web_environment`.
 3. Mark HTML output as safe (`Markup`) only after escaping its input.

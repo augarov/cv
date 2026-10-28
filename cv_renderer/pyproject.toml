@@ -109,9 +109,6 @@ addopts = [
     "--verbose",
 ]
 pythonpath = ["src"]
-markers = [
-    "integration: builds whole CVs end to end (deselect with '-m \"not integration\"')",
-]
 
 [tool.coverage.run]
 source = ["src"]

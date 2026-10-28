@@ -10,7 +10,7 @@ from rendercv.renderer.templater.templater import render_full_template
 
 from cv_renderer.inputs import InputError, load_cv, load_website
 
-FIXTURES = Path(__file__).parent / "fixtures"
+FIXTURES = Path(__file__).parents[1] / "fixtures"
 
 
 def _paths(option: str, path: Path) -> dict[str, Any]:

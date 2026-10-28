@@ -2,12 +2,10 @@
 
 from pathlib import Path
 
-import pytest
-
 from cv_renderer.app import run
 
-FIXTURES = Path(__file__).parent / "fixtures"
-TEMPLATES = Path(__file__).parents[2] / "templates" / "web"
+FIXTURES = Path(__file__).parents[1] / "fixtures"
+TEMPLATES = Path(__file__).parents[3] / "templates" / "web"
 SOURCE_DATE_EPOCH = "1893542400"  # 2030-01-02 UTC
 WEB_OUTPUTS = {"index.html": "index.html.j2", "sitemap.xml": "sitemap.xml.j2"}
 OUTPUTS = ["cv.typ", "cv.pdf", *WEB_OUTPUTS]
@@ -36,7 +34,6 @@ def _build(folder: Path) -> None:
         assert run(["-s", "web", *cv_inputs, *web]) == 0
 
 
-@pytest.mark.integration
 def test_same_source_date_gives_identical_outputs(tmp_path, monkeypatch):
     """Test that two builds in different folders are byte-identical."""
     monkeypatch.setenv("SOURCE_DATE_EPOCH", SOURCE_DATE_EPOCH)

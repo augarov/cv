@@ -15,7 +15,7 @@ from PIL import Image
 from cv_renderer.inputs import InputError, load_cv, load_website
 from cv_renderer.web_renderer import make_web_environment, render_web
 
-FIXTURES = Path(__file__).parent / "fixtures"
+FIXTURES = Path(__file__).parents[1] / "fixtures"
 SOURCE = "{{ value }}"
 
 
@@ -144,8 +144,8 @@ class TestTemplateErrorLine:
             render_web(model, website, template, tmp_path / "page.html")
 
 
-TEMPLATES = Path(__file__).parents[2] / "templates" / "web"
-SITE = Path(__file__).parents[2] / "gh-pages"
+TEMPLATES = Path(__file__).parents[3] / "templates" / "web"
+SITE = Path(__file__).parents[3] / "gh-pages"
 # Website files rendered by stage 1 rather than kept in gh-pages/ (the
 # Makefile's WEB_FILES), relative to the site root
 RENDERED_SITE_FILES = {"img/favicon/site.webmanifest", "cv.pdf", "sitemap.xml"}

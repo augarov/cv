@@ -12,7 +12,7 @@ rendercv owns the schema, validation and the PDF (Typst). Don't re-implement any
 
 ### Keep the rendercv surface small
 
-rendercv has no documented Python API, so every import from it is internal. Each import lives in one module (listed in CLAUDE.md) and is checked by `tests/test_rendercv_contract.py`. A new import, or a template relying on a model attribute beyond the plain schema, gets a contract test in the same change.
+rendercv has no documented Python API, so every import from it is internal. Each import lives in one module (listed in CLAUDE.md) and is checked by `tests/unit/test_rendercv_contract.py`. A new import, or a template relying on a model attribute beyond the plain schema, gets a contract test in the same change.
 
 ### Trust library guarantees — no redundant validation
 

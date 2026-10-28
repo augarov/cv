@@ -53,6 +53,10 @@ jobs:
         run: |
           make test-renderer
 
+      - name: ✅ Run integration tests ✅
+        run: |
+          make test-renderer-integration
+
       - name: ✅ Run website unit tests ✅
         run: |
           make test-website-unit
