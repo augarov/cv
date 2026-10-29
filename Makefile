@@ -15,6 +15,7 @@ PDF_OUT_DIR = $(BUILD_DIR)/pdf
 WEB_OUT_DIR = $(BUILD_DIR)/web
 RELEASE_DIR = $(BUILD_DIR)/release
 DOWNLOADS_DIR = $(BASE_DIR)/downloads
+SCRIPTS_DIR = $(BASE_DIR)/scripts
 
 # Python setup: uv keeps the project's venv at the root instead of in
 # cv_renderer/, and installs the Python of cv_renderer/.python-version itself
@@ -132,6 +133,7 @@ endif
 # Commands
 ENTER_RENDERER_DIR = cd $(RENDERER_DIR)
 ENTER_WEBSITE_DIR  = cd $(WEBSITE_DIR)
+CHECK_DEPS = $(SCRIPTS_DIR)/check-deps.sh
 RENDERER = $(ENTER_RENDERER_DIR) && \
 	$(if $(SOURCE_DATE_EPOCH),SOURCE_DATE_EPOCH=$(SOURCE_DATE_EPOCH) )uv run --locked python -m cv_renderer
 
@@ -143,6 +145,7 @@ RENDERER = $(ENTER_RENDERER_DIR) && \
         render-typst render-web \
         build-cv build-pdf build-website build-website-from-bundle build-release \
         test-renderer test-renderer-unit test-renderer-integration test-website-unit test-website-dist test-website-dist-from-bundle \
+        check-deps check-deps-python check-deps-node \
         install-deps-node install-deps-python install-deps-node-frozen \
         preview-website-prod preview-website-dev \
         clear-cv clear-deps-node clear-deps-python clear-all \
@@ -172,6 +175,9 @@ help :
 	$(PRINT_TARGET_HELP)   "test-website-unit"           "run unit tests of the website scripts"
 	$(PRINT_TARGET_HELP)   "test-website-dist"           "check the built website files in gh-pages/dist"
 	$(PRINT_TARGET_HELP)   "test-website-dist-from-bundle" "check the website built from the release bundle"
+	$(PRINT_TARGET_HELP)   "check-deps"                  "check the tools of both stages"
+	$(PRINT_TARGET_HELP)   "check-deps-python"           "check the tools of the PDF build (git, uv)"
+	$(PRINT_TARGET_HELP)   "check-deps-node"             "check the tools of the website (git, git-lfs, Node.js, pnpm)"
 	$(PRINT_TARGET_HELP)   "install-deps-node"           "install Node.js dependencies"
 	$(PRINT_TARGET_HELP)   "install-deps-node-frozen"    "install Node.js dependencies (frozen)"
 	$(PRINT_TARGET_HELP)   "install-deps-python"         "install Python dependencies with uv"
@@ -222,6 +228,17 @@ test-website-dist : $(WEBSITE_BUILD_MARKER) $(MODULES_MARKER)
 # CI: the same checks on the website built from the release bundle
 test-website-dist-from-bundle : $(WEBSITE_BUILD_FROM_BUNDLE_MARKER) $(MODULES_FROZEN_MARKER)
 	$(ENTER_WEBSITE_DIR) && pnpm run test:dist
+
+# The dependency markers take these as order-only prerequisites, so every
+# target that runs uv or pnpm checks first (once per make run), and a check
+# never makes anything out of date
+check-deps : check-deps-python check-deps-node
+
+check-deps-python :
+	$(CHECK_DEPS) python
+
+check-deps-node :
+	$(CHECK_DEPS) node
 
 install-deps-node : $(MODULES_MARKER)
 
@@ -330,16 +347,16 @@ $(WEBSITE_BUILD_FROM_BUNDLE_MARKER) : $(WEBSITE_BUNDLE_ARCHIVE) $(WEBSITE_SOURCE
 
 # ── Python / Node deps ────────────────────────────────────────────────────
 
-$(MODULES_MARKER) : $(PACKAGE_JSON)
+$(MODULES_MARKER) : $(PACKAGE_JSON) | check-deps-node
 	$(ENTER_WEBSITE_DIR) && pnpm install
 	touch $(MODULES_MARKER)
 
-$(MODULES_FROZEN_MARKER) : $(PACKAGE_JSON) $(PNPM_LOCK_FILE)
+$(MODULES_FROZEN_MARKER) : $(PACKAGE_JSON) $(PNPM_LOCK_FILE) | check-deps-node
 	$(ENTER_WEBSITE_DIR) && pnpm install --frozen-lockfile
 	touch $(MODULES_FROZEN_MARKER)
 	touch $(MODULES_MARKER)
 
 # uv creates the venv, and recreates it when the Python version changes
-$(PYTHON_DEPS_MARKER) : $(PYPROJECT_TOML) $(UV_LOCK_FILE) $(PYTHON_VERSION_FILE)
+$(PYTHON_DEPS_MARKER) : $(PYPROJECT_TOML) $(UV_LOCK_FILE) $(PYTHON_VERSION_FILE) | check-deps-python
 	$(ENTER_RENDERER_DIR) && uv sync --locked
 	touch $(PYTHON_DEPS_MARKER)
