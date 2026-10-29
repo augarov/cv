@@ -13,7 +13,7 @@
 
 The CV is written in [rendercv](https://docs.rendercv.com/)'s YAML format in `cv/`; rendercv renders the PDF with Typst, and the same data renders the website.
 
-Requirements: Python 3.12 and, for the website, Node.js with pnpm.
+Requirements: [uv](https://docs.astral.sh/uv/) (it installs the Python of `cv_renderer/.python-version` itself) and, for the website, Node.js with pnpm.
 
 ```bash
 make all                    # PDF in build/pdf/, website in gh-pages/dist/, release in build/release/

@@ -44,11 +44,11 @@ All non-file targets must be listed in `.PHONY`, and in the `help` target.
 Use hidden `.stamp` files to prevent re-running expensive setup operations:
 
 ```makefile
-VENV_MARKER = $(VENV_DIR)/.setup-env-python.stamp
+PYTHON_DEPS_MARKER = $(VENV_DIR)/.install-deps-python.stamp
 
-$(VENV_MARKER) :
-	python3 -m venv $(VENV_DIR)
-	touch $(VENV_MARKER)
+$(PYTHON_DEPS_MARKER) : $(PYPROJECT_TOML) $(UV_LOCK_FILE) $(PYTHON_VERSION_FILE)
+	$(ENTER_RENDERER_DIR) && uv sync --locked
+	touch $(PYTHON_DEPS_MARKER)
 ```
 
 ### File organization order
