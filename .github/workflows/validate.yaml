@@ -38,17 +38,18 @@ jobs:
           key: pnpm-store-${{ runner.os }}-${{ hashFiles('gh-pages/pnpm-lock.yaml') }}
           restore-keys: pnpm-store-${{ runner.os }}-
 
-      - name: 🐍 Set up Python 🐍
-        uses: actions/setup-python@v7
+      # uv installs the Python of cv_renderer/.python-version itself
+      - name: 🐍 Set up uv 🐍
+        uses: astral-sh/setup-uv@v10.3.3
         with:
-          python-version: "3.12"
+          version-file: cv_renderer/pyproject.toml
 
       - name: 📦 Install pnpm dependencies 📦
         shell: bash
         run: |
           make install-deps-node-frozen
 
-      - name: 📦 Install poetry dependencies 📦
+      - name: 📦 Install Python dependencies 📦
         run: |
           make install-deps-python
 

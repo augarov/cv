@@ -16,10 +16,18 @@ WEB_OUT_DIR = $(BUILD_DIR)/web
 RELEASE_DIR = $(BUILD_DIR)/release
 DOWNLOADS_DIR = $(BASE_DIR)/downloads
 
-# Python setup
+# Python setup: uv keeps the project's venv at the root instead of in
+# cv_renderer/, and installs the Python of cv_renderer/.python-version itself
+# (never the system's, so local and CI builds use the same one). Its cache and
+# Pythons stay in the repo, like pnpm's store; CI sets its own cache.
 VENV_DIR = $(BASE_DIR)/.venv
 PYPROJECT_TOML = $(RENDERER_DIR)/pyproject.toml
-POETRY_LOCK_FILE = $(RENDERER_DIR)/poetry.lock
+UV_LOCK_FILE = $(RENDERER_DIR)/uv.lock
+PYTHON_VERSION_FILE = $(RENDERER_DIR)/.python-version
+export UV_PROJECT_ENVIRONMENT = $(VENV_DIR)
+export UV_PYTHON_PREFERENCE = only-managed
+export UV_CACHE_DIR ?= $(BASE_DIR)/.uv-cache
+export UV_PYTHON_INSTALL_DIR ?= $(BASE_DIR)/.uv-python
 
 # Node setup
 NODE_MODULES_DIR = $(WEBSITE_DIR)/node_modules
@@ -115,7 +123,6 @@ WEBSITE_BUILD_MARKER              = $(BUILD_DIR)/.build-website.stamp
 WEBSITE_BUILD_FROM_BUNDLE_MARKER  = $(BUILD_DIR)/.build-website-from-bundle.stamp
 MODULES_MARKER                    = $(NODE_MODULES_DIR)/.install-deps-node.stamp
 MODULES_FROZEN_MARKER             = $(NODE_MODULES_DIR)/.install-deps-node-frozen.stamp
-VENV_MARKER                       = $(VENV_DIR)/.setup-env-python.stamp
 PYTHON_DEPS_MARKER                = $(VENV_DIR)/.install-deps-python.stamp
 
 ifneq ($(BUILD_PARAMS),$(shell cat $(BUILD_PARAMS_STAMP) 2>/dev/null))
@@ -123,11 +130,10 @@ $(shell rm -f $(BUILD_PARAMS_STAMP))
 endif
 
 # Commands
-ACTIVATE_VENV    = . $(VENV_DIR)/bin/activate
-ENTER_RENDERER_DIR = $(ACTIVATE_VENV) && cd $(RENDERER_DIR)
+ENTER_RENDERER_DIR = cd $(RENDERER_DIR)
 ENTER_WEBSITE_DIR  = cd $(WEBSITE_DIR)
 RENDERER = $(ENTER_RENDERER_DIR) && \
-	$(if $(SOURCE_DATE_EPOCH),SOURCE_DATE_EPOCH=$(SOURCE_DATE_EPOCH) )poetry run python -m cv_renderer
+	$(if $(SOURCE_DATE_EPOCH),SOURCE_DATE_EPOCH=$(SOURCE_DATE_EPOCH) )uv run --locked python -m cv_renderer
 
 ######################################################################
 #                             TARGETS                                #
@@ -168,7 +174,7 @@ help :
 	$(PRINT_TARGET_HELP)   "test-website-dist-from-bundle" "check the website built from the release bundle"
 	$(PRINT_TARGET_HELP)   "install-deps-node"           "install Node.js dependencies"
 	$(PRINT_TARGET_HELP)   "install-deps-node-frozen"    "install Node.js dependencies (frozen)"
-	$(PRINT_TARGET_HELP)   "install-deps-python"         "install Python dependencies with Poetry"
+	$(PRINT_TARGET_HELP)   "install-deps-python"         "install Python dependencies with uv"
 	$(PRINT_TARGET_HELP)   "preview-website-prod"        "preview website in production mode"
 	$(PRINT_TARGET_HELP)   "preview-website-dev"         "preview website in development mode"
 	$(PRINT_TARGET_HELP)   "clear-cv"                    "remove built CV files"
@@ -193,17 +199,18 @@ build-website-from-bundle : $(WEBSITE_BUILD_FROM_BUNDLE_MARKER)
 build-release : $(RELEASE_OUTPUTS)
 
 validate-pre-commit : $(PYTHON_DEPS_MARKER) $(MODULES_MARKER)
-	$(ACTIVATE_VENV) && pre-commit run --all-files
+	# From the root, where pre-commit runs: --project finds the venv without a cd
+	uv run --project $(RENDERER_DIR) --locked pre-commit run --all-files
 
 test-renderer : test-renderer-unit test-renderer-integration
 
 # One module at a time, on the fixtures
 test-renderer-unit : $(PYTHON_DEPS_MARKER)
-	$(ENTER_RENDERER_DIR) && poetry run pytest tests/unit
+	$(ENTER_RENDERER_DIR) && uv run --locked pytest tests/unit
 
 # Whole builds through the CLI: every real CV (cv/, local/*/) and reproducibility
 test-renderer-integration : $(PYTHON_DEPS_MARKER)
-	$(ENTER_RENDERER_DIR) && poetry run pytest tests/integration
+	$(ENTER_RENDERER_DIR) && uv run --locked pytest tests/integration
 
 test-website-unit : $(MODULES_MARKER)
 	$(ENTER_WEBSITE_DIR) && pnpm run test:unit
@@ -332,12 +339,7 @@ $(MODULES_FROZEN_MARKER) : $(PACKAGE_JSON) $(PNPM_LOCK_FILE)
 	touch $(MODULES_FROZEN_MARKER)
 	touch $(MODULES_MARKER)
 
-$(PYTHON_DEPS_MARKER) : $(VENV_MARKER) $(PYPROJECT_TOML) $(POETRY_LOCK_FILE)
-	$(ENTER_RENDERER_DIR) && poetry install
+# uv creates the venv, and recreates it when the Python version changes
+$(PYTHON_DEPS_MARKER) : $(PYPROJECT_TOML) $(UV_LOCK_FILE) $(PYTHON_VERSION_FILE)
+	$(ENTER_RENDERER_DIR) && uv sync --locked
 	touch $(PYTHON_DEPS_MARKER)
-
-$(VENV_MARKER) :
-	python3 -m venv $(VENV_DIR)
-	$(ACTIVATE_VENV) && pip install --upgrade pip
-	$(ACTIVATE_VENV) && pip install poetry
-	touch $(VENV_MARKER)

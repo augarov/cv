@@ -4,7 +4,7 @@ version = "2.0.0"
 description = "Render a rendercv CV to Typst, PDF and website files"
 authors = [{name = "Anton Ugarov", email = "augarov.swe@gmail.com"}]
 readme = "README.md"
-requires-python = ">=3.12,<4.0"
+requires-python = ">=3.14,<4.0"
 dependencies = [
     # rendercv's Python API is internal: patch updates only (see CLAUDE.md)
     "rendercv[full]>=2.8,<2.9",
@@ -29,17 +29,18 @@ dev = [
     "types-PyYAML>=6.0.12,<7",
 ]
 
-[tool.poetry]
-packages = [{include = "cv_renderer", from = "src"}]
+# The uv that wrote uv.lock, or newer (setup-uv in CI reads it too)
+[tool.uv]
+required-version = ">=0.13.6"
 
 [build-system]
-requires = ["poetry-core>=2.0.0,<3.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["uv_build>=0.13.6,<0.14"]
+build-backend = "uv_build"
 
 # Development tools configuration
 [tool.black]
 line-length = 88
-target-version = ['py312']
+target-version = ['py314']
 include = '\.pyi?$'
 extend-exclude = '''
 /(
@@ -64,7 +65,7 @@ line_length = 88
 known_first_party = ["cv_renderer"]
 
 [tool.mypy]
-python_version = "3.12"
+python_version = "3.14"
 warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = true

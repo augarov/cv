@@ -55,10 +55,11 @@ jobs:
           # Full history: the build date is the last commit that changed cv/
           fetch-depth: 0
 
-      - name: 🐍 Set up Python 🐍
-        uses: actions/setup-python@v7
+      # uv installs the Python of cv_renderer/.python-version itself
+      - name: 🐍 Set up uv 🐍
+        uses: astral-sh/setup-uv@v10.3.3
         with:
-          python-version: "3.12"
+          version-file: cv_renderer/pyproject.toml
 
       - name: 📦 Install cv_renderer dependencies 📦
         run: |

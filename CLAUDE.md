@@ -8,12 +8,12 @@ A CV/résumé build. The CV data is in [rendercv](https://github.com/rendercv/re
 
 ## Build commands
 
-All orchestration goes through `make`. Prefer `make` targets over direct `poetry run`, `pnpm`, or `pre-commit` invocations. Python deps require Poetry inside a venv (`.venv`); Node deps use pnpm inside `gh-pages/`.
+All orchestration goes through `make`. Prefer `make` targets over direct `uv`, `pnpm`, or `pre-commit` invocations. Python deps are managed by uv (`cv_renderer/uv.lock`) in the root `.venv`, with the Python of `cv_renderer/.python-version` (3.14), which uv installs itself; uv's cache and Pythons are in the repo (`.uv-cache/`, `.uv-python/`, ignored). The Makefile sets the `UV_*` variables for this, so a bare `uv run` in `cv_renderer/` would create a second venv: go through `make`, or activate `.venv`. Node deps use pnpm inside `gh-pages/`.
 
-Prefer `make all` for full builds rather than running individual targets. Use `make clear-cv` to remove the build outputs before a clean rebuild. Use `make test-renderer` (all), `make test-renderer-unit` or `make test-renderer-integration` to run Python tests rather than invoking `poetry run pytest` directly.
+Prefer `make all` for full builds rather than running individual targets. Use `make clear-cv` to remove the build outputs before a clean rebuild. Use `make test-renderer` (all), `make test-renderer-unit` or `make test-renderer-integration` to run Python tests rather than invoking `pytest` directly.
 
 ```bash
-make install-deps-python      # set up .venv and install Poetry deps
+make install-deps-python      # uv sync: .venv with Python and the locked deps
 make install-deps-node        # install pnpm deps for gh-pages
 
 make render-typst             # build/pdf/cv.typ
@@ -40,7 +40,7 @@ make validate-pre-commit      # run pre-commit on all files
 Run a single Python test:
 
 ```bash
-. .venv/bin/activate && cd cv_renderer && poetry run pytest tests/unit/test_template_utils.py::test_name -v
+. .venv/bin/activate && cd cv_renderer && pytest tests/unit/test_template_utils.py::test_name -v
 ```
 
 ## Architecture
