@@ -107,11 +107,7 @@ WEBSITE_DIST = $(WEBSITE_DIR)/dist
 # library (public/pdfjs/build) links to node_modules. The versions must match.
 PDFJS_VIEWER = $(WEBSITE_DIR)/public/pdfjs/web/viewer.mjs
 PDFJS_PACKAGE = $(NODE_MODULES_DIR)/pdfjs-dist/package.json
-CHECK_PDFJS_VERSION = \
-	version=$$(node -p "require('$(PDFJS_PACKAGE)').version") && \
-	grep -q "pdfjsVersion = $$version$$" $(PDFJS_VIEWER) || { \
-		echo "pdfjs-dist $$version doesn't match the viewer in public/pdfjs/web/;" \
-			"see .claude/skills/pdfjs-customization" >&2; exit 1; }
+CHECK_PDFJS_VERSION = $(SCRIPTS_DIR)/check-pdfjs-version.sh $(PDFJS_PACKAGE) $(PDFJS_VIEWER)
 
 # CI downloads
 WEBSITE_BUNDLE_ARCHIVE = $(DOWNLOADS_DIR)/gh-pages-bundle.tar.gz
