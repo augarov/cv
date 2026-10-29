@@ -51,6 +51,8 @@ $(PYTHON_DEPS_MARKER) : $(PYPROJECT_TOML) $(UV_LOCK_FILE) $(PYTHON_VERSION_FILE)
 	touch $(PYTHON_DEPS_MARKER)
 ```
 
+Setup markers take the tool check of their stage as an order-only prerequisite (`| check-deps-python`, `| check-deps-node`): the phony check runs once per make run before anything that uses the tools, and never makes the marker out of date. A new tool goes into `scripts/check-deps.sh` (its minimum read from the project file that defines it), not into a recipe.
+
 ### File organization order
 
 1. Section: VARIABLES (with `######` banner comments)

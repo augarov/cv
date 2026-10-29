@@ -17,6 +17,7 @@ on:
       - "cv_renderer/**"
       - "gh-pages/**"
       - "Makefile"
+      - "scripts/**"
 
   # Builds both stages without releasing or deploying; the PDF and the bundle
   # are a workflow artifact
@@ -29,6 +30,7 @@ on:
       - "cv_renderer/**"
       - "gh-pages/**"
       - "Makefile"
+      - "scripts/**"
 
   workflow_dispatch:
     inputs:
