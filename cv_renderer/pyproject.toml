@@ -19,10 +19,8 @@ dependencies = [
 [dependency-groups]
 dev = [
     "pytest>=9.1,<10",
-    "black>=26.10,<27",
-    "isort>=9.0,<10",
     "mypy>=2.4,<3",
-    "flake8>=7.4,<8",
+    "ruff>=0.17.3,<0.18",
     "pytest-cov>=7.1,<8",
     "pre-commit>=4.7,<5",
     "bandit>=1.9,<2",
@@ -38,31 +36,23 @@ requires = ["uv_build>=0.13.6,<0.14"]
 build-backend = "uv_build"
 
 # Development tools configuration
-[tool.black]
+# Ruff: the linter and formatter (in place of flake8 with flake8-docstrings,
+# isort and black). The Python version comes from requires-python; the
+# default excludes cover .venv, build and the caches.
+[tool.ruff]
 line-length = 88
-target-version = ['py314']
-include = '\.pyi?$'
-extend-exclude = '''
-/(
-  # directories
-  \.eggs
-  | \.git
-  | \.hg
-  | \.mypy_cache
-  | \.tox
-  | \.venv
-  | _build
-  | buck-out
-  | build
-  | dist
-)/
-'''
 
-[tool.isort]
-profile = "black"
-multi_line_output = 3
-line_length = 88
-known_first_party = ["cv_renderer"]
+[tool.ruff.lint]
+# flake8's defaults (pycodestyle E / W, pyflakes F), flake8-docstrings (D)
+# and isort (I)
+select = ["E", "W", "F", "D", "I"]
+
+[tool.ruff.lint.pydocstyle]
+# flake8-docstrings' default
+convention = "pep257"
+
+[tool.ruff.lint.isort]
+known-first-party = ["cv_renderer"]
 
 [tool.mypy]
 python_version = "3.14"

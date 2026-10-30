@@ -29,35 +29,28 @@ repos:
     hooks:
       - id: shellcheck
 
-  # Python formatting with black
-  - repo: https://github.com/psf/black
-    rev: 26.10.1
-    hooks:
-      - id: black
-        files: ^cv_renderer/
-        language_version: python3
-
-  # Import sorting with isort
-  - repo: https://github.com/pycqa/isort
-    rev: 9.0.2
-    hooks:
-      - id: isort
-        files: ^cv_renderer/
-        args: ["--profile", "black"]
-
-  # Linting with flake8
-  - repo: https://github.com/pycqa/flake8
-    rev: 7.4.1
-    hooks:
-      - id: flake8
-        files: ^cv_renderer/
-        additional_dependencies: [flake8-docstrings]
-        args: ["--config", "cv_renderer/.flake8"]
-
-  # Type checking with mypy from the project venv, so installed packages
-  # bring their own type hints (needs `make install-deps-python` first)
+  # Python tools from the project venv (needs `make install-deps-python`
+  # first): their versions come from uv.lock, and mypy sees the installed
+  # packages' type hints
   - repo: local
     hooks:
+      # Lint (pyflakes, pycodestyle, docstrings) and sort imports, then
+      # format; both read [tool.ruff] in cv_renderer/pyproject.toml
+      - id: ruff-check
+        name: ruff check (project venv)
+        entry: .venv/bin/ruff check --fix --force-exclude
+        language: system
+        files: ^cv_renderer/
+        types_or: [python, pyi]
+        require_serial: true
+      - id: ruff-format
+        name: ruff format (project venv)
+        entry: .venv/bin/ruff format --force-exclude
+        language: system
+        files: ^cv_renderer/
+        types_or: [python, pyi]
+        require_serial: true
+      # Type checking
       - id: mypy
         name: mypy (project venv)
         entry: .venv/bin/mypy --config-file=cv_renderer/pyproject.toml cv_renderer/src cv_renderer/tests

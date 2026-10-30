@@ -200,8 +200,8 @@ build-website-from-bundle : $(WEBSITE_BUILD_FROM_BUNDLE_MARKER)
 
 build-release : $(RELEASE_OUTPUTS)
 
+# From the root, where pre-commit runs: --project finds the venv without a cd
 validate-pre-commit : $(PYTHON_DEPS_MARKER) $(MODULES_MARKER)
-	# From the root, where pre-commit runs: --project finds the venv without a cd
 	uv run --project $(RENDERER_DIR) --locked pre-commit run --all-files
 
 test-renderer : test-renderer-unit test-renderer-integration
