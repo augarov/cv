@@ -27,9 +27,11 @@ dev = [
     "types-PyYAML>=6.0.12,<7",
 ]
 
-# The uv that wrote uv.lock, or newer (setup-uv in CI reads it too)
+# The oldest uv this project works with (setup-uv in CI reads it too). Kept at
+# Dependabot's uv, which lags behind uv releases: its uv updates fail when this
+# is above its version. Raise it only when a feature needs it.
 [tool.uv]
-required-version = ">=0.13.6"
+required-version = ">=0.13.5"
 
 [build-system]
 requires = ["uv_build>=0.13.6,<0.14"]
