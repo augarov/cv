@@ -102,8 +102,8 @@ Vite-based static site. Receives the rendered files from `build/web/` before the
 
 ## Code style (Python)
 
-- Black (88-char line length), isort with black profile, flake8 with docstrings, mypy strict, bandit security scan — all enforced via pre-commit.
-- The mypy hook runs `.venv/bin/mypy` from the project venv (so installed packages bring their own type hints), checking `src/` and `tests/`. Run `make install-deps-python` first, also in a new worktree; otherwise the hook fails with "executable not found".
+- Ruff (`[tool.ruff]` in `cv_renderer/pyproject.toml`): `ruff format` (black's style, 88-char lines) and `ruff check` with pyflakes, pycodestyle, pep257 docstrings and isort's import order; mypy strict; bandit security scan — all enforced via pre-commit.
+- The Ruff and mypy hooks run `.venv/bin/ruff` / `.venv/bin/mypy` from the project venv: their versions come from `uv.lock` (no hook `rev` to keep in sync), and mypy sees the installed packages' type hints, checking `src/` and `tests/`. Run `make install-deps-python` first, also in a new worktree; otherwise the hooks fail with "executable not found".
 - Full type annotations required; mypy is configured strictly (`disallow_untyped_defs`, `warn_return_any`, etc.).
 
 ## Adding a website filter

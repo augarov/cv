@@ -13,7 +13,7 @@
   "files.insertFinalNewline": true,
   // Python formatting and linting configuration to match pre-commit
   "[python]": {
-    "editor.defaultFormatter": "ms-python.black-formatter",
+    "editor.defaultFormatter": "charliermarsh.ruff",
     "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
       "source.organizeImports": "explicit"
@@ -40,8 +40,6 @@
   "[yml]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-  "isort.check": true,
-  "flake8.args": ["--config", "${workspaceFolder}/cv_renderer/.flake8"],
   "mypy-type-checker.args": [
     "--config-file=${workspaceFolder}/cv_renderer/pyproject.toml"
   ],
