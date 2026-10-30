@@ -1,6 +1,7 @@
-# Version updates as pull requests, one per ecosystem and month: each group
-# bundles that ecosystem's updates. The cooldown leaves a release a week to be
-# yanked before a PR proposes it.
+# Version updates as pull requests, monthly: each group bundles that
+# ecosystem's updates. For uv and npm the groups take minor and patch updates
+# only, so each major update gets a PR of its own. The cooldown leaves a release
+# a week to be yanked before a PR proposes it.
 version: 2
 
 updates:
@@ -13,6 +14,7 @@ updates:
     groups:
       python:
         patterns: ["*"]
+        update-types: ["minor", "patch"]
     ignore:
       # rendercv's Python API is internal: patch updates only (see CLAUDE.md)
       - dependency-name: rendercv
@@ -28,6 +30,7 @@ updates:
     groups:
       node:
         patterns: ["*"]
+        update-types: ["minor", "patch"]
     ignore:
       # The viewer in gh-pages/public/pdfjs/ is upgraded with it, by hand
       # (pdfjs-customization skill)
