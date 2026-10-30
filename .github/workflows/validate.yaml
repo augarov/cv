@@ -31,13 +31,15 @@ jobs:
           node-version: "26"
 
       # The store itself, not setup-node's pnpm cache: setup-node asks pnpm for
-      # the store from the repo root, where storeDir in gh-pages/ doesn't apply
+      # the store from the repo root, where storeDir in gh-pages/ doesn't apply.
+      # The store's layout version (.pnpm-store/v11) is in the key, so a pnpm
+      # with a new layout doesn't restore and re-save the old store
       - name: Cache pnpm store
         uses: actions/cache@v6
         with:
           path: .pnpm-store
-          key: pnpm-store-${{ runner.os }}-${{ hashFiles('gh-pages/pnpm-lock.yaml') }}
-          restore-keys: pnpm-store-${{ runner.os }}-
+          key: pnpm-store-v11-${{ runner.os }}-${{ hashFiles('gh-pages/pnpm-lock.yaml') }}
+          restore-keys: pnpm-store-v11-${{ runner.os }}-
 
       # uv installs the Python of cv_renderer/.python-version itself
       - name: 🐍 Set up uv 🐍
