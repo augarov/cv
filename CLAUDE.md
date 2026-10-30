@@ -36,6 +36,7 @@ make check-deps-python        # git, uv (also check-deps-node: git, git-lfs, Nod
 
 - `make all CV_DIR=local/<name>` builds the CV in another folder (default `cv`). `local/` is ignored by git: CVs there never go into the repo.
 - `SOURCE_DATE_EPOCH` sets the build date of the PDF and the website (an explicit `settings.current_date` wins). The Makefile sets it to the last commit that changed `CV_DIR`, or leaves it empty (today) while `CV_DIR` has uncommitted changes. Before stage 1 renders, make prints which date it uses and why (a `::notice` annotation in GitHub Actions). The same inputs and date give byte-identical `build/pdf/` and `build/web/` files (not the release tarball, whose gzip header and file times differ).
+- `PREVIEW_HOST` sets the address the `preview-website-*` servers listen on (default `127.0.0.1`); `make preview-website-prod PREVIEW_HOST=0.0.0.0` makes them reachable through a forwarded port.
 - `make help` lists all targets.
 - `scripts/check-deps.sh python|node` checks that a stage's tools are installed and new enough, with an install hint per problem. The dependency markers take `check-deps-python` / `check-deps-node` as order-only prerequisites, so every target checks its own stage's tools first (CI's stage 2 job has no Python and checks only Node). The minimums live in the project files: uv's in `cv_renderer/pyproject.toml` (`tool.uv.required-version`), Node.js' and pnpm's in `gh-pages/package.json` (`engines`, which pnpm enforces too); the script only reads `>=X.Y.Z`.
 
