@@ -12,20 +12,20 @@
     "pdfjs-dist": "6.4.299"
   },
   "devDependencies": {
-    "@eslint/css": "^0.11.1",
-    "@eslint/js": "^9.39.5",
-    "eslint": "^9.39.5",
-    "globals": "^16.5.0",
+    "@eslint/css": "^2.0.1",
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.13.0",
+    "globals": "^17.13.0",
     "html-minifier-terser": "^7.2.0",
     "html-validate": "^11.17.0",
     "htmlhint": "^1.9.2",
     "pngjs": "^7.0.0",
     "prettier": "^3.9.10",
-    "stylelint": "^16.26.1",
-    "stylelint-config-standard": "^39.0.1",
+    "stylelint": "^17.16.0",
+    "stylelint-config-standard": "^40.0.0",
     "terser": "^5.51.2",
-    "vite": "^7.3.7",
-    "vite-plugin-minify": "^2.1.0"
+    "vite": "^8.3.5",
+    "vite-plugin-minify": "^3.0.0"
   },
   "scripts": {
     "dev": "vite",
