@@ -1,0 +1,44 @@
+# Version updates as pull requests, one per ecosystem and month: each group
+# bundles that ecosystem's updates. The cooldown leaves a release a week to be
+# yanked before a PR proposes it.
+version: 2
+
+updates:
+  - package-ecosystem: uv
+    directory: /cv_renderer
+    schedule:
+      interval: monthly
+    cooldown:
+      default-days: 7
+    groups:
+      python:
+        patterns: ["*"]
+    ignore:
+      # rendercv's Python API is internal: patch updates only (see CLAUDE.md)
+      - dependency-name: rendercv
+        update-types:
+          ["version-update:semver-major", "version-update:semver-minor"]
+
+  - package-ecosystem: npm
+    directory: /gh-pages
+    schedule:
+      interval: monthly
+    cooldown:
+      default-days: 7
+    groups:
+      node:
+        patterns: ["*"]
+    ignore:
+      # The viewer in gh-pages/public/pdfjs/ is upgraded with it, by hand
+      # (pdfjs-customization skill)
+      - dependency-name: pdfjs-dist
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    cooldown:
+      default-days: 7
+    groups:
+      actions:
+        patterns: ["*"]

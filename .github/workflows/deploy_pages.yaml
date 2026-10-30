@@ -41,15 +41,16 @@ jobs:
         with:
           lfs: true
 
+      # The version is packageManager's in gh-pages/package.json, as locally
       - name: Install pnpm
         uses: pnpm/action-setup@v6
         with:
-          version: 10
+          package_json_file: gh-pages/package.json
 
       - name: Setup Node.js
         uses: actions/setup-node@v7
         with:
-          node-version: "22"
+          node-version: "26"
 
       # The store itself, not setup-node's pnpm cache: setup-node asks pnpm for
       # the store from the repo root, where storeDir in gh-pages/ doesn't apply

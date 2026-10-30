@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "CV website built with Vite",
   "type": "module",
+  "packageManager": "pnpm@12.15.0",
   "engines": {
     "node": ">=22.22.0",
     "pnpm": ">=10.6.0"
