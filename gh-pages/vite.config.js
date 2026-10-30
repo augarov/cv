@@ -27,13 +27,6 @@ export default defineConfig({
     // Minify HTML
     minify: "terser",
 
-    // Rollup options for build optimization
-    rollupOptions: {
-      input: {
-        main: "index.html",
-      },
-    },
-
     // Copy additional files that Vite doesn't process automatically
     copyPublicDir: true,
   },
