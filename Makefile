@@ -35,6 +35,10 @@ NODE_MODULES_DIR = $(WEBSITE_DIR)/node_modules
 PNPM_LOCK_FILE = $(WEBSITE_DIR)/pnpm-lock.yaml
 PACKAGE_JSON = $(WEBSITE_DIR)/package.json
 
+# Address the preview servers listen on. Use `make preview-website-prod
+# PREVIEW_HOST=0.0.0.0` to reach them from outside, e.g. through a forwarded port.
+PREVIEW_HOST ?= 127.0.0.1
+
 # CV inputs. Build another CV with `make all CV_DIR=local/<name>` (local/ is
 # ignored by git, for CVs that stay out of the repo).
 # Only cv.yaml is required; design, locale and settings are passed when present.
@@ -243,10 +247,10 @@ install-deps-node-frozen : $(MODULES_FROZEN_MARKER)
 install-deps-python : $(PYTHON_DEPS_MARKER)
 
 preview-website-prod : $(WEBSITE_BUILD_MARKER)
-	$(ENTER_WEBSITE_DIR) && pnpm run preview
+	$(ENTER_WEBSITE_DIR) && pnpm run preview --host $(PREVIEW_HOST)
 
 preview-website-dev : $(SITE_INPUTS_STAMP) $(MODULES_MARKER)
-	$(ENTER_WEBSITE_DIR) && pnpm run dev
+	$(ENTER_WEBSITE_DIR) && pnpm run dev --host $(PREVIEW_HOST)
 
 clear-cv :
 	rm -rf $(BUILD_DIR)
