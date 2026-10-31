@@ -1,7 +1,7 @@
 # Version updates as pull requests, monthly: each group bundles that
-# ecosystem's updates. For uv and npm the groups take minor and patch updates
-# only, so each major update gets a PR of its own. The cooldown leaves a release
-# a week to be yanked before a PR proposes it.
+# ecosystem's updates. For uv, npm and pre-commit the groups take minor and
+# patch updates only, so each major update gets a PR of its own. The cooldown
+# leaves a release a week to be yanked before a PR proposes it.
 version: 2
 
 updates:
@@ -48,3 +48,16 @@ updates:
     groups:
       actions:
         patterns: ["*"]
+
+  # Hook revs in .pre-commit-config.yaml; the local hooks (Ruff, mypy, …) run
+  # from .venv, so uv.lock pins them
+  - package-ecosystem: pre-commit
+    directory: /
+    schedule:
+      interval: monthly
+    cooldown:
+      default-days: 7
+    groups:
+      pre-commit:
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
