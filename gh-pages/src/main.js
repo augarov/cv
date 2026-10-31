@@ -37,12 +37,8 @@ function resolveDownloadButtonLinks(cvUrl) {
   }
 }
 
-function resolveElements() {
-  const base = import.meta.env.BASE_URL;
-  const cvUrl = base + "cv.pdf";
-  resolvePDFViewer(base, cvUrl);
-  resolveDownloadButtonLinks(cvUrl);
-}
+const base = import.meta.env.BASE_URL;
+const cvUrl = base + "cv.pdf";
 
 function testAndShowPDFViewer() {
   let pdfViewerContainer = document.getElementById("pdfViewerContainer");
@@ -74,6 +70,10 @@ function testAndShowPDFViewer() {
   // Enable PDF viewer mode - add class for full-screen styling
   document.body.classList.add("pdf-viewer-mode");
 
+  // Load the viewer only when it's shown: a hidden iframe would still
+  // download pdf.js and the PDF on the accessible page
+  resolvePDFViewer(base, cvUrl);
+
   // Hide accessible container, show PDF viewer
   accessibleContainer.style.display = "none";
   pdfViewerContainer.style.display = "block";
@@ -81,7 +81,7 @@ function testAndShowPDFViewer() {
 }
 
 function main() {
-  resolveElements();
+  resolveDownloadButtonLinks(cvUrl);
 
   document.addEventListener("DOMContentLoaded", testAndShowPDFViewer);
 }
