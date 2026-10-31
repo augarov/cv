@@ -1,44 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { indexTags, metaContent } from "../dist/helpers.js";
-
-// The CV's name, from the built page
-const [author] = metaContent(indexTags, "name", "author");
-
-// WebKit reports a style-src-attr CSP violation for the zoom <select> of the
-// stock viewer.html (line 327 in pdf.js 6.4.299): no script sets a style
-// attribute there, nothing is visibly unstyled, and Chromium and Firefox
-// report nothing, so it's WebKit's own rendering of the <select>
-function isKnownIssue(browserName, message) {
-  return (
-    browserName === "webkit" &&
-    message.location().url.includes("/pdfjs/web/viewer.html") &&
-    message
-      .text()
-      .startsWith("Refused to apply a stylesheet because its hash, its nonce,")
-  );
-}
-
-// Console errors, uncaught exceptions and failed requests of the page and
-// its frames (the viewer runs in an iframe)
-function collectProblems(page, browserName) {
-  const problems = [];
-  page.on("console", (message) => {
-    if (message.type() === "error" && !isKnownIssue(browserName, message)) {
-      problems.push(`console: ${message.text()}`);
-    }
-  });
-  page.on("pageerror", (error) => problems.push(`pageerror: ${error.message}`));
-  page.on("requestfailed", (request) =>
-    problems.push(`failed: ${request.url()} ${request.failure()?.errorText}`),
-  );
-  page.on("response", (response) => {
-    if (response.status() >= 400) {
-      problems.push(`${response.status()}: ${response.url()}`);
-    }
-  });
-  return problems;
-}
+import { author, collectProblems, locale, openViewer } from "./helpers.js";
 
 test("the viewer renders the PDF without errors", async ({
   page,
@@ -46,10 +8,55 @@ test("the viewer renders the PDF without errors", async ({
 }) => {
   const problems = collectProblems(page, browserName);
 
-  await page.goto("./");
-  const viewer = page.frameLocator("#pdfViewerIframe");
-  await expect(viewer.locator(".page").first()).toBeVisible();
+  const { frame, viewer } = await openViewer(page);
   await expect(viewer.locator(".textLayer").first()).toContainText(author);
+  // Every page of the PDF is in the viewer
+  const pagesCount = await frame.evaluate(
+    () => window.PDFViewerApplication.pagesCount,
+  );
+  expect(pagesCount).toBeGreaterThan(0);
+  await expect(viewer.locator(".page")).toHaveCount(pagesCount);
 
   expect(problems).toEqual([]);
+});
+
+test("the viewer uses the site's locale", async ({ page }) => {
+  test.skip(!locale, "website.yaml sets no locale");
+  const ftlRequests = [];
+  page.on("request", (request) => {
+    if (request.url().endsWith("/viewer.ftl")) {
+      ftlRequests.push(new URL(request.url()).pathname);
+    }
+  });
+
+  const { frame } = await openViewer(page);
+
+  // pdf.js 6.4 doesn't set <html lang> in the viewer: its l10n reports the
+  // language, and the site's locale file is what it loaded
+  const language = await frame.evaluate(() =>
+    window.PDFViewerApplication.l10n.getLanguage(),
+  );
+  expect(language).toBe(locale.toLowerCase());
+  expect(ftlRequests).toContainEqual(
+    expect.stringMatching(new RegExp(`/locale/${locale}/viewer\\.ftl$`, "i")),
+  );
+});
+
+// custom.js turns PDF scripting off (CVE-2026-16633): no sandbox is loaded
+test("PDF scripting is off", async ({ page }) => {
+  const sandboxRequests = [];
+  page.on("request", (request) => {
+    if (request.url().includes("pdf.sandbox")) {
+      sandboxRequests.push(request.url());
+    }
+  });
+
+  const { frame } = await openViewer(page);
+
+  expect(
+    await frame.evaluate(() =>
+      window.PDFViewerApplicationOptions.get("enableScripting"),
+    ),
+  ).toBe(false);
+  expect(sandboxRequests).toEqual([]);
 });
