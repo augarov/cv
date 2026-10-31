@@ -49,6 +49,11 @@ build/Release
 
 # Dependency directories
 node_modules/
+# Playwright: browsers (make install-playwright-browsers), results and report
+/.playwright-browsers/
+/gh-pages/test-results/
+/gh-pages/playwright-report/
+
 # pnpm's store for this repo (gh-pages/pnpm-workspace.yaml)
 /.pnpm-store/
 jspm_packages/

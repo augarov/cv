@@ -35,6 +35,14 @@ NODE_MODULES_DIR = $(WEBSITE_DIR)/node_modules
 PNPM_LOCK_FILE = $(WEBSITE_DIR)/pnpm-lock.yaml
 PACKAGE_JSON = $(WEBSITE_DIR)/package.json
 
+# Playwright's browsers for the e2e tests, in the repo like uv's cache; CI
+# caches them. CI also passes PLAYWRIGHT_INSTALL_FLAGS=--with-deps for the
+# system libraries. E2E_ARGS go to `playwright test`, e.g. --project=firefox
+export PLAYWRIGHT_BROWSERS_PATH ?= $(BASE_DIR)/.playwright-browsers
+PLAYWRIGHT_BROWSERS = chromium firefox webkit
+PLAYWRIGHT_INSTALL_FLAGS ?=
+E2E_ARGS ?=
+
 # Address the preview servers listen on. Use `make preview-website-prod
 # PREVIEW_HOST=0.0.0.0` to reach them from outside, e.g. through a forwarded port.
 PREVIEW_HOST ?= 127.0.0.1
@@ -124,6 +132,7 @@ WEBSITE_BUILD_MARKER              = $(BUILD_DIR)/.build-website.stamp
 WEBSITE_BUILD_FROM_BUNDLE_MARKER  = $(BUILD_DIR)/.build-website-from-bundle.stamp
 MODULES_MARKER                    = $(NODE_MODULES_DIR)/.install-deps-node.stamp
 MODULES_FROZEN_MARKER             = $(NODE_MODULES_DIR)/.install-deps-node-frozen.stamp
+PLAYWRIGHT_MARKER                 = $(NODE_MODULES_DIR)/.install-playwright-browsers.stamp
 PYTHON_DEPS_MARKER                = $(VENV_DIR)/.install-deps-python.stamp
 
 ifneq ($(BUILD_PARAMS),$(shell cat $(BUILD_PARAMS_STAMP) 2>/dev/null))
@@ -144,9 +153,9 @@ RENDERER = $(ENTER_RENDERER_DIR) && \
 .PHONY: all help \
         render-typst render-web \
         build-cv build-pdf build-website build-website-from-bundle build-release \
-        test-renderer test-renderer-unit test-renderer-integration test-website-unit test-website-dist test-website-dist-from-bundle \
+        test-renderer test-renderer-unit test-renderer-integration test-website-unit test-website-dist test-website-dist-from-bundle test-website-e2e test-website-e2e-from-bundle \
         check-deps check-deps-python check-deps-node \
-        install-deps-node install-deps-python install-deps-node-frozen \
+        install-deps-node install-deps-python install-deps-node-frozen install-playwright-browsers \
         preview-website-prod preview-website-dev \
         clear-cv clear-deps-node clear-deps-python clear-all \
         validate-pre-commit
@@ -175,12 +184,15 @@ help :
 	$(PRINT_TARGET_HELP)   "test-website-unit"           "run unit tests of the website scripts"
 	$(PRINT_TARGET_HELP)   "test-website-dist"           "check the built website files in gh-pages/dist"
 	$(PRINT_TARGET_HELP)   "test-website-dist-from-bundle" "check the website built from the release bundle"
+	$(PRINT_TARGET_HELP)   "test-website-e2e"            "run the browser tests on the built website (E2E_ARGS for playwright)"
+	$(PRINT_TARGET_HELP)   "test-website-e2e-from-bundle" "run the browser tests on the website built from the release bundle"
 	$(PRINT_TARGET_HELP)   "check-deps"                  "check the tools of both stages"
 	$(PRINT_TARGET_HELP)   "check-deps-python"           "check the tools of the PDF build (git, uv)"
 	$(PRINT_TARGET_HELP)   "check-deps-node"             "check the tools of the website (git, git-lfs, Node.js, pnpm)"
 	$(PRINT_TARGET_HELP)   "install-deps-node"           "install Node.js dependencies"
 	$(PRINT_TARGET_HELP)   "install-deps-node-frozen"    "install Node.js dependencies (frozen)"
 	$(PRINT_TARGET_HELP)   "install-deps-python"         "install Python dependencies with uv"
+	$(PRINT_TARGET_HELP)   "install-playwright-browsers" "install the browsers of the e2e tests"
 	$(PRINT_TARGET_HELP)   "preview-website-prod"        "preview website in production mode"
 	$(PRINT_TARGET_HELP)   "preview-website-dev"         "preview website in development mode"
 	$(PRINT_TARGET_HELP)   "clear-cv"                    "remove built CV files"
@@ -229,6 +241,14 @@ test-website-dist : $(WEBSITE_BUILD_MARKER) $(MODULES_MARKER)
 test-website-dist-from-bundle : $(WEBSITE_BUILD_FROM_BUNDLE_MARKER) $(MODULES_FROZEN_MARKER)
 	$(ENTER_WEBSITE_DIR) && pnpm run test:dist
 
+# Browsers (Playwright) against the site in dist/, served by vite preview
+test-website-e2e : $(WEBSITE_BUILD_MARKER) $(PLAYWRIGHT_MARKER)
+	$(ENTER_WEBSITE_DIR) && pnpm run test:e2e $(E2E_ARGS)
+
+# CI: the same tests on the website built from the release bundle
+test-website-e2e-from-bundle : $(WEBSITE_BUILD_FROM_BUNDLE_MARKER) $(MODULES_FROZEN_MARKER) $(PLAYWRIGHT_MARKER)
+	$(ENTER_WEBSITE_DIR) && pnpm run test:e2e $(E2E_ARGS)
+
 # The dependency markers take these as order-only prerequisites, so every
 # target that runs uv or pnpm checks first (once per make run), and a check
 # never makes anything out of date
@@ -246,6 +266,8 @@ install-deps-node-frozen : $(MODULES_FROZEN_MARKER)
 
 install-deps-python : $(PYTHON_DEPS_MARKER)
 
+install-playwright-browsers : $(PLAYWRIGHT_MARKER)
+
 preview-website-prod : $(WEBSITE_BUILD_MARKER)
 	$(ENTER_WEBSITE_DIR) && pnpm run preview --host $(PREVIEW_HOST)
 
@@ -261,6 +283,7 @@ clear-deps-node :
 	rm -rf $(WEBSITE_DIR)/node_modules
 	rm -f $(MODULES_MARKER)
 	rm -f $(MODULES_FROZEN_MARKER)
+	rm -rf $(PLAYWRIGHT_BROWSERS_PATH)
 
 clear-deps-python :
 	rm -rf $(VENV_DIR)
@@ -350,6 +373,11 @@ $(WEBSITE_BUILD_FROM_BUNDLE_MARKER) : $(WEBSITE_BUNDLE_ARCHIVE) $(WEBSITE_SOURCE
 $(MODULES_MARKER) : $(PACKAGE_JSON) | check-deps-node
 	$(ENTER_WEBSITE_DIR) && pnpm install
 	touch $(MODULES_MARKER)
+
+# Playwright's version, and with it the browsers', comes from node_modules
+$(PLAYWRIGHT_MARKER) : $(MODULES_MARKER) | check-deps-node
+	$(ENTER_WEBSITE_DIR) && pnpm exec playwright install $(PLAYWRIGHT_INSTALL_FLAGS) $(PLAYWRIGHT_BROWSERS)
+	touch $@
 
 $(MODULES_FROZEN_MARKER) : $(PACKAGE_JSON) $(PNPM_LOCK_FILE) | check-deps-node
 	$(ENTER_WEBSITE_DIR) && pnpm install --frozen-lockfile
