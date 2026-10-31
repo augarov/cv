@@ -11,7 +11,12 @@ export default defineConfig([
     languageOptions: { globals: globals.browser },
   },
   {
-    files: ["tests/**/*.js", "vite-plugins/**/*.js", "vite.config.js"],
+    files: [
+      "tests/**/*.js",
+      "vite-plugins/**/*.js",
+      "vite.config.js",
+      "playwright.config.js",
+    ],
     languageOptions: { globals: globals.node },
   },
   {
