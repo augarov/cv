@@ -64,6 +64,13 @@
   inset-inline-start: 0 !important;
 }
 
+/* viewer.css gives the viewer a 350 px minimum width, so a 320 px phone
+   scrolls sideways and the menu button sits off screen; the toolbar, with
+   the items left after hiding the ones above, needs about 250 px */
+#mainContainer {
+  min-width: 0;
+}
+
 /* No editing tools */
 #editorModeButtons,
 #editorModeSeparator {
