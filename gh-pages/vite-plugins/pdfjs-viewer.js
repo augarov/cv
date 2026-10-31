@@ -59,12 +59,17 @@ async function minifyPage(file) {
 }
 
 // Keep en-US (pdf.js's fallback) and the languages pdf.js tries for the
-// site's locale (custom.js's ?locale=): the full tag and its language
+// site's locale (website.yaml's locale, passed as ?locale=): the full tag and
+// its language. Without a locale the viewer follows the browser's language,
+// so every locale stays.
 async function pruneLocales(localeDir) {
+  const lang = getTemplateParams().locale?.toLowerCase();
+  if (!lang) {
+    return;
+  }
   const indexFile = path.join(localeDir, "locale.json");
   const locales = JSON.parse(await readFile(indexFile, "utf8"));
-  const lang = getTemplateParams().locale?.toLowerCase();
-  const wanted = new Set(["en-us", lang, lang?.split("-")[0]]);
+  const wanted = new Set(["en-us", lang, lang.split("-")[0]]);
 
   const kept = Object.fromEntries(
     Object.entries(locales).filter(([key]) => wanted.has(key)),

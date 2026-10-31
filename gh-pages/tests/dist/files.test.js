@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { lstatSync, readdirSync } from "node:fs";
 import { describe, it } from "node:test";
 
+import { getTemplateParams } from "../../src/template_params.js";
 import { distPath, isDistFile, manifest, readDist } from "./helpers.js";
 
 const VIEWER_DIR = "pdfjs/web";
@@ -59,7 +60,12 @@ describe("pdf.js", () => {
     assert.deepEqual(unused, []);
   });
 
-  it("only en-US and the site's locale are left in locale.json", () => {
+  // Without a locale the viewer follows the browser's language: all stay
+  it("only en-US and the site's locale are left in locale.json", (t) => {
+    if (!getTemplateParams().locale) {
+      t.skip("website.yaml sets no locale");
+      return;
+    }
     const locales = JSON.parse(readDist(`${VIEWER_DIR}/locale/locale.json`));
 
     assert.ok(Object.keys(locales).length <= 3, Object.keys(locales).join());
