@@ -11,6 +11,9 @@ updates:
       interval: monthly
     cooldown:
       default-days: 7
+    # Update only uv.lock while pyproject.toml's range allows the new version;
+    # the default raises the lower bound to it
+    versioning-strategy: increase-if-necessary
     groups:
       python:
         patterns: ["*"]
