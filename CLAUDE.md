@@ -100,7 +100,7 @@ rendercv has no documented Python API, so every import from it is internal. It's
 
 ### Website (`gh-pages/`)
 
-Vite-based static site. Receives the rendered files from `build/web/` before the Vite build runs. The PDF is shown with a customized pdf.js viewer (`gh-pages/public/pdfjs/`); the website build fails when the installed `pdfjs-dist` isn't the viewer's version (`scripts/check-pdfjs-version.sh`).
+Vite-based static site. Receives the rendered files from `build/web/` before the Vite build runs. The PDF is shown with a customized pdf.js viewer (`gh-pages/public/pdfjs/`); the website build fails when the installed `pdfjs-dist` isn't the viewer's version (`scripts/check-pdfjs-version.sh`). Vite copies the viewer as is; `vite-plugins/pdfjs-viewer.js` then minifies it in `dist/pdfjs/` and deletes the files it never loads (source maps, unminified builds, sandbox, debugger, other locales).
 
 ## Code style (Python)
 

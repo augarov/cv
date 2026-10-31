@@ -191,6 +191,9 @@ importers:
       htmlhint:
         specifier: ^1.9.2
         version: 1.9.2
+      lightningcss:
+        specifier: ^1.33.0
+        version: 1.33.0
       pngjs:
         specifier: ^7.0.0
         version: 7.0.0

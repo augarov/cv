@@ -1,6 +1,8 @@
 import { defineConfig } from "vite";
 import { ViteMinifyPlugin } from "vite-plugin-minify";
 
+import pdfjsViewer from "./vite-plugins/pdfjs-viewer.js";
+
 export default defineConfig({
   // Set the base path for GitHub Pages deployment
   // This should match your repository name
@@ -13,6 +15,8 @@ export default defineConfig({
       removeComments: true,
       collapseWhitespace: true,
     }),
+    // Minifies and prunes the pdf.js viewer copied from public/pdfjs/
+    pdfjsViewer(),
   ],
 
   // Build configuration
