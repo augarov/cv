@@ -3,6 +3,10 @@
  * under the base path, in desktop browsers and emulated phones. Run through
  * `make test-website-e2e`, which builds the site and installs the browsers.
  */
+import { mkdirSync } from "node:fs";
+import { tmpdir } from "node:os";
+import path from "node:path";
+
 import { defineConfig, devices } from "@playwright/test";
 
 import viteConfig from "./vite.config.js";
@@ -11,6 +15,19 @@ import viteConfig from "./vite.config.js";
 const PORT = 4174;
 const ORIGIN = `http://127.0.0.1:${PORT}`;
 const CI = Boolean(process.env.CI);
+
+// Playwright 1.64's Firefox (firefox-1555) exits at launch on macOS 27 with
+// "Could not find profile folder": it reads the installed Firefox's app data
+// in ~/Library, which macOS now blocks. An empty home of its own avoids that
+// (microsoft/playwright#42768); drop this once Playwright ships Firefox 158+.
+function firefoxLaunchOptions() {
+  if (process.platform !== "darwin") {
+    return {};
+  }
+  const home = path.join(tmpdir(), "cv-playwright-firefox-home");
+  mkdirSync(home, { recursive: true });
+  return { env: { ...process.env, CFFIXED_USER_HOME: home } };
+}
 
 export default defineConfig({
   testDir: "tests/e2e",
@@ -30,7 +47,13 @@ export default defineConfig({
   },
   projects: [
     { name: "chromium", use: { ...devices["Desktop Chrome"] } },
-    { name: "firefox", use: { ...devices["Desktop Firefox"] } },
+    {
+      name: "firefox",
+      use: {
+        ...devices["Desktop Firefox"],
+        launchOptions: firefoxLaunchOptions(),
+      },
+    },
     { name: "webkit", use: { ...devices["Desktop Safari"] } },
     { name: "pixel", use: { ...devices["Pixel 7"] } },
     // iOS 18.7: "iPhone 15" is iOS 17.5, below the viewer's minimum (iOS 18,
