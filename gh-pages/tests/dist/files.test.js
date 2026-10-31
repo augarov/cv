@@ -28,9 +28,10 @@ describe("pdf.js", () => {
   });
 
   it("the worker custom.js sets is there", () => {
+    // Minified: the options argument is renamed
     const customJs = readDist(`${VIEWER_DIR}/custom.js`);
     const [, workerSrc] =
-      customJs.match(/setOption\(\s*options,\s*"workerSrc",\s*"([^"]+)"/) ?? [];
+      customJs.match(/setOption\(\s*\w+,\s*"workerSrc",\s*"([^"]+)"/) ?? [];
 
     assert.ok(workerSrc, "no workerSrc in custom.js");
     assert.ok(isDistFile(`${VIEWER_DIR}/${workerSrc}`), workerSrc);
@@ -47,6 +48,30 @@ describe("pdf.js", () => {
       assert.ok(filesIn(`${VIEWER_DIR}/${dir}`, extension).length > 0);
     });
   }
+
+  // vite-plugins/pdfjs-viewer.js
+  it("files the viewer never loads are left out", () => {
+    const files = readdirSync(distPath("pdfjs"), { recursive: true });
+    const unused = files.filter((f) =>
+      /\.map$|^build\/pdf(\.worker)?\.mjs$|sandbox|debugger|\.d\.mts$/.test(f),
+    );
+
+    assert.deepEqual(unused, []);
+  });
+
+  it("only en-US and the site's locale are left in locale.json", () => {
+    const locales = JSON.parse(readDist(`${VIEWER_DIR}/locale/locale.json`));
+
+    assert.ok(Object.keys(locales).length <= 3, Object.keys(locales).join());
+  });
+
+  it("viewer.mjs is minified and keeps its license and version", () => {
+    const viewer = readDist(`${VIEWER_DIR}/viewer.mjs`);
+
+    assert.ok(viewer.split("\n").length < 100);
+    assert.match(viewer, /@licstart/);
+    assert.match(viewer, /pdfjsVersion = \d/);
+  });
 
   it("the locale files for en-US (the fallback) and the site's locale are there", () => {
     const locales = JSON.parse(readDist(`${VIEWER_DIR}/locale/locale.json`));

@@ -77,7 +77,7 @@ repos:
         entry: bash -c 'realpath "$@" | xargs pnpm -C gh-pages exec eslint --fix --max-warnings=0' --
         language: system
         pass_filenames: true
-        files: ^gh-pages/(src|tests)/.*\.(js|mjs|cjs|jsx|css)$
+        files: ^gh-pages/(src|tests|vite-plugins)/.*\.(js|mjs|cjs|jsx|css)$
 
   # CSS linting with local Stylelint setup
   - repo: local
